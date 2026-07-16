@@ -5,39 +5,75 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/15 11:16:19 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/16 11:49:07 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/07/16 13:35:01 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/07/16 14:55:25 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
+#include "RequestParser.hpp"
 
 #include <iostream>
 #include <string>
 
+
+void test(const std::string &req)
+{
+	RequestParser parser;
+
+	parser.feed(req.c_str(), req.size());
+
+	if (parser.hasError())
+	{
+		std::cout << "ERROR\n";
+		return;
+	}
+
+	if (parser.isComplete())
+	{
+		Request r = parser.getRequest();
+
+		std::cout << r.method << std::endl;
+		std::cout << r.target << std::endl;
+		std::cout << r.version << std::endl;
+	}
+	else
+		std::cout << "INCOMPLETE\n";
+}
+
 int main()
 {
-  RequestParser parser;
+	std::cout << "----- Test 1 -----" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		"\r\n");
 
-std::string req =
-    "GET /index.html HTTP/1.1\r\n"
-    "Host: localhost\r\n"
-    "\r\n";
+	std::cout << "\n----- Test 2 -----" << std::endl;
+	test(
+		"GET /index.html HTTP/1.1\r\n"
+		"Host: localhost\r\n"
+		"\r\n");
 
-parser.feed(req.c_str(), req.size());
+	std::cout << "\n----- Test 3 -----" << std::endl;
+	test(
+		"GET /\r\n"
+		"\r\n");
 
-if (parser.isComplete())
+  return 0;
+}
+
+//TODO Arcadio tiene que hacer
+
+/*while (true)
 {
-    Request r = parser.getRequest();
+	bytes = recv(...);
 
-    std::cout << r.method << std::endl;
-    std::cout << r.target << std::endl;
-    std::cout << r.version << std::endl;
-    std::cout << r.headers["Host"] << std::endl;
-}
+	parser.feed(buffer, bytes);
 
-	return (0);
-}
+	if (parser.isComplete())
+		break;
 
-//TODO Arcadio solo tiene que hacer "parse.feed(buffer, bytes)"
+	if (parser.hasError())
+		break;
+
+	// Esperar otro recv()
+}*/

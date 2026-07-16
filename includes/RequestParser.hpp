@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpRequest.hpp                                    :+:      :+:    :+:   */
+/*   RequestParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/16 11:50:54 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/16 15:08:32 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPREQUEST_HPP
-#define HTTPREQUEST_HPP
+#ifndef REQUESTPARSER_HPP
+#define REQUESTPARSER_HPP
 
 #include <cstddef>
 #include <string>
@@ -21,7 +21,12 @@
 class RequestParser
 {
 	public:
+		// Ortodox Canonical Form
 		RequestParser();
+		RequestParser(const RequestParser &other);
+		RequestParser &operator=(const RequestParser &other);
+		~RequestParser();
+
 
 		void feed(const char *buffer, size_t bytes);
 
