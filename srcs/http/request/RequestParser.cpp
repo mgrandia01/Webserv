@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/16 15:19:18 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/17 12:16:40 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 RequestParser::RequestParser()
 {
 	_state = PARSING_HEADERS;
+	_errorCode = 0;
 	_requestLineParsed = false;
 	_contentLength = 0;
 	_chunked = false;
@@ -31,6 +32,7 @@ RequestParser &RequestParser::operator=(const RequestParser &other)
 	if (this != &other)
 	{
 		_state = other._state;
+		_errorCode = other._errorCode;
 		_stream = other._stream;
 		_request = other._request;
 		_requestLineParsed = other._requestLineParsed;
@@ -46,42 +48,34 @@ RequestParser::~RequestParser()
 
 void RequestParser::reset()
 {
-  //TODO:
-  //
 	_state = PARSING_HEADERS;
-
+	_errorCode = 0;
 	_requestLineParsed = false;
-
 	_stream.clear();
-
 	_request = Request();
-
 	_contentLength = 0;
-
 	_chunked = false;
 }
 
 Request RequestParser::getRequest() const
 {
-  //TODO:
-  //
 	return _request;
 }
+
+int RequestParser::getErrorCode() const
+{
+	return _errorCode;
+}
+
 bool RequestParser::hasError() const
 {
-  //TODO:
-  //
 	return (_state == ERROR);
 }
 
 bool RequestParser::isComplete() const
 {
-  //TODO:
-  //
 	return (_state == COMPLETE);
 }
-
-
 
 void RequestParser::feed(const char *buffer, size_t bytes)
 {

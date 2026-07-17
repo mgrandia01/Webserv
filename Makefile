@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/07/16 15:19:42 by mgrandia         ###   ########.fr        #
+#    Updated: 2026/07/17 12:43:05 by mgrandia         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ DIR_SRC = srcs/
 # ─────────────────────────────────────────────────────────────
 # ARCHIVOS
 # ─────────────────────────────────────────────────────────────
-SRC = main.cpp http/request/RequestParser.cpp http/request/RequestParserHeaders.cpp http/request/RequestParserBody.cpp
+SRC = main.cpp http/request/RequestParser.cpp http/request/RequestParserHeaders.cpp http/request/RequestParserBody.cpp http/request/RequestParserValidation.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 

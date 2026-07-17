@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
+/*																			*/
+/*														:::	  ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/16 13:35:01 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/16 14:55:25 by mgrandia         ###   ########.fr       */
-/*                                                                            */
+/*													+:+ +:+		 +:+	 */
+/*   By: mgrandia <mgrandia@student.42barcelon	  +#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2026/07/16 13:35:01 by mgrandia		  #+#	#+#			 */
+/*   Updated: 2026/07/17 15:04:04 by mgrandia         ###   ########.fr       */
+/*																			*/
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
@@ -19,12 +19,12 @@
 void test(const std::string &req)
 {
 	RequestParser parser;
-
+	//TODO existe la funcion parser.reset(), para poder reutilizar el objeto
 	parser.feed(req.c_str(), req.size());
-
+	
 	if (parser.hasError())
 	{
-		std::cout << "ERROR\n";
+		std::cout << "ERROR " << parser.getErrorCode() << std::endl;
 		return;
 	}
 
@@ -60,6 +60,7 @@ int main()
 
   return 0;
 }
+
 
 //TODO Arcadio tiene que hacer
 

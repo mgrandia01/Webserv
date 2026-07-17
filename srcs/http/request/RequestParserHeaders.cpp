@@ -6,52 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/16 15:17:21 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/17 14:41:26 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
-
-bool RequestParser::parseRequestLine(const std::string &line)
-{
-	size_t firstSpace = line.find(' ');
-
-	if (firstSpace == std::string::npos)
-		return false;
-
-	size_t secondSpace = line.find(' ', firstSpace + 1);
-
-	if (secondSpace == std::string::npos)
-		return false;
-
-	std::string method = line.substr(0, firstSpace);
-
-	std::string target = line.substr(firstSpace + 1, secondSpace - firstSpace - 1);
-
-	std::string version = line.substr(secondSpace + 1);
-
-	// Comprobar que no haya más espacios
-	if (version.find(' ') != std::string::npos)
-		return false;
-
-	// Aquí irán las comprobaciones
-	// if (!isValidMethod(method))
-	//	 return false;
-
-	// if (version != "HTTP/1.1")
-	//	 return false;
-  //
-  //TODO:
-// - Validate supported HTTP methods.
-// - Validate HTTP version.
-// - Validate request-target according to RFC 9112.
-
-	_request.method = method;
-	_request.target = target;
-	_request.version = version;
-
-	return true;
-}
+#include "HttpStatus.hpp"
 
 bool RequestParser::parseHeaderLine(const std::string &line)
 {
@@ -65,6 +25,42 @@ bool RequestParser::parseHeaderLine(const std::string &line)
 	std::string value = line.substr(pos + 1);
 
 	_request.headers[key] = value;
+
+	return true;
+}
+
+
+bool RequestParser::parseRequestLine(const std::string &line)
+{
+	if (!validateRequestLineStructure(line))
+		return false;
+
+	size_t firstSpace = line.find(' ');
+	size_t secondSpace = line.find(' ', firstSpace + 1);
+
+	std::string method = line.substr(0, firstSpace);
+	std::string target = line.substr(firstSpace + 1, secondSpace - firstSpace - 1);
+	std::string version = line.substr(secondSpace + 1);
+
+	// Comprobar que no haya más espacios
+	if (version.find(' ') != std::string::npos)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+
+	if (!validateMethod(method))
+		return false;
+	
+	if(!validateTarget(target))
+		return false;
+
+	if (!validateVersion(version))
+		return false;
+
+	_request.method = method;
+	_request.target = target;
+	_request.version = version;
 
 	return true;
 }
