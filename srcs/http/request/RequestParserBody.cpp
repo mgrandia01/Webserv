@@ -1,23 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpRequest.hpp                                    :+:      :+:    :+:   */
+/*   RequestParserBody.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/15 11:21:02 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/07/16 15:18:28 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/07/16 15:19:16 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPREQUEST_HPP
-#define HTTPREQUEST_HPP
+#include "RequestParser.hpp"
 
-class HttpRequest
+void RequestParser::parseBody()
 {
-	public:
-		HttpRequest();
-		void hello() const;
-};
+  //TODO:
 
-#endif
+	_request.body = _stream;
+	_stream.clear();
+
+	_state = COMPLETE;
+}
+
+

@@ -1,21 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpResponse.cpp                                   :+:      :+:    :+:   */
+/*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/15 11:17:15 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/15 11:21:40 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/07/16 11:47:16 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "HttpResponse.hpp"
-#include <iostream>
+#ifndef REQUEST_HPP
+#define REQUEST_HPP
 
-HttpResponse::HttpResponse() {}
+#include <string>
+#include <map>
 
-void HttpResponse::hello() const
+class Request
 {
-	std::cout << "Hello from HttpResponse!" << std::endl;
-}
+	public:
+		std::string method;
+		std::string target;
+		std::string version;
+
+		std::map<std::string, std::string> headers;
+
+		std::string body;
+};
+
+#endif
