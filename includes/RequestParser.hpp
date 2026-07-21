@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/21 10:49:13 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/21 13:45:44 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ class RequestParser
 		std::string trimWhitespace(const std::string &str);
 		bool parseHeaderLine(const std::string &line);
 		bool parseRequestLine(const std::string &line);
-
+		bool validateHeaders();
 	private:
 
 		enum State

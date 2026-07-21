@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/21 11:01:42 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/21 13:50:58 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,6 @@ std::string RequestParser::trimWhitespace(const std::string &str)
 
 bool RequestParser::parseHeaderLine(const std::string &line)
 {
-  //TODO: que pasa si llega un header duplicado? porque con este tipo de map
-  //se sobreescribe y elimina el primero que llego
-
 	size_t pos = line.find(':');
 
 	if (pos == std::string::npos)
@@ -47,6 +44,8 @@ bool RequestParser::parseHeaderLine(const std::string &line)
 		_errorCode = BAD_REQUEST;
 		return false;
 	}
+	_request.headerOccurrences[key]++; //TODO: gracias a esto podremos ver que pasa 
+					    //con los headers duplicados
 	_request.headers[key] = value;
 
 	return true;
@@ -117,6 +116,12 @@ void RequestParser::parseHeaders()
 
 		if (line.empty())
 		{
+			if (!validateHeaders())
+			{
+				_state = ERROR;
+				return;
+
+			}
 			_state = PARSING_BODY;
 			return;
 		}

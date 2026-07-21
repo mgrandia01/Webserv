@@ -6,13 +6,31 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 12:41:35 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/20 12:05:34 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/21 13:47:40 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 #include "HttpStatus.hpp"
 #include <cctype>
+
+bool RequestParser::validateHeaders()
+{
+	//TODO anyadir una response error de esas?
+	if (_request.headerOccurrences["Host"] != 1)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+
+	/*
+	if (_request.headerOccurrences["Content-Length"] > 1)
+		return false;
+	if (_request.headerOccurrences["Transfer-Encoding"] > 1)
+		return false;
+*/
+	return true;
+}
 
 bool RequestParser::validateTarget(const std::string &target)
 {
