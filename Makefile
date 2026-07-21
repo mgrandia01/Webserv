@@ -16,7 +16,7 @@
 NAME = webserv
 CC = c++
 RM = rm -f
-FLAGS = -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
+FLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address #-g 
 # ─────────────────────────────────────────────────────────────
 # COLORESSSSSS
 # ─────────────────────────────────────────────────────────────
@@ -36,7 +36,7 @@ DIR_SRC = srcs/
 # ─────────────────────────────────────────────────────────────
 # ARCHIVOS
 # ─────────────────────────────────────────────────────────────
-SRC = main.cpp http/request/RequestParser.cpp http/request/RequestParserHeaders.cpp http/request/RequestParserBody.cpp http/request/RequestParserValidation.cpp
+SRC = main.cpp http/request/RequestParser.cpp http/request/RequestParserHeaders.cpp http/request/RequestParserBody.cpp http/request/RequestParserValidation.cpp config/Config.cpp manager/ServerManager.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 

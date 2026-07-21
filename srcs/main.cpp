@@ -1,8 +1,22 @@
-#include "RequestParser.hpp"
+/* ************************************************************************** */
+/*																			*/
+/*														:::	  ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*													+:+ +:+		 +:+	 */
+/*   By: mgrandia <mgrandia@student.42barcelon	  +#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2026/07/16 13:35:01 by mgrandia		  #+#	#+#			 */
+/*   Updated: 2026/07/17 15:04:04 by mgrandia         ###   ########.fr       */
+/*																			*/
+/* ************************************************************************** */
+
 
 #include <iostream>
+#include <exception>
 #include <string>
-
+#include "Config.hpp"
+#include "ServerManager.hpp"
+#include "RequestParser.hpp"
 
 #include <iostream>
 #include <map>
@@ -43,90 +57,44 @@ void test(const std::string &req)
 	}
 }
 
-int main()
+
+int main(int argc, char **argv)
 {
-	std::cout << "==============================" << std::endl;
-	std::cout << "Test 1 - No headers" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"\r\n");
+    
 
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 2 - Host header" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"Host: localhost\r\n"
-		"\r\n");
 
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 3 - Multiple headers" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET /index.html HTTP/1.1\r\n"
-		"Host: localhost\r\n"
-		"Connection: keep-alive\r\n"
-		"User-Agent: curl/8.0\r\n"
-		"Accept: */*\r\n"
-		"\r\n");
-
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 4 - Optional whitespace" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"Host:      localhost      \r\n"
-		"\r\n");
-
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 5 - Empty header value" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"X-Test:\r\n"
-		"\r\n");
-
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 6 - Spaces only after colon" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"X-Test:        \r\n"
-		"\r\n");
-
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 7 - Missing colon" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"Host localhost\r\n"
-		"\r\n");
-
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 8 - Empty header name" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		": localhost\r\n"
-		"\r\n");
-
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 9 - Colon inside value" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"Host: localhost:8080\r\n"
-		"\r\n");
-
-	std::cout << "\n==============================" << std::endl;
-	std::cout << "Test 10 - Duplicate header" << std::endl;
-	std::cout << "==============================" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"Host: localhost\r\n"
-		"Host: google.com\r\n"
-		"\r\n");
-
-	return 0;
+	if (argc != 2)
+	{
+		std::cerr << "Usage: ./webserv config.conf\n";
+		return (1);
+	}
+	
+	try
+	{
+		Config config(argv[1]);
+		
+		const std::vector<ServerConfig>& servers = config.getServers();
+		
+		for (size_t i = 0; i < servers.size(); i++)
+		{
+			std::cout << "Server " << i << std::endl;
+			std::cout << "Host : " << servers[i].getHost() << std::endl;
+			std::cout << "Port : " << servers[i].getPort() << std::endl;
+			std::cout << "Name : " << servers[i].getServerName() << std::endl;
+			std::cout << "Root : " << servers[i].getRoot() << std::endl;
+			std::cout << std::endl;
+		}
+		
+		ServerManager manager(config);
+		manager.init();
+		manager.printSockets();
+		manager.run();
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return (1);
+	}
+	
+	return (0);
 }
