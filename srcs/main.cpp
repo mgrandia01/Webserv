@@ -4,12 +4,17 @@
 #include <string>
 
 
+#include <iostream>
+#include <map>
+
+#include "RequestParser.hpp"
+
 void test(const std::string &req)
 {
 	RequestParser parser;
-	//TODO existe la funcion parser.reset(), para poder reutilizar el objeto
+
 	parser.feed(req.c_str(), req.size());
-	
+
 	if (parser.hasError())
 	{
 		std::cout << "ERROR " << parser.getErrorCode() << std::endl;
@@ -20,155 +25,108 @@ void test(const std::string &req)
 	{
 		Request r = parser.getRequest();
 
-		std::cout << r.method << std::endl;
-		std::cout << r.target << std::endl;
-		std::cout << r.version << std::endl;
+		std::cout << "Method : " << r.method << std::endl;
+		std::cout << "Target : " << r.target << std::endl;
+		std::cout << "Version: " << r.version << std::endl;
+
+		std::cout << "Headers:" << std::endl;
+
+		for (std::map<std::string, std::string>::const_iterator it = r.headers.begin();
+			it != r.headers.end(); ++it)
+		{
+			std::cout << "  [" << it->first << "] = [" << it->second << "]" << std::endl;
+		}
 	}
 	else
-		std::cout << "INCOMPLETE\n";
+	{
+		std::cout << "INCOMPLETE" << std::endl;
+	}
 }
-/*
+
 int main()
 {
-	std::cout << "----- Test 1 -----" << std::endl;
+	std::cout << "==============================" << std::endl;
+	std::cout << "Test 1 - No headers" << std::endl;
+	std::cout << "==============================" << std::endl;
 	test(
-		"GET /%20 HTTP/1.1\r\n"
+		"GET / HTTP/1.1\r\n"
 		"\r\n");
 
-	std::cout << "\n----- Test 2 -----" << std::endl;
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 2 - Host header" << std::endl;
+	std::cout << "==============================" << std::endl;
 	test(
-		"GET /index.html HTTP/1.1\r\n"
+		"GET / HTTP/1.1\r\n"
 		"Host: localhost\r\n"
 		"\r\n");
 
-	std::cout << "\n----- Test 3 -----" << std::endl;
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 3 - Multiple headers" << std::endl;
+	std::cout << "==============================" << std::endl;
 	test(
-		"GET /\r\n"
+		"GET /index.html HTTP/1.1\r\n"
+		"Host: localhost\r\n"
+		"Connection: keep-alive\r\n"
+		"User-Agent: curl/8.0\r\n"
+		"Accept: */*\r\n"
 		"\r\n");
 
-  return 0;
-}*/
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 4 - Optional whitespace" << std::endl;
+	std::cout << "==============================" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		"Host:      localhost      \r\n"
+		"\r\n");
 
-int main()
-{
-    std::cout << "----- Test 1: GET válido -----" << std::endl;
-    test(
-        "GET / HTTP/1.1\r\n"
-        "\r\n");
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 5 - Empty header value" << std::endl;
+	std::cout << "==============================" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		"X-Test:\r\n"
+		"\r\n");
 
-    std::cout << "\n----- Test 2: Target con fichero -----" << std::endl;
-    test(
-        "GET /index.html HTTP/1.1\r\n"
-        "\r\n");
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 6 - Spaces only after colon" << std::endl;
+	std::cout << "==============================" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		"X-Test:        \r\n"
+		"\r\n");
 
-    std::cout << "\n----- Test 3: POST válido -----" << std::endl;
-    test(
-        "POST /upload HTTP/1.1\r\n"
-        "\r\n");
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 7 - Missing colon" << std::endl;
+	std::cout << "==============================" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		"Host localhost\r\n"
+		"\r\n");
 
-    std::cout << "\n----- Test 4: DELETE válido -----" << std::endl;
-    test(
-        "DELETE /file.txt HTTP/1.1\r\n"
-        "\r\n");
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 8 - Empty header name" << std::endl;
+	std::cout << "==============================" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		": localhost\r\n"
+		"\r\n");
 
-    std::cout << "\n----- Test 5: Método no soportado (501) -----" << std::endl;
-    test(
-        "PUT / HTTP/1.1\r\n"
-        "\r\n");
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 9 - Colon inside value" << std::endl;
+	std::cout << "==============================" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		"Host: localhost:8080\r\n"
+		"\r\n");
 
-    std::cout << "\n----- Test 6: HTTP/1.0 -----" << std::endl;
-    test(
-        "GET / HTTP/1.0\r\n"
-        "\r\n");
+	std::cout << "\n==============================" << std::endl;
+	std::cout << "Test 10 - Duplicate header" << std::endl;
+	std::cout << "==============================" << std::endl;
+	test(
+		"GET / HTTP/1.1\r\n"
+		"Host: localhost\r\n"
+		"Host: google.com\r\n"
+		"\r\n");
 
-    std::cout << "\n----- Test 7: HTTP/2 (505) -----" << std::endl;
-    test(
-        "GET / HTTP/2\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 8: Falta versión (400) -----" << std::endl;
-    test(
-        "GET /\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 9: Falta target (400) -----" << std::endl;
-    test(
-        "GET HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 10: Espacio al principio (400) -----" << std::endl;
-    test(
-        " GET / HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 11: Espacio al final (400) -----" << std::endl;
-    test(
-        "GET / HTTP/1.1 \r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 12: Doble espacio método-target (400) -----" << std::endl;
-    test(
-        "GET  / HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 13: Doble espacio target-version (400) -----" << std::endl;
-    test(
-        "GET /  HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 14: Campo extra (400) -----" << std::endl;
-    test(
-        "GET / HTTP/1.1 EXTRA\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 15: Target sin '/' (400) -----" << std::endl;
-    test(
-        "GET index.html HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 16: Percent-encoding válido -----" << std::endl;
-    test(
-        "GET /hola%20mundo HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 17: Percent-encoding inválido (%ZZ) -----" << std::endl;
-    test(
-        "GET /hola%ZZ HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 18: Percent-encoding incompleto (%) -----" << std::endl;
-    test(
-        "GET /hola% HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 19: Percent-encoding incompleto (%A) -----" << std::endl;
-    test(
-        "GET /hola%A HTTP/1.1\r\n"
-        "\r\n");
-
-    std::cout << "\n----- Test 20: Header Host -----" << std::endl;
-    test(
-        "GET /index.html HTTP/1.1\r\n"
-        "Host: localhost\r\n"
-        "\r\n");
-
-    return 0;
+	return 0;
 }
-
-
-//TODO Arcadio tiene que hacer
-
-/*while (true)
-{
-	bytes = recv(...);
-
-	parser.feed(buffer, bytes);
-
-	if (parser.isComplete())
-		break;
-
-	if (parser.hasError())
-		break;
-
-	// Esperar otro recv()
-}*/
