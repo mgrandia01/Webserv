@@ -6,12 +6,13 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 12:41:35 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/17 14:39:47 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/20 12:05:34 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 #include "HttpStatus.hpp"
+#include <cctype>
 
 bool RequestParser::validateTarget(const std::string &target)
 {
@@ -26,14 +27,41 @@ bool RequestParser::validateTarget(const std::string &target)
 		_errorCode = BAD_REQUEST;
 		return false;
 	}
-	// TODO:
-	// Validate origin-form according to RFC 9112.
+
+	for(size_t i = 0; i < target.size(); i++)
+	{
+		if (iscntrl(target[i]))
+		{
+			_errorCode = BAD_REQUEST;
+			return false;
+		}
+	}
+
+	//Validar lo de % puede ser %00-%FF ASCII	
+	for (size_t i = 0; i < target.size(); ++i)
+	{
+		if (target[i] == '%')
+		{
+			if (i + 2 >= target.size())
+			{
+			_errorCode = BAD_REQUEST;
+			return false;
+			}
+
+			if (!isxdigit(static_cast<unsigned char>(target[i + 1])) || !isxdigit(static_cast<unsigned char>(target[i + 2])))
+			{
+				_errorCode = BAD_REQUEST;
+				return false;
+			}
+			i += 2;
+		}
+	}
 	return true;
 }
 
 bool RequestParser::validateVersion(const std::string &version)
 {
-	if (version != "HTTP/1.1")
+	if (version != "HTTP/1.1" && version != "HTTP/1.0")
 	{
 		_errorCode = HTTP_VERSION_NOT_SUPPORTED;
 		return false;

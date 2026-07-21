@@ -6,24 +6,47 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/17 14:41:26 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/21 11:01:42 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 #include "HttpStatus.hpp"
 
+std::string RequestParser::trimWhitespace(const std::string &str)
+{
+	size_t start = 0;
+	size_t end = str.length();
+
+	while (start < end && (str[start] == ' ' || str[start] == '\t'))
+		start++;
+	while (end > start && (str[end - 1] == ' ' || str[end - 1] == '\t'))
+		end--;
+	return str.substr(start, end - start);
+}
+
 bool RequestParser::parseHeaderLine(const std::string &line)
 {
-  //TODO:
+  //TODO: que pasa si llega un header duplicado? porque con este tipo de map
+  //se sobreescribe y elimina el primero que llego
+
 	size_t pos = line.find(':');
 
 	if (pos == std::string::npos)
+	{
+		_errorCode = BAD_REQUEST;
 		return false;
+	}
 
+	//TODO: en un futuro rechazar la key si hay espacios en su interior?
 	std::string key = line.substr(0, pos);
-	std::string value = line.substr(pos + 1);
+	std::string value = trimWhitespace(line.substr(pos + 1));
 
+	if (key.empty())
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
 	_request.headers[key] = value;
 
 	return true;

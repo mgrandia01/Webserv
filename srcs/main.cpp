@@ -18,12 +18,17 @@
 #include "ServerManager.hpp"
 #include "RequestParser.hpp"
 
+#include <iostream>
+#include <map>
+
+#include "RequestParser.hpp"
+
 void test(const std::string &req)
 {
 	RequestParser parser;
-	//TODO existe la funcion parser.reset(), para poder reutilizar el objeto
+
 	parser.feed(req.c_str(), req.size());
-	
+
 	if (parser.hasError())
 	{
 		std::cout << "ERROR " << parser.getErrorCode() << std::endl;
@@ -34,36 +39,28 @@ void test(const std::string &req)
 	{
 		Request r = parser.getRequest();
 
-		std::cout << r.method << std::endl;
-		std::cout << r.target << std::endl;
-		std::cout << r.version << std::endl;
+		std::cout << "Method : " << r.method << std::endl;
+		std::cout << "Target : " << r.target << std::endl;
+		std::cout << "Version: " << r.version << std::endl;
+
+		std::cout << "Headers:" << std::endl;
+
+		for (std::map<std::string, std::string>::const_iterator it = r.headers.begin();
+			it != r.headers.end(); ++it)
+		{
+			std::cout << "  [" << it->first << "] = [" << it->second << "]" << std::endl;
+		}
 	}
 	else
-		std::cout << "INCOMPLETE\n";
+	{
+		std::cout << "INCOMPLETE" << std::endl;
+	}
 }
 
 
 int main(int argc, char **argv)
 {
     
-    /*
-    std::cout << "----- Test 1 -----" << std::endl;
-	test(
-		"GET / HTTP/1.1\r\n"
-		"\r\n");
-
-	std::cout << "\n----- Test 2 -----" << std::endl;
-	test(
-		"GET /index.html HTTP/1.1\r\n"
-		"Host: localhost\r\n"
-		"\r\n");
-
-	std::cout << "\n----- Test 3 -----" << std::endl;
-	test(
-		"GET /\r\n"
-		"\r\n");
-    
-    */
 
 
 	if (argc != 2)
@@ -101,24 +98,3 @@ int main(int argc, char **argv)
 	
 	return (0);
 }
-
-
-
-
-
-//TODO Arcadio tiene que hacer
-
-/*while (true)
-{
-	bytes = recv(...);
-
-	parser.feed(buffer, bytes);
-
-	if (parser.isComplete())
-		break;
-
-	if (parser.hasError())
-		break;
-
-	// Esperar otro recv()
-}*/
