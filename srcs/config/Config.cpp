@@ -6,14 +6,14 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/07/18 09:29:25 by arcmarti         ###   ########.fr       */
+/*   Updated: 2026/07/21 21:14:52 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string>
 #include "Config.hpp"
 
-Config::Config(const std::string& file)
+/*Config::Config(const std::string& file)
 {
 	(void) file;
 
@@ -32,16 +32,9 @@ Config::~Config(){}
 const std::vector<ServerConfig>& Config::getServers() const
 {
     return (_servers);
-}
+}*/
 
-
-
-
-
-
-
-
-ServerConfig::ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root) : _host(host), _port(port), _serverName(serverName), _root(root) {};
+/*ServerConfig::ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root) : _host(host), _port(port), _serverName(serverName), _root(root) {};
 ServerConfig::~ServerConfig(){}
 ServerConfig::ServerConfig(const ServerConfig& other)
 {
@@ -87,12 +80,9 @@ const std::string&	ServerConfig::getServerName() const
 const std::string&	ServerConfig::getRoot() const
 {
 	return _root;
-}
+}*/
 
-
-
-
-LocationConfig::LocationConfig(){}
+/*LocationConfig::LocationConfig(){}
 LocationConfig::~LocationConfig(){}
 LocationConfig::LocationConfig(const LocationConfig& other)
 {
@@ -109,6 +99,4 @@ LocationConfig&	LocationConfig::operator=(const LocationConfig& rhs)
 	}
 	
 	return *this;
-}
-
-
+}*/

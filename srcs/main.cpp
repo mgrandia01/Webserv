@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon	  +#+  +:+	   +#+		*/
 /*												+#+#+#+#+#+   +#+		   */
 /*   Created: 2026/07/16 13:35:01 by mgrandia		  #+#	#+#			 */
-/*   Updated: 2026/07/17 15:04:04 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/21 21:12:13 by mcuenca-         ###   ########.fr       */
 /*																			*/
 /* ************************************************************************** */
 
@@ -60,21 +60,21 @@ void test(const std::string &req)
 
 int main(int argc, char **argv)
 {
-    
-
-
 	if (argc != 2)
 	{
 		std::cerr << "Usage: ./webserv config.conf\n";
 		return (1);
 	}
-	
-	try
+
+	/*1. Read file*/
+	/*2. Classify? Create an strut for saving tmp data?*/
+	/*3. Create config class*/
+	/*try
 	{
+
 		Config config(argv[1]);
 		
-		const std::vector<ServerConfig>& servers = config.getServers();
-		
+		// *const std::vector<ServerConfig>& servers = config.getServers();
 		for (size_t i = 0; i < servers.size(); i++)
 		{
 			std::cout << "Server " << i << std::endl;
@@ -88,13 +88,13 @@ int main(int argc, char **argv)
 		ServerManager manager(config);
 		manager.init();
 		manager.printSockets();
-		manager.run();
+		manager.run();* //
 	}
 	catch (std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 		return (1);
-	}
+	}*/
 	
 	return (0);
 }

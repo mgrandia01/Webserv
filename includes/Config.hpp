@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:25:51 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/07/18 09:26:04 by arcmarti         ###   ########.fr       */
+/*   Updated: 2026/07/21 21:14:50 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <vector>
 #include <exception>
 
-class LocationConfig {
+/*class LocationConfig {
 
 public:
 	LocationConfig();
@@ -33,9 +33,9 @@ private:
 	std::string	_att1;
 	int		_att2;
 
-};
+};*/
 
-class ServerConfig {
+/*class ServerConfig {
 
 public:
 	ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root);
@@ -66,9 +66,9 @@ private:
 	
 
 
-};
+};*/
 
-class Config {
+/*class Config {
 
 public:
 	Config(const std::string& file);
@@ -85,7 +85,7 @@ public:
 		{
 			return ("Configuration file error");
 		}
-    	};
+    };
 
 private:
 
@@ -98,6 +98,6 @@ private:
 	std::string	_att2;
 	int		_att3;
 	int		_att4;
-};
+};*/
 
 #endif
