@@ -10,11 +10,13 @@
 /*																			*/
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
 
 #include <iostream>
+#include <exception>
 #include <string>
-
+#include "Config.hpp"
+#include "ServerManager.hpp"
+#include "RequestParser.hpp"
 
 void test(const std::string &req)
 {
@@ -40,9 +42,12 @@ void test(const std::string &req)
 		std::cout << "INCOMPLETE\n";
 }
 
-int main()
+
+int main(int argc, char **argv)
 {
-	std::cout << "----- Test 1 -----" << std::endl;
+    
+    /*
+    std::cout << "----- Test 1 -----" << std::endl;
 	test(
 		"GET / HTTP/1.1\r\n"
 		"\r\n");
@@ -57,9 +62,48 @@ int main()
 	test(
 		"GET /\r\n"
 		"\r\n");
+    
+    */
 
-  return 0;
+
+	if (argc != 2)
+	{
+		std::cerr << "Usage: ./webserv config.conf\n";
+		return (1);
+	}
+	
+	try
+	{
+		Config config(argv[1]);
+		
+		const std::vector<ServerConfig>& servers = config.getServers();
+		
+		for (size_t i = 0; i < servers.size(); i++)
+		{
+			std::cout << "Server " << i << std::endl;
+			std::cout << "Host : " << servers[i].getHost() << std::endl;
+			std::cout << "Port : " << servers[i].getPort() << std::endl;
+			std::cout << "Name : " << servers[i].getServerName() << std::endl;
+			std::cout << "Root : " << servers[i].getRoot() << std::endl;
+			std::cout << std::endl;
+		}
+		
+		ServerManager manager(config);
+		manager.init();
+		manager.printSockets();
+		manager.run();
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return (1);
+	}
+	
+	return (0);
 }
+
+
+
 
 
 //TODO Arcadio tiene que hacer
