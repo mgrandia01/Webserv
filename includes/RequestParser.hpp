@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/17 14:45:03 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/21 10:49:13 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,9 @@ class RequestParser
 		bool validateMethod(const std::string &method);
 		bool validateVersion(const std::string &version);
 		bool validateTarget(const std::string &target);
-		bool parseRequestLine(const std::string &line);
+		std::string trimWhitespace(const std::string &str);
 		bool parseHeaderLine(const std::string &line);
+		bool parseRequestLine(const std::string &line);
 
 	private:
 
