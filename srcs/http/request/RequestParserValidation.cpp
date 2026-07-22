@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 12:41:35 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/21 13:47:40 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/22 10:43:12 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,119 @@
 #include "HttpStatus.hpp"
 #include <cctype>
 
-bool RequestParser::validateHeaders()
+
+bool RequestParser::validateFramingHeaders()
 {
-	//TODO anyadir una response error de esas?
-	if (_request.headerOccurrences["Host"] != 1)
+	if (_request.headerOccurrences["content-length"] > 0 &&
+			_request.headerOccurrences["transfer-encoding"] > 0)
 	{
 		_errorCode = BAD_REQUEST;
 		return false;
 	}
 
-	/*
-	if (_request.headerOccurrences["Content-Length"] > 1)
+	return true;
+}
+
+bool RequestParser::validateTransferEncoding()
+{
+	size_t occurrences = _request.headerOccurrences["transfer-encoding"];
+	if (occurrences > 1)
+	{
+		_errorCode = BAD_REQUEST;
 		return false;
-	if (_request.headerOccurrences["Transfer-Encoding"] > 1)
+	}
+
+	if (occurrences == 1)
+	{
+		if (_request.headers["transfer-encoding"].empty())
+		{
+			_errorCode = BAD_REQUEST;
+			return false;
+		}
+		if (_request.headers["transfer-encoding"] != "chunked")
+		{
+			_errorCode = NOT_IMPLEMENTED;
+			return false;
+		}
+	}
+	return true;
+}
+
+
+//TODO anyadir a la classe
+bool RequestParser::isValidContentLength(const std::string &value)
+{
+	size_t result = 0;
+
+	for (size_t i = 0; i < value.size(); i++)
+	{
+		if (!std::isdigit(static_cast<unsigned char>(value[i])))
+			return false;
+
+		result = result * 10 + (value[i] - '0');
+	}
+	_contentLength = result;
+	// TODO: Detectar overflow de Content-Length
+	return true;
+}
+bool RequestParser::validateContentLength()
+{
+	size_t occurrences = _request.headerOccurrences["content-length"];
+	//entero decimal, no negativo, no desborde, no vacio
+	if (occurrences > 1)
+	{
+		_errorCode = BAD_REQUEST;
 		return false;
-*/
+	}
+	if (occurrences == 1)
+	{
+		if (_request.headers["content-length"].empty())
+		{
+			_errorCode = BAD_REQUEST;
+			return false;
+		}
+		//validar que sea un numero...
+		
+		if (!isValidContentLength(_request.headers["content-length"]))
+		{
+			_errorCode = BAD_REQUEST;
+			return false;
+
+		}
+	}
+	return true;
+}
+
+
+bool RequestParser::validateHost()
+{
+	if (_request.headerOccurrences["host"] != 1)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+	if (_request.headers["host"].empty())
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+	return true;
+}
+
+bool RequestParser::validateHeaders()
+{
+	if (!validateHost())
+		return false;
+
+	//error de framing, si tenemos content-length y transfer encoding chunked a la vez
+	if (!validateFramingHeaders())
+		return false;
+
+	if (!validateContentLength())
+		return false;
+
+	if (!validateTransferEncoding())
+		return false;
 	return true;
 }
 

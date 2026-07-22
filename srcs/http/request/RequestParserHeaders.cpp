@@ -6,13 +6,14 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/21 13:50:58 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/22 08:32:41 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 #include "HttpStatus.hpp"
 
+//TODO utils
 std::string RequestParser::trimWhitespace(const std::string &str)
 {
 	size_t start = 0;
@@ -23,6 +24,17 @@ std::string RequestParser::trimWhitespace(const std::string &str)
 	while (end > start && (str[end - 1] == ' ' || str[end - 1] == '\t'))
 		end--;
 	return str.substr(start, end - start);
+}
+
+//TODO utils i posar al hpp
+std::string toLower(const std::string &str)
+{
+    std::string result = str;
+
+    for (size_t i = 0; i < result.size(); ++i)
+        result[i] = std::tolower(result[i]);
+
+    return result;
 }
 
 bool RequestParser::parseHeaderLine(const std::string &line)
@@ -36,8 +48,13 @@ bool RequestParser::parseHeaderLine(const std::string &line)
 	}
 
 	//TODO: en un futuro rechazar la key si hay espacios en su interior?
-	std::string key = line.substr(0, pos);
+	//HTTP/1.1 dice que los headers no son snsibles a las mayusculas, asi que todo es valido
+	//con trasfer encodint tbbn pasa
+	std::string key = toLower(line.substr(0, pos));
 	std::string value = trimWhitespace(line.substr(pos + 1));
+
+	if (key == "transfer-encoding")
+		value = toLower(value);
 
 	if (key.empty())
 	{
