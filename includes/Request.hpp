@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/20 10:57:42 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/22 10:32:40 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class Request
 		std::string version;
 
 		std::map<std::string, std::string> headers;
+		std::map<std::string, size_t> headerOccurrences;
 
 		std::string body;
 };
