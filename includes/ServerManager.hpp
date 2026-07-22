@@ -36,13 +36,21 @@ private:
 
 	const Config&		_config;
 	std::vector<int>	_listenSockets;
+	std::vector<struct pollfd> _pollFds;
 
 	void	createSockets();
 	void	bindSocket(int socketFd, const ServerConfig& server);
 	void	listenSocket(int socketFd);
+	void	acceptClient(int socketFd);
 	
-
-		
+	
+	void	initPollFds();
+	bool	isListenSocket(int fd) const;
+	bool	readClient(int indexPoll);
+	
+	//temporal debug
+	void sendResponse(int indexPoll);
+	
 };
 
 #endif
