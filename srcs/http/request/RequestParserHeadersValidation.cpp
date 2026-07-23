@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 12:03:38 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 12:03:30 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,21 @@
 
 #include <limits>
 
+
+bool RequestParser::isValidHeaderName(const std::string &key)
+{
+ 	static const std::string valid = "!#$%&'*+-.^_`|~";
+
+ 	for (size_t i = 0; i < key.size(); i++)
+ 	{
+ 		unsigned char c = static_cast<unsigned char>(key[i]);
+
+		if (!isalnum(c) && valid.find(c) == std::string::npos)
+			return false;
+	}
+
+	return true;
+}
 
 bool RequestParser::validateFramingHeaders()
 {

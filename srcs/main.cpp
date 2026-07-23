@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 11:24:46 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 12:14:11 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,3 @@ int main(int argc, char **argv)
 	
 	return (0);
 }
-
