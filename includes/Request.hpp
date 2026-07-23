@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 10:32:40 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 11:01:44 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ class Request
 	public:
 		std::string method;
 		std::string target;
+		std::string path;
+		std::string query;
 		std::string version;
 
 		std::map<std::string, std::string> headers;
