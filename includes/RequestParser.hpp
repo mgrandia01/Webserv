@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 11:45:58 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 11:13:34 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class RequestParser
 		void parseBody();
 
 		// RequestParserStartLine.cpp
+		void parseRequestTarget(const std::string &target);
 		bool parseRequestLine(const std::string &line);
 
 		// RequestParserHeadersValidation.cpp

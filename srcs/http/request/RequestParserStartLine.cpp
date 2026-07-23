@@ -6,12 +6,29 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:28 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 11:27:21 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 11:13:13 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 #include "HttpStatus.hpp"
+
+void RequestParser::parseRequestTarget(const std::string &target)
+{
+	size_t pos = target.find('?');
+
+	if (pos == std::string::npos)
+	{
+		_request.path = target;
+		_request.query.clear();
+	}
+	else
+	{
+		_request.path = target.substr(0,pos);
+		_request.query = target.substr(pos + 1);
+	}
+
+}
 
 bool RequestParser::parseRequestLine(const std::string &line)
 {
@@ -44,6 +61,8 @@ bool RequestParser::parseRequestLine(const std::string &line)
 	_request.method = method;
 	_request.target = target;
 	_request.version = version;
+
+	parseRequestTarget(target);
 
 	return true;
 }
