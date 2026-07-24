@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 12:03:38 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 13:57:35 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,21 @@
 
 #include <limits>
 
+
+bool RequestParser::isValidHeaderName(const std::string &key)
+{
+ 	static const std::string valid = "!#$%&'*+-.^_`|~";
+
+ 	for (size_t i = 0; i < key.size(); i++)
+ 	{
+ 		unsigned char c = static_cast<unsigned char>(key[i]);
+
+		if (!isalnum(c) && valid.find(c) == std::string::npos)
+			return false;
+	}
+
+	return true;
+}
 
 bool RequestParser::validateFramingHeaders()
 {
@@ -53,8 +68,6 @@ bool RequestParser::validateTransferEncoding()
 	return true;
 }
 
-
-//TODO anyadir a la classe
 bool RequestParser::isValidContentLength(const std::string &value)
 {
 	size_t result = 0;
@@ -71,13 +84,11 @@ bool RequestParser::isValidContentLength(const std::string &value)
 		result = result * 10 + (value[i] - '0');
 	}
 	_contentLength = result;
-	// TODO: Detectar overflow de Content-Length
 	return true;
 }
 bool RequestParser::validateContentLength()
 {
 	size_t occurrences = _request.headerOccurrences["content-length"];
-	//entero decimal, no negativo, no desborde, no vacio
 	if (occurrences > 1)
 	{
 		_errorCode = BAD_REQUEST;

@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 11:25:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 14:54:41 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,17 @@ bool RequestParser::parseHeaderLine(const std::string &line)
 	//con trasfer encodint tbbn pasa
 	std::string key = toLower(line.substr(0, pos));
 	std::string value = trimWhitespace(line.substr(pos + 1));
-
+	
+	if (key.find(' ') != std::string::npos)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+	if (!isValidHeaderName(key))
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
 	if (key == "transfer-encoding")
 		value = toLower(value);
 
@@ -77,7 +87,11 @@ void RequestParser::parseHeaders()
 				return;
 
 			}
-			_state = PARSING_BODY;
+
+			if (hasBody())
+				_state = PARSING_BODY;
+			else
+				_state = COMPLETE;
 			return;
 		}
 

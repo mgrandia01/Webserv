@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 11:13:34 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 14:25:49 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <string>
 #include <cctype>
+#include <iostream>
 
 #include "Request.hpp"
 
@@ -45,6 +46,7 @@ class RequestParser
 		bool parseHeaderLine(const std::string &line);
 
 		// RequestParserBody.cpp
+		bool hasBody() const;
 		void parseBody();
 
 		// RequestParserStartLine.cpp
@@ -52,6 +54,7 @@ class RequestParser
 		bool parseRequestLine(const std::string &line);
 
 		// RequestParserHeadersValidation.cpp
+		bool isValidHeaderName(const std::string &key);
 		bool validateHeaders();
 		bool validateFramingHeaders();
 		bool validateTransferEncoding();
