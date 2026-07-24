@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 14:25:49 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/24 12:24:57 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,6 @@ class RequestParser
 		void parseHeaders();
 		bool parseHeaderLine(const std::string &line);
 
-		// RequestParserBody.cpp
-		bool hasBody() const;
-		void parseBody();
-
-		// RequestParserStartLine.cpp
-		void parseRequestTarget(const std::string &target);
-		bool parseRequestLine(const std::string &line);
-
 		// RequestParserHeadersValidation.cpp
 		bool isValidHeaderName(const std::string &key);
 		bool validateHeaders();
@@ -62,16 +54,31 @@ class RequestParser
 		bool validateHost();
 		bool isValidContentLength(const std::string &value);
 
+
+		// RequestParserStartLine.cpp
+		void parseRequestTarget(const std::string &target);
+		bool parseRequestLine(const std::string &line);
+
 		// RequestParserStartLineValidation.cpp
 		bool validateRequestLineStructure(const std::string &line);
 		bool validateMethod(const std::string &method);
 		bool validateVersion(const std::string &version);
 		bool validateTarget(const std::string &target);
+		
+		// RequestParserBody.cpp
+		void parseContentLengthBody();
+		//void parseChunkedBody();
+		bool hasBody() const;
+		void parseBody();
+
+		// RequestParserBodyValidation.cpp
+		bool validateBodySize() const;
 
 		// RequestParserUtils.cpp
 		std::string trimWhitespace(const std::string &str);
 		std::string toLower(const std::string &str);
 	private:
+		size_t _clientMaxBodySize;//TODO parche para tener valor del .config
 
 		enum State
 		{
@@ -87,7 +94,7 @@ class RequestParser
 
 		bool _requestLineParsed;
 
-		std::string _stream;
+		std::string _stream;//buffer recibido
 
 		Request _request;
 

@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:19:10 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 11:21:49 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/24 11:47:03 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ bool RequestParser::validateTarget(const std::string &target)
 		}
 	}
 
-	//Validar lo de % puede ser %00-%FF ASCII	
 	for (size_t i = 0; i < target.size(); ++i)
 	{
 		if (target[i] == '%')

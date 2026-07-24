@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 13:57:35 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/24 12:43:11 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ bool RequestParser::validateTransferEncoding()
 			_errorCode = NOT_IMPLEMENTED;
 			return false;
 		}
+
+		_chunked = true;
 	}
 	return true;
 }

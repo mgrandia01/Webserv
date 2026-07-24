@@ -1,30 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpStatus.hpp                                     :+:      :+:    :+:   */
+/*   RequestParserBodyValidation.cpp                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/17 11:55:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/24 11:38:50 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/07/24 11:46:22 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/07/24 12:21:11 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPSTATUS_HPP
-#define HTTPSTATUS_HPP
+#include "RequestParser.hpp"
+#include "HttpStatus.hpp"
 
-enum HttpStatus
+bool RequestParser::validateBodySize() const
 {
-	OK = 200,
 
-	BAD_REQUEST = 400,
-	NOT_FOUND = 404,
-	METHOD_NOT_ALLOWED = 405,
-	PAYLOAD_TOO_LARGE = 413,
-
-	INTERNAL_SERVER_ERROR = 500,
-	NOT_IMPLEMENTED = 501,
-	HTTP_VERSION_NOT_SUPPORTED = 505
-};
-
-#endif
+//TODO if (request.contentLength > serverConfig.clientMaxBodySize) TODO mas adelante
+	if (_contentLength > _clientMaxBodySize)
+		return false;
+	return true;
+}
