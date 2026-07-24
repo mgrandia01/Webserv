@@ -25,6 +25,7 @@
 #include <arpa/inet.h> //address.sin_addr.s_addr = inet_addr(server.host.c_str());
 #include <algorithm>
 
+
 static const int LISTEN_BACKLOG = 128;
 
 
@@ -136,6 +137,7 @@ void	ServerManager::run()
 	
 	while (true)
 	{
+		// -1, inifnite timoeut until at least one fd has an event
 		int	ret = poll(&_pollFds[0], _pollFds.size(), -1);
 		if (ret == -1)
 			throw std::runtime_error("poll() failed");
@@ -145,48 +147,91 @@ void	ServerManager::run()
 		for (int i = 0; i < (int)_pollFds.size(); i++)
 		{
 			std::cout << "fd: " << _pollFds[i].fd << " revents: " << _pollFds[i].revents << std::endl;
-			if (_pollFds[i].revents & POLLIN)
-			{
-				std::cout << "POLLIN on fd: " << _pollFds[i].fd << std::endl;
-				
-				// only listening general sockets can accept new connections
-				if (std::find(_listenSockets.begin(), _listenSockets.end(), _pollFds[i].fd) != _listenSockets.end())
-				{
-					std::cout << "Client activity on listening socket fd: " << _pollFds[i].fd << std::endl;
-					acceptClient(_pollFds[i].fd);
-				}
-				else // listening specific sockets receive data
-				{
-					std::cout << "Client activity on fd: " << _pollFds[i].fd << std::endl;
-					if (readClient(i))
-						i--;
-				
-					
-				}
-			}
-			else if (_pollFds[i].revents & POLLHUP) // closing socket all information transmited
+			if (_pollFds[i].revents & (POLLHUP | POLLERR | POLLNVAL)) // closing socket all information transmited
 			{
 				std::cout << "POLLHUP on fd: " << _pollFds[i].fd << std::endl;
-				close(_pollFds[i].fd);
+				int fd = _pollFds[i].fd;
+				close(fd);
 				_pollFds.erase(_pollFds.begin() + i);
+				_clients.erase(fd);
 				i--;
 				continue ;	
-			}
-			else if (_pollFds[i].revents & POLLNVAL)
+			} else if (_pollFds[i].revents & POLLIN) {
+				std::cout << "POLLIN on fd: " << _pollFds[i].fd << std::endl;
+				
+				int fd = _pollFds[i].fd;
+				// type 1: LISTENING sockets : POLLIN means there are new connections waiting to be accepted
+				if (std::find(_listenSockets.begin(), _listenSockets.end(), fd) != _listenSockets.end())
+				{
+					std::cout << "Client activity on listening socket fd: " << _pollFds[i].fd << std::endl;
+					acceptClient(fd);
+				}
+				else // type 2: data sockets : POLLIN menss sockets have received data and are ready to be read
+				{
+					std::cout << "Client activity on fd: " << _pollFds[i].fd << std::endl;
+					//if (readClient(i))
+					//	i--;
+					if (!_clients.at(fd).receive())
+					{
+        					std::cout << "CLIENT ERROR on fd: " << _pollFds[i].fd << std::endl;
+        					
+							close(fd);
+							_pollFds.erase(_pollFds.begin() + i);
+							_clients.erase(fd);
+							i--;
+					}
+					else
+					{
+
+						if (_clients.at(fd).getParser().hasError())
+						{
+								// crear respuesta de error
+							   	// 400, 413, etc
+						}
+						else
+						{
+								if (_clients.at(fd).getParser().isComplete())
+								{
+								std::cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa for fd " << fd << std::endl;
+
+									Request request = _clients.at(fd).getParser().getRequest();
+									//Response response = _requestHandler.handle(request);
+    		
+    								//temporal
+    								Response response( "HTTP/1.1 200 OK\r\n""Content-Length: 5\r\n" "\r\n" "Hello");
+    								_clients.at(fd).setResponse(response);
+    							}
+    					}
+    					if (!_clients.at(fd).hasResponse()) // temporal forzadooooooooooooooooooooooooooo seria al reves
+    					{
+    						
+    						_pollFds[i].events = POLLOUT;
+    						std::cout << "Setting POLLOUT for fd " << fd << std::endl;
+    					}
+        			
+						/*if (_clients.at(fd).getParser().isComplete())
+						{
+							//prepareResponse();
+        					//enablePollout(fd);
+        				}
+        				else
+        				{
+        					std::cout << "CLIENT ERROR on fd: " << _pollFds[i].fd << std::endl;
+
+        					close(fd);
+							_pollFds.erase(_pollFds.begin() + i);
+							_clients.erase(fd);
+							i--;
+        				}*/
+
+					}
+					
+				}
+			}else if (_pollFds[i].revents & POLLOUT)  // temporal debug
 			{
-				std::cout << "POLLNVAL on fd: " << _pollFds[i].fd << std::endl;
-				close(_pollFds[i].fd);
-				_pollFds.erase(_pollFds.begin() + i);
+				sendResponse(i);
 				i--;
-				continue;
-			}
-			
-			// temporal debug
-			if (_pollFds[i].revents & POLLOUT)
-			{
-			sendResponse(i);
-			i--;
-			continue ;
+				continue ;
 			}
 			
 		}
@@ -206,7 +251,7 @@ bool	ServerManager::isListenSocket(int fd) const
 
 void	ServerManager::acceptClient(int socketFd)
 {
-	sockaddr_in	clientAddress;
+	sockaddr_in		clientAddress;
 	struct pollfd	client;
 	
 	socklen_t clientLen = sizeof(clientAddress);
@@ -219,7 +264,7 @@ void	ServerManager::acceptClient(int socketFd)
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
 	{
 		close(clientFd);
-    		throw std::runtime_error("fcntl(F_SETFL) failed");
+    	throw std::runtime_error("fcntl(F_SETFL) failed");
     	}
     	
 	client.fd = clientFd;
@@ -227,6 +272,7 @@ void	ServerManager::acceptClient(int socketFd)
 	client.revents = 0;
 	
 	_pollFds.push_back(client);
+	_clients.insert(std::make_pair(clientFd, Client(clientFd)));
 
 	std::cout << "New client connected. fd = " << clientFd << std::endl;
 
@@ -237,9 +283,15 @@ bool	ServerManager::readClient(int indexPoll)
 {
 	int clientFd = _pollFds[indexPoll].fd;
 	
-	char buffer[4096];
+	// no se puede dar el caso de que no exista, pero por si acaso
+	std::map<int, Client>::iterator it = _clients.find(clientFd);
 
-	int bytes = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+	if (it == _clients.end())
+    	return false;
+
+	Client& client = it->second;
+
+	/*int bytes = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
 	if (bytes == -1)
 	{
@@ -260,13 +312,40 @@ bool	ServerManager::readClient(int indexPoll)
 	std::cout << "Request received:" << std::endl;
 	std::cout << buffer << std::endl;
 	
-	_pollFds[indexPoll].events = POLLOUT;// temporal
+	*/
+	if (client.receive())
+    {
+    	if (client.getParser().hasError())
+    	{
+        	// crear respuesta de error
+        	// 400, 413, etc
+        }
+    	else
+    	{
+        	Request request = client.getParser().getRequest();
+
+    		//Response response = _requestHandler.handle(request);
+    		
+
+        	//temporal
+    		Response response( "HTTP/1.1 200 OK\r\n""Content-Length: 5\r\n" "\r\n" "Hello");
+
+    		client.setResponse(response);
+    		
+    	}
+    	if (client.hasResponse())
+    	{
+        	_pollFds[indexPoll].events = POLLOUT;
+        	std::cout << "Setting POLLOUT for fd " << clientFd << std::endl;
+    	}
+        
+    }
 
 	
 	return false;
 }
 
-
+/*
 //temporal debug
 void ServerManager::sendResponse(int index)
 {
@@ -283,8 +362,31 @@ void ServerManager::sendResponse(int index)
     _pollFds.erase(_pollFds.begin() + index);
 
     _pollFds[index].events = POLLIN;
-}
+}*/
 
+void ServerManager::sendResponse(int index)
+{
+    int fd = _pollFds[index].fd;
+
+    Client& client = _clients.find(fd)->second;
+
+    const std::string& data = client.getResponse().getStream();
+
+    //no hay que asumir que el send envia todo
+    send(fd, data.c_str(), data.size(), 0);
+
+    if (client.getKeepAlive())
+    {
+        client.getParser().reset();
+        client.clearResponse();
+
+        _pollFds[index].events = POLLIN;
+    }
+    else
+    {
+        close(_pollFds[index].fd);
+    }
+}
 
 
 

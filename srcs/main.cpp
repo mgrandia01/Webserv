@@ -14,16 +14,13 @@
 #include <exception>
 #include <string>
 #include "Config.hpp"
+#include "Response.hpp"
 #include "ServerManager.hpp"
 #include "RequestParser.hpp"
 #include <map>
 
 
-#include "RequestParser.hpp"
-#include <iostream>
-#include <map>
-
-
+/*
 void test(const std::string &title, const std::string &req)
 {
 	std::cout << "==============================" << std::endl;
@@ -82,16 +79,16 @@ void test(const std::string &title, const std::string &req)
 	}
 
 	std::cout << std::endl;
-}
+}*/
 
-
+/*
 int main()
 {
-	/*
+	*
 	 * ===========================
 	 * HOST
 	 * ===========================
-	 */
+	 
 
 	test("VALID HOST",
 		"GET / HTTP/1.1\r\n"
@@ -118,11 +115,11 @@ int main()
 		"\r\n");
 
 
-	/*
+	*
 	 * ===========================
 	 * CONTENT LENGTH
 	 * ===========================
-	 */
+	 *
 
 	test("VALID CONTENT LENGTH",
 		"POST /upload HTTP/1.1\r\n"
@@ -174,11 +171,11 @@ int main()
 		"\r\n");
 
 
-	/*
+	*
 	 * ===========================
 	 * TRANSFER ENCODING
 	 * ===========================
-	 */
+	 *
 
 	test("VALID TRANSFER ENCODING",
 		"POST /upload HTTP/1.1\r\n"
@@ -209,11 +206,11 @@ int main()
 		"\r\n");
 
 
-	/*
+	*
 	 * ===========================
 	 * FRAMING CONFLICT
 	 * ===========================
-	 */
+	 *
 
 	test("CONTENT LENGTH + TRANSFER ENCODING",
 		"POST /upload HTTP/1.1\r\n"
@@ -224,7 +221,7 @@ int main()
 
 
 	return 0;
-}
+}*/
 
 /*void test(const std::string &title, const std::string &req)
 {
@@ -331,7 +328,7 @@ void test(const std::string &req)
 		std::cout << "INCOMPLETE" << std::endl;
 	}
 }
-
+*/
 int main(int argc, char **argv)
 {
     
@@ -371,5 +368,5 @@ int main(int argc, char **argv)
 	}
 	
 	return (0);
-}*/
+}
 
