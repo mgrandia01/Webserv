@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 11:57:53 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 14:54:41 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,11 @@ void RequestParser::parseHeaders()
 				return;
 
 			}
-			_state = PARSING_BODY;
+
+			if (hasBody())
+				_state = PARSING_BODY;
+			else
+				_state = COMPLETE;
 			return;
 		}
 

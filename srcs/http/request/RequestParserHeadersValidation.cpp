@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 12:03:30 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/23 13:57:35 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,6 @@ bool RequestParser::validateTransferEncoding()
 	return true;
 }
 
-
-//TODO anyadir a la classe
 bool RequestParser::isValidContentLength(const std::string &value)
 {
 	size_t result = 0;
@@ -86,13 +84,11 @@ bool RequestParser::isValidContentLength(const std::string &value)
 		result = result * 10 + (value[i] - '0');
 	}
 	_contentLength = result;
-	// TODO: Detectar overflow de Content-Length
 	return true;
 }
 bool RequestParser::validateContentLength()
 {
 	size_t occurrences = _request.headerOccurrences["content-length"];
-	//entero decimal, no negativo, no desborde, no vacio
 	if (occurrences > 1)
 	{
 		_errorCode = BAD_REQUEST;
