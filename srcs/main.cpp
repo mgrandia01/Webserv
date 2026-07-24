@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/24 09:51:28 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/24 12:32:29 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "RequestParser.hpp"
 #include <map>
 
+/*
 int main(int argc, char **argv)
 {
     
@@ -57,4 +58,133 @@ int main(int argc, char **argv)
 	}
 	
 	return (0);
+}*/
+
+#include <cstring>
+
+static void printResult(const std::string &title, RequestParser &parser)
+{
+    std::cout << "==============================\n";
+    std::cout << title << std::endl;
+    std::cout << "Complete : " << parser.isComplete() << std::endl;
+    std::cout << "Error    : " << parser.hasError() << std::endl;
+    std::cout << "Code     : " << parser.getErrorCode() << std::endl;
+
+    if (parser.isComplete())
+        std::cout << "Body      : [" << parser.getRequest().body << "]" << std::endl;
+
+    std::cout << "==============================\n\n";
+}
+
+int main()
+{
+    /*
+    **********************************************
+    ** TEST 1 - Complete Content-Length body
+    **********************************************
+    */
+
+    {
+        RequestParser parser;
+
+        const char *req =
+            "POST / HTTP/1.1\r\n"
+            "Host: localhost\r\n"
+            "Content-Length: 5\r\n"
+            "\r\n"
+            "Hello";
+
+        parser.feed(req, strlen(req));
+
+        printResult("TEST 1 - Complete body", parser);
+    }
+
+    /*
+    **********************************************
+    ** TEST 2 - Incomplete body
+    **********************************************
+    */
+
+    {
+        RequestParser parser;
+
+        const char *part1 =
+            "POST / HTTP/1.1\r\n"
+            "Host: localhost\r\n"
+            "Content-Length: 10\r\n"
+            "\r\n"
+            "Hello";
+
+        parser.feed(part1, strlen(part1));
+
+        printResult("TEST 2 - Incomplete body", parser);
+
+        std::cout << "Sending remaining bytes...\n\n";
+
+        parser.feed("World", 5);
+
+        printResult("TEST 2 - After second feed", parser);
+    }
+
+    /*
+    **********************************************
+    ** TEST 3 - Empty body
+    **********************************************
+    */
+
+    {
+        RequestParser parser;
+
+        const char *req =
+            "POST / HTTP/1.1\r\n"
+            "Host: localhost\r\n"
+            "Content-Length: 0\r\n"
+            "\r\n";
+
+        parser.feed(req, strlen(req));
+
+        printResult("TEST 3 - Empty body", parser);
+    }
+
+    /*
+    **********************************************
+    ** TEST 4 - Chunked
+    **********************************************
+    */
+
+    {
+        RequestParser parser;
+
+        const char *req =
+            "POST / HTTP/1.1\r\n"
+            "Host: localhost\r\n"
+            "Transfer-Encoding: chunked\r\n"
+            "\r\n";
+
+        parser.feed(req, strlen(req));
+
+        printResult("TEST 4 - Chunked", parser);
+    }
+
+    /*
+    **********************************************
+    ** TEST 5 - Payload Too Large
+    **********************************************
+    */
+
+    {
+        RequestParser parser;
+
+        const char *req =
+            "POST / HTTP/1.1\r\n"
+            "Host: localhost\r\n"
+            "Content-Length: 999999999\r\n"
+            "\r\n";
+
+        parser.feed(req, strlen(req));
+
+        printResult("TEST 5 - Payload Too Large", parser);
+    }
+
+    return 0;
 }

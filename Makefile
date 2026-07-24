@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/07/22 11:26:53 by mgrandia         ###   ########.fr        #
+#    Updated: 2026/07/24 11:48:33 by mgrandia         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ DIR_SRC = srcs/
 # ─────────────────────────────────────────────────────────────
 # ARCHIVOS
 # ─────────────────────────────────────────────────────────────
-SRC = main.cpp http/request/RequestParser.cpp http/request/RequestParserHeaders.cpp http/request/RequestParserHeadersValidation.cpp http/request/RequestParserStartLine.cpp http/request/RequestParserStartLineValidation.cpp http/request/RequestParserUtils.cpp  http/request/RequestParserBody.cpp config/Config.cpp manager/ServerManager.cpp
+SRC = main.cpp http/request/RequestParser.cpp http/request/RequestParserHeaders.cpp http/request/RequestParserHeadersValidation.cpp http/request/RequestParserStartLine.cpp http/request/RequestParserStartLineValidation.cpp http/request/RequestParserBody.cpp http/request/RequestParserBodyValidation.cpp http/request/RequestParserUtils.cpp config/Config.cpp manager/ServerManager.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 

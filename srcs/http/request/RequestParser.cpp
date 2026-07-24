@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/20 11:24:27 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/24 11:53:59 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ RequestParser::RequestParser()
 	_requestLineParsed = false;
 	_contentLength = 0;
 	_chunked = false;
+	_clientMaxBodySize = 1024*1024;//TODO es un parcheeee
 }
 	
 RequestParser::RequestParser(const RequestParser &other)

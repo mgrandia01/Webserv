@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:18:28 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 14:53:10 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/24 12:29:31 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,26 @@ bool RequestParser::hasBody() const
 	return false;
 }
 
-void RequestParser::parseBody()
+void RequestParser::parseContentLengthBody()
 {
-  //TODO:
+	if (_stream.size() < _contentLength)
+		return ;
 
-//	_request.body = _stream;
-//	_stream.clear();
-
-//	_state = COMPLETE;
+	_request.body = _stream.substr(0, _contentLength);
+	_stream.erase(0, _contentLength);
+	_state = COMPLETE;
 }
 
+void RequestParser::parseBody()
+{
+	if (_chunked)
+	{
+		std::cout << "Chunked!" << std::endl;
+		//parseChunkedBody();
+		//TODO
+		return; 
+	}
+	else
+		parseContentLengthBody();
+}
 
