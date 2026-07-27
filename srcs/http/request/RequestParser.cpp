@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:30:02 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 13:03:10 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,12 @@ void RequestParser::reset()
 	_errorCode = 0;
 	_requestLineParsed = false;
 	_stream.clear();
-	_request = Request();
+	_request = HttpRequest();
 	_contentLength = 0;
 	_chunked = false;
 }
 
-Request RequestParser::getRequest() const
+HttpRequest RequestParser::getRequest() const
 {
 	return _request;
 }
