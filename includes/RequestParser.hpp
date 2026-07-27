@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/24 12:24:57 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 10:58:55 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,14 @@ class RequestParser
 		
 		// RequestParserBody.cpp
 		void parseContentLengthBody();
-		//void parseChunkedBody();
+		void parseChunkedBody();
 		bool hasBody() const;
 		void parseBody();
 
 		// RequestParserBodyValidation.cpp
 		bool validateBodySize() const;
+		bool isValidHexSize (const std::string &hexSize);
+		size_t hexToDecimal(const std::string &hexSize);
 
 		// RequestParserUtils.cpp
 		std::string trimWhitespace(const std::string &str);
