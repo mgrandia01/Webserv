@@ -6,12 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/24 11:46:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 10:55:54 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:31:03 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
-#include "HttpStatus.hpp"
+#include "http/RequestParser.hpp"
+#include "http/HttpStatus.hpp"
 
 bool RequestParser::validateBodySize() const
 {

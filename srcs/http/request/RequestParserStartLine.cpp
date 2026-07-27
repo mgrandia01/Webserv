@@ -6,12 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:28 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/23 11:13:13 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:31:42 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
-#include "HttpStatus.hpp"
+#include "http/RequestParser.hpp"
+#include "http/HttpStatus.hpp"
 
 void RequestParser::parseRequestTarget(const std::string &target)
 {

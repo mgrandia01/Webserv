@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 10:58:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:29:33 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <cctype>
 #include <iostream>
 
-#include "Request.hpp"
+#include "HttpRequest.hpp"
 
 class RequestParser
 {

@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 11:18:34 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:32:46 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,9 @@
 #include <string>
 #include "Config.hpp"
 #include "ServerManager.hpp"
-#include "RequestParser.hpp"
+#include "http/RequestParser.hpp"
 #include <map>
 
-/*
 int main(int argc, char **argv)
 {
     
@@ -58,5 +57,5 @@ int main(int argc, char **argv)
 	}
 	
 	return (0);
-}*/
+}
 
