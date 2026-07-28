@@ -6,12 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:57:13 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 14:36:49 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#ifndef HTTPHANDLER_HPP
+#define HTTPHANDLER_HPP
 
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"

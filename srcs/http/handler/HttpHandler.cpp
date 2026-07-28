@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 13:19:31 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/28 11:12:55 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,10 @@ HttpResponse HttpHandler::handle(const HttpRequest& request)
 	if (request.method == "GET")
 		return handleGet(request);
 
-	if (request.method == "POST")
+	else if (request.method == "POST")
 		return handlePost(request);
 
-	if (request.method == "DELETE")
+	else if (request.method == "DELETE")
 		return handleDelete(request);
 
 	//NUNCA llega aqui

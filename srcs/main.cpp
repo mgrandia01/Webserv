@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:32:46 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/28 11:19:35 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,26 @@ int main(int argc, char **argv)
 		std::cerr << e.what() << std::endl;
 		return (1);
 	}
-	
+
 	return (0);
 }
 
+//TODO demomento la llamada a las funciones de HTTP seria algo asi:
+/*
+bytes = recv(fd, buffer, sizeof(buffer), 0);
+
+parser.feed(buffer, bytes);
+
+if (parser.hasError())
+{
+    // preparar respuesta de error
+}
+else if (parser.isComplete())
+{
+    HttpRequest request = parser.getRequest();
+
+    HttpResponse response = handler.handle(request);
+
+    // guardar la respuesta para enviarla cuando poll()
+    // indique que el socket está listo para escribir
+}*/
