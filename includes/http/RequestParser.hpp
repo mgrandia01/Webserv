@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 10:58:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 13:00:00 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <cctype>
 #include <iostream>
 
-#include "Request.hpp"
+#include "HttpRequest.hpp"
 
 class RequestParser
 {
@@ -35,7 +35,7 @@ class RequestParser
 		bool isComplete() const;
 		bool hasError() const;
 
-		Request getRequest() const;
+		HttpRequest getRequest() const;
 		int getErrorCode() const;
 		void reset();
 
@@ -98,7 +98,7 @@ class RequestParser
 
 		std::string _stream;//buffer recibido
 
-		Request _request;
+		HttpRequest _request;
 
 		size_t _contentLength;
 

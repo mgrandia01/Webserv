@@ -6,14 +6,13 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:05:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 11:10:29 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:32:28 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-#include "RequestParser.hpp"
+#include "http/RequestParser.hpp"
 
-//TODO utils
 std::string RequestParser::trimWhitespace(const std::string &str)
 {
 	size_t start = 0;
@@ -26,7 +25,6 @@ std::string RequestParser::trimWhitespace(const std::string &str)
 	return str.substr(start, end - start);
 }
 
-//TODO utils i posar al hpp
 std::string RequestParser::toLower(const std::string &str)
 {
     std::string result = str;

@@ -6,12 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:19:10 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/24 11:47:03 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:32:01 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
-#include "HttpStatus.hpp"
+#include "http/RequestParser.hpp"
+#include "http/HttpStatus.hpp"
 
 bool RequestParser::validateTarget(const std::string &target)
 {

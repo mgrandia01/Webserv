@@ -6,12 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:18:28 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 11:14:09 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:30:44 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
-#include "HttpStatus.hpp"
+#include "http/RequestParser.hpp"
+#include "http/HttpStatus.hpp"
 
 bool RequestParser::hasBody() const
 {
