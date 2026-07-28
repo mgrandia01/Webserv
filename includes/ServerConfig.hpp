@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/07/27 20:45:59 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/07/28 21:18:32 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,12 @@ typedef struct	s_directive
 	std::vector<std::string>	args;
 	std::vector<s_directive>	children;
 }	t_directive;
+
+typedef struct	s_errorPage
+{
+	std::vector<int>	codes;
+	std::string			src;
+}	t_errorPage;
 
 class ServerConfig
 {
@@ -62,11 +68,17 @@ class ServerConfig
 		//ServerConfig(const ServerConfig& src);
 		//ServerConfig& operator=(const ServerConfig& rhs);
 
-		std::string	_host;
-		int			_port;
+
+		std::string					_host;
+		int							_port;
+		bool						_defServ;
+		std::string					_serverName;
+		std::vector<t_errorPage>	_err_page;
+		size_t						_client_max_body_size;
+		std::string					_root;
+		std::vector<ServerConfig>	_locations;
 
 		//listen_directive(std::string& str);//
-
 };
 
 /*class ServerConfig {

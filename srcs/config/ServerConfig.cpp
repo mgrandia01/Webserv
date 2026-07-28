@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/07/27 21:12:38 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/07/28 20:59:50 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 /* ***************************** constr & destr ***************************** */
 
 ServerConfig::ServerConfig(){}
-
-void	tokenizer(const std::vector<std::string>& lines,
+//PASAR DE LECTURA A TOKENSTRUCT
+/*void	tokenizer(const std::vector<std::string>& lines,
 					std::vector<t_directive>& tokens,
 					size_t start, size_t end)
 {
@@ -60,13 +60,13 @@ void	tokenizer(const std::vector<std::string>& lines,
 			}
 
 
-			/*if (str[i] && str[i] == '{')
+			// *if (str[i] && str[i] == '{')
 				nd.isBlock = true;	
 			else if (str[i] == '}')
 			{
 				keyword = false;
 				tokens.push_back(nd);
-			}*/
+			}* //
 			if(str[i] == ';')
 			{
 				keyword = false;
@@ -76,9 +76,118 @@ void	tokenizer(const std::vector<std::string>& lines,
 			}
 		}
 	}
+}*/
+
+//PASAR DE TOKEN A TOKENSTRUCT v1
+/*void	processToken(std::string& token, t_directive& nd, bool& keyword, bool& inBlock)
+{
+	if (keyword == false)
+	{
+		nd.name = token;
+		keyword = true;	
+	}
+	else
+	{
+		if (token == "{")
+		{
+			inBlock = true;
+			keyword = false;
+		}
+		//else if (token == "}")
+		//{	
+		//	inBlock = false;
+		//	keyword = false;
+		//	return ;
+		//}
+		else if (token == ";" || token == "}")
+		{
+			keyword = false;
+			return ;
+		}
+		else
+		{
+			nd.args.push_back(token);
+		}
+	}
 }
 
-/*void	tokenizer(std::string str, std::vector<std::string>& tokens)
+void	tokenizerStruct(std::vector<t_directive>& tkStruct, std::vector<std::string>& tokens)
+{
+	t_directive	nd;
+	t_directive	child;
+	size_t		tokensLen = tokens.size();
+	bool		inBlock = false;
+	bool		keyword = false;
+
+	for (size_t j = 0; j < tokensLen; j++)
+	{
+		if (inBlock == false)
+			processToken(tokens[j], nd, keyword, inBlock);
+		else
+		{
+			//while (inBlock == true && tokens[j] != "}")
+			if (tokens[j] != "}")
+			{
+				processToken(tokens[j], child, keyword, inBlock);
+				if (tokens[j] == ";")
+				{
+					nd.children.push_back(child);
+					child = t_directive();
+				}
+				//j++;
+			}
+		}
+		if ((tokens[j] == ";" && inBlock == false) || tokens[j] == "}")
+		{
+			inBlock = false;
+			tkStruct.push_back(nd);
+			nd = t_directive();
+		}
+	}
+}*/
+
+void	parserDirective(std::vector<t_directive>& tkStruct,
+				std::vector<std::string>& tokens,
+				size_t& j)
+{
+	t_directive	nd;
+
+	nd.name = tokens[j];
+	j++;
+	while (tokens[j] != ";" && tokens[j] != "{")
+	{
+		nd.args.push_back(tokens[j]);
+		j++;
+	}
+	if (tokens[j] == ";")
+		nd.isBlock = false;
+	else if (tokens[j] == "{")
+	{
+		nd.isBlock = true;
+		j++;
+		while (tokens[j] != "}")
+		{
+			parserDirective(nd.children, tokens, j);
+			j++;
+		}
+	}	
+	tkStruct.push_back(nd);
+}
+
+void	tokenizerStruct(std::vector<t_directive>& tokensStruct, std::vector<std::string>& tokens)
+{
+	size_t	j = 0;
+	size_t	len = tokens.size();
+
+	while (j < len)
+	{
+		parserDirective(tokensStruct, tokens, j);
+		j++;
+	}
+}
+
+//PASAR DE LECTURA A TOKEN
+void	tokenizer(std::string str, std::vector<std::string>& tokens)
 {
 	size_t 		start = 0;
 	size_t		len = 0;
@@ -103,16 +212,39 @@ void	tokenizer(const std::vector<std::string>& lines,
 		if (str[i] && (str[i] == '{' || str[i] == '}' || str[i] == ';'))
 			tokens.push_back(std::string(1, str[i]));
 	}
-}*/
+}
 
 ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, size_t end)
 {
-	/*std::vector<std::string>	tokens;
+	std::vector<std::string>	tokens;
+
 	
 	for (size_t j = start + 1; j < end; j++)
-		tokenizer(lines[j], tokens);*/
+		tokenizer(lines[j], tokens);
+	//PRINT BASIC TOKEN
+	/*for (size_t j = 0; j < tokens.size(); j++)
+		std::cout << tokens[j] << std::endl;*/
 	
-	std::vector<t_directive>	tokens;
+	std::vector<t_directive>	tokensStruct;
+
+	tokenizerStruct(tokensStruct, tokens);
+	//PRINT SRTUCT TOKEN
+	for (size_t k = 0; k < tokensStruct.size(); k++)
+	{
+		std::cout << k << "\t" << tokensStruct[k].name << std::endl;
+		for (size_t l = 0; l < tokensStruct[k].args.size(); l++)
+			std::cout << k << " " << l << "\t\t" << tokensStruct[k].args[l] << std::endl;
+		for (size_t l = 0; l < tokensStruct[k].children.size(); l++)
+		{
+			std::cout << k << " " << l << "\t\t>" << tokensStruct[k].children[l].name << std::endl;
+			for (size_t m = 0; m < tokensStruct[k].children[l].args.size(); m++)
+				std::cout << k << " " << l << " " << m << "\t\t\t" << tokensStruct[k].children[l].args[m] << std::endl;	
+		}
+	}
+	
+	
+
+	/*std::vector<t_directive>	tokens;
 	
 	tokenizer(lines, tokens, start, end);
 
@@ -121,7 +253,7 @@ ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, 
 		std::cout << k << " " << tokens[k].name << std::endl;
 		for (size_t l = 0; l < tokens[k].args.size(); l++)
 			std::cout << k << " " << l << " " << tokens[k].args[l] << std::endl;
-	}
+	}*/
 	
 	/*for (int i = start + 1; i < end; i++)
 	{
@@ -170,7 +302,12 @@ const std::string&	ServerConfig::getHost() const{return _host;}
 int			ServerConfig::getPort() const{return _port;}
 
 
-/*ServerConfig::ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root) : _host(host), _port(port), _serverName(serverName), _root(root) {};
+/*ServerConfig::ServerConfig(const std::string& host, int port,
+ 							const std::string& serverName,
+							const std::string& root) : 
+							_host(host), _port(port), 
+							_serverName(serverName),
+							_root(root) {};
 ServerConfig::~ServerConfig(){}
 ServerConfig::ServerConfig(const ServerConfig& other)
 {
@@ -196,16 +333,6 @@ ServerConfig&	ServerConfig::operator=(const ServerConfig& rhs)
 const std::vector<LocationConfig>& ServerConfig::getLocations() const
 {
     return (_locations);
-}
-
-const std::string&	ServerConfig::getHost() const
-{
-	return _host;
-}
-
-int			ServerConfig::getPort() const
-{
-	return _port;
 }
 
 const std::string&	ServerConfig::getServerName() const
