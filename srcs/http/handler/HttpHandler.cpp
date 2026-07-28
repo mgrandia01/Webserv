@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/28 11:12:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/28 14:53:47 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,32 +14,51 @@
 #include "http/HttpStatus.hpp"
 #include <cassert>
 #include <cstdlib>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-HttpResponse HttpHandler::handleGet(const HttpRequest&)
+HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 {
-    HttpResponse response;
+	std::string root = "./www";//TODO esto esta parcheado
+	std::string fullPath = root + request.path;
+	HttpResponse response;
 
-    // TODO: Implement GET
+	//TODO usar stat() por si el usuario quiere un abrir un directorio
+	//y no directamente un fichero, ya que tendra que mirar index, autoindex...
+	int fd = open(fullPath.c_str(), O_RDONLY);
 
-    return response;
+	if (fd == -1)
+	{
+		response.statusCode = 404;
+		response.reasonPhrase = "Not Found";
+		response.body = "404 Not Found";
+		return response;
+	}
+
+	close(fd);
+	
+	response.statusCode = 200;
+	response.reasonPhrase = "OK";
+	return response;
 }
 
 HttpResponse HttpHandler::handlePost(const HttpRequest&)
 {
-    HttpResponse response;
+	HttpResponse response;
 
-    // TODO: Implement POST
+	// TODO: Implement POST
 
-    return response;
+	return response;
 }
 
 HttpResponse HttpHandler::handleDelete(const HttpRequest&)
 {
-    HttpResponse response;
+	HttpResponse response;
 
-    // TODO: Implement DELETE
+	// TODO: Implement DELETE
 
-    return response;
+	return response;
 }
 
 HttpResponse HttpHandler::handle(const HttpRequest& request)
@@ -53,8 +72,9 @@ HttpResponse HttpHandler::handle(const HttpRequest& request)
 	else if (request.method == "DELETE")
 		return handleDelete(request);
 
-	//NUNCA llega aqui
 	assert(false && "Unexpected HTTP method");
 	std::abort();
 }
+
+
 
