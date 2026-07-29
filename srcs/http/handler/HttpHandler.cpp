@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 12:07:45 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 16:07:10 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,13 @@
 
 HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 {
+	//TODO cgi
+	//if (config.isCGI(request.path))
+	//	return cgiHandler.execute(request);
+
+
+
+
 	std::string root = "./www";//TODO esto esta parcheado
 	std::string fullPath = root + request.path;
 	HttpResponse response;
@@ -62,19 +69,38 @@ HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 	
 	response.statusCode = 200;
 	response.reasonPhrase = "OK";
-	response.headers["Content-Type"] = getContentType(fullPath);
 
-	std::stringstream ss;
-	ss << response.body.size();
-	response.headers["Content-Length"] = ss.str();
+	setHeaders(response, getContentType(fullPath));
 	return response;
 }
 
-HttpResponse HttpHandler::handlePost(const HttpRequest& )
+HttpResponse HttpHandler::handlePost(const HttpRequest& request)
 {
+	//TODO cgi
+	//if (config.isCGI(request.path))
+	//	return cgiHandler.execute(request);
+
+
 	HttpResponse response;
 
-	// TODO: Implement POST
+	std::string uploadStore = "./uploads";//TODO desparchear
+	
+	std::string filename = uploadStore + "/upload.txt";
+
+	if (!saveFile(filename, request.body))
+	{
+		response.statusCode = 500;
+		response.reasonPhrase = "Internal Server Error";
+		response.body = "500 Internal Server Error";
+		return response;
+	}
+
+	
+	response.statusCode = 201;
+	response.reasonPhrase = "Created";
+	response.body = "Upload successful";
+	
+	setHeaders(response, "text/plain");
 
 	return response;
 }
@@ -90,10 +116,6 @@ HttpResponse HttpHandler::handleDelete(const HttpRequest& )
 
 HttpResponse HttpHandler::handle(const HttpRequest& request)
 {
-	//TODO cgi
-	//if (config.isCGI(request.path))
-	//	return cgiHandler.execute(request);
-
 	if (request.method == "GET")
 		return handleGet(request);
 
