@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:31:24 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/28 11:49:14 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,6 @@ bool RequestParser::validateContentLength()
 			_errorCode = BAD_REQUEST;
 			return false;
 		}
-		//validar que sea un numero...
 		
 		if (!isValidContentLength(_request.headers["content-length"]))
 		{
@@ -136,7 +135,6 @@ bool RequestParser::validateHeaders()
 	if (!validateHost())
 		return false;
 
-	//error de framing, si tenemos content-length y transfer encoding chunked a la vez
 	if (!validateFramingHeaders())
 		return false;
 
@@ -147,5 +145,3 @@ bool RequestParser::validateHeaders()
 		return false;
 	return true;
 }
-
-

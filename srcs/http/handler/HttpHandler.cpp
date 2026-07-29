@@ -6,44 +6,94 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/28 11:12:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 12:07:45 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp"
-#include <cassert>
-#include <cstdlib>
+#include <cerrno>
+#include <sstream>
 
-HttpResponse HttpHandler::handleGet(const HttpRequest&)
+HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 {
-    HttpResponse response;
+	std::string root = "./www";//TODO esto esta parcheado
+	std::string fullPath = root + request.path;
+	HttpResponse response;
 
-    // TODO: Implement GET
+	//TODO usar stat() por si el usuario quiere un abrir un directorio
+	//y no directamente un fichero, ya que tendra que mirar index, autoindex...
+	int fd = open(fullPath.c_str(), O_RDONLY);
 
-    return response;
+	if (fd == -1)
+	{
+		if (errno == ENOENT)
+		{
+			response.statusCode = 404;
+			response.reasonPhrase = "Not Found";
+			response.body = "404 Not Found";
+		}
+		else if (errno == EACCES)
+		{
+			response.statusCode = 403;
+			response.reasonPhrase = "Forbidden";
+			response.body = "Forbidden";
+		}
+		else
+		{
+			response.statusCode = 500;
+			response.reasonPhrase = "Internal Server Error";
+			response.body = "500 Internal Server Error";
+		}
+
+		return response;
+	}
+	
+	if (!readFile(fd, response.body))
+	{
+		close(fd);
+		response.statusCode = 500;
+		response.reasonPhrase = "Internal Server Error";
+		response.body = "500 Internal Server Error";
+		return response;
+	}
+
+	close(fd);
+	
+	response.statusCode = 200;
+	response.reasonPhrase = "OK";
+	response.headers["Content-Type"] = getContentType(fullPath);
+
+	std::stringstream ss;
+	ss << response.body.size();
+	response.headers["Content-Length"] = ss.str();
+	return response;
 }
 
-HttpResponse HttpHandler::handlePost(const HttpRequest&)
+HttpResponse HttpHandler::handlePost(const HttpRequest& )
 {
-    HttpResponse response;
+	HttpResponse response;
 
-    // TODO: Implement POST
+	// TODO: Implement POST
 
-    return response;
+	return response;
 }
 
-HttpResponse HttpHandler::handleDelete(const HttpRequest&)
+HttpResponse HttpHandler::handleDelete(const HttpRequest& )
 {
-    HttpResponse response;
+	HttpResponse response;
 
-    // TODO: Implement DELETE
+	// TODO: Implement DELETE
 
-    return response;
+	return response;
 }
 
 HttpResponse HttpHandler::handle(const HttpRequest& request)
 {
+	//TODO cgi
+	//if (config.isCGI(request.path))
+	//	return cgiHandler.execute(request);
+
 	if (request.method == "GET")
 		return handleGet(request);
 
@@ -53,8 +103,9 @@ HttpResponse HttpHandler::handle(const HttpRequest& request)
 	else if (request.method == "DELETE")
 		return handleDelete(request);
 
-	//NUNCA llega aqui
 	assert(false && "Unexpected HTTP method");
 	std::abort();
 }
+
+
 

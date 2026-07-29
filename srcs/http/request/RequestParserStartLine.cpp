@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:28 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:31:42 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/28 11:48:35 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ bool RequestParser::parseRequestLine(const std::string &line)
 	std::string target = line.substr(firstSpace + 1, secondSpace - firstSpace - 1);
 	std::string version = line.substr(secondSpace + 1);
 
-	// Comprobar que no haya más espacios
 	if (version.find(' ') != std::string::npos)
 	{
 		_errorCode = BAD_REQUEST;
