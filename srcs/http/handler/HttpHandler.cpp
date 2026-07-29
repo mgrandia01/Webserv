@@ -6,17 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/28 14:53:47 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 08:29:02 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp"
-#include <cassert>
-#include <cstdlib>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 {
@@ -36,6 +31,23 @@ HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 		return response;
 	}
 
+	//TODO extraer esto  una funcion
+	char buffer[1024];
+	while (true)
+	{
+		size_t bytesRead = read(fd, buffer, sizeof(buffer));
+		if (bytesRead < 0)
+		{
+			close(fd);
+			response.statusCode = 500;
+			return response;
+		}
+
+		if (bytesRead == 0)
+			break;
+		response.body.append(buffer, bytesRead);
+	
+	}
 	close(fd);
 	
 	response.statusCode = 200;

@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/07/27 12:54:59 by mgrandia         ###   ########.fr        #
+#    Updated: 2026/07/29 07:59:41 by mgrandia         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,6 +42,7 @@ SRC = main.cpp \
       http/request/RequestParserStartLine.cpp http/request/RequestParserStartLineValidation.cpp \
       http/request/RequestParserBody.cpp http/request/RequestParserBodyValidation.cpp \
       http/handler/HttpHandler.cpp \
+      http/handler/HttpHandlerGet.cpp http/handler/HttpHandlerPost.cpp http/handler/HttpHandlerDelete.cpp \
       config/Config.cpp manager/ServerManager.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
