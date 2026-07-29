@@ -6,145 +6,19 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/07/28 20:59:50 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/07/29 21:20:04 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <stdlib.h>
+#include <map>
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 
 /* ***************************** constr & destr ***************************** */
 
 ServerConfig::ServerConfig(){}
-//PASAR DE LECTURA A TOKENSTRUCT
-/*void	tokenizer(const std::vector<std::string>& lines,
-					std::vector<t_directive>& tokens,
-					size_t start, size_t end)
-{
-	t_directive	nd;
-	t_directive	child;
-	bool		keyword = false;
-
-	for (size_t j = start + 1; j < end; j++)
-	{
-		std::string	str = lines[j];
-
-		for (size_t i = 0; str[i]; i++)
-		{
-			std::string	tmp;
-			size_t		begin;
-			size_t		len;
-
-			while (str[i] && isspace(str[i]))
-				i++;
-			begin = i;
-			len = 0;
-			while (str[i] && str[i] != '{' && str[i] != '}' && str[i] != ';' && !isspace(str[i]))
-			{
-				i++;
-				len++;
-			}
-			if (len > 0)
-			{
-				tmp = str.substr(begin, len);
-				std::cout << tmp << std::endl;
-				if (keyword == false)
-				{
-					keyword = true;
-					nd.name = tmp; 
-				}
-				else
-					nd.args.push_back(tmp);
-			}
-
-
-			// *if (str[i] && str[i] == '{')
-				nd.isBlock = true;	
-			else if (str[i] == '}')
-			{
-				keyword = false;
-				tokens.push_back(nd);
-			}* //
-			if(str[i] == ';')
-			{
-				keyword = false;
-				nd.isBlock = false;
-				tokens.push_back(nd);
-				nd = t_directive();
-			}
-		}
-	}
-}*/
-
-//PASAR DE TOKEN A TOKENSTRUCT v1
-/*void	processToken(std::string& token, t_directive& nd, bool& keyword, bool& inBlock)
-{
-	if (keyword == false)
-	{
-		nd.name = token;
-		keyword = true;	
-	}
-	else
-	{
-		if (token == "{")
-		{
-			inBlock = true;
-			keyword = false;
-		}
-		//else if (token == "}")
-		//{	
-		//	inBlock = false;
-		//	keyword = false;
-		//	return ;
-		//}
-		else if (token == ";" || token == "}")
-		{
-			keyword = false;
-			return ;
-		}
-		else
-		{
-			nd.args.push_back(token);
-		}
-	}
-}
-
-void	tokenizerStruct(std::vector<t_directive>& tkStruct, std::vector<std::string>& tokens)
-{
-	t_directive	nd;
-	t_directive	child;
-	size_t		tokensLen = tokens.size();
-	bool		inBlock = false;
-	bool		keyword = false;
-
-	for (size_t j = 0; j < tokensLen; j++)
-	{
-		if (inBlock == false)
-			processToken(tokens[j], nd, keyword, inBlock);
-		else
-		{
-			//while (inBlock == true && tokens[j] != "}")
-			if (tokens[j] != "}")
-			{
-				processToken(tokens[j], child, keyword, inBlock);
-				if (tokens[j] == ";")
-				{
-					nd.children.push_back(child);
-					child = t_directive();
-				}
-				//j++;
-			}
-		}
-		if ((tokens[j] == ";" && inBlock == false) || tokens[j] == "}")
-		{
-			inBlock = false;
-			tkStruct.push_back(nd);
-			nd = t_directive();
-		}
-	}
-}*/
 
 void	parserDirective(std::vector<t_directive>& tkStruct,
 				std::vector<std::string>& tokens,
@@ -229,9 +103,10 @@ ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, 
 
 	tokenizerStruct(tokensStruct, tokens);
 	//PRINT SRTUCT TOKEN
-	for (size_t k = 0; k < tokensStruct.size(); k++)
+	/*for (size_t k = 0; k < tokensStruct.size(); k++)
 	{
 		std::cout << k << "\t" << tokensStruct[k].name << std::endl;
+		//std::cout << std::setw(10) << tokensStruct[k].args[l] << std::endl;
 		for (size_t l = 0; l < tokensStruct[k].args.size(); l++)
 			std::cout << k << " " << l << "\t\t" << tokensStruct[k].args[l] << std::endl;
 		for (size_t l = 0; l < tokensStruct[k].children.size(); l++)
@@ -240,10 +115,50 @@ ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, 
 			for (size_t m = 0; m < tokensStruct[k].children[l].args.size(); m++)
 				std::cout << k << " " << l << " " << m << "\t\t\t" << tokensStruct[k].children[l].args[m] << std::endl;	
 		}
-	}
-	
-	
+	}*/
 
+	std::map<std::string, directiveFunc>	tkFuncMap;
+
+	//tkFuncMap["listen"] = &ServerConfig::listenDirective;
+	tkFuncMap["server_name"] = &ServerConfig::serverNameDirective;
+	tkFuncMap["error_page"] = &ServerConfig::errorPageDirective;
+	tkFuncMap["client_max_size_body"] = &ServerConfig::clientMaxBodySizeDirective;
+	//			^^^^							^^^
+	//tkFuncMap["root"] = &ServerConfig::rootDirective;
+	//tkFuncMap["index"] = &ServerConfig::indexDirective;
+
+	for (std::vector<t_directive>::iterator tk = tokensStruct.begin();
+		tk != tokensStruct.end(); tk++)
+	{
+		std::map<std::string, directiveFunc>::iterator func;
+		
+		func = tkFuncMap.find(tk->name);
+		if (func == tkFuncMap.end())
+			throw ServerConfigMissedDirectiveException();
+		(this->*(func->second))(*tk);
+	}
+
+}
+
+ServerConfig::~ServerConfig(){}
+
+/* ******************************** get & set ******************************* */
+
+const std::string&	ServerConfig::getHost() const{return _host;}
+
+const std::vector<std::string>&	ServerConfig::getServerName() const {return (_serverName);}
+
+const std::vector<t_errorPage>&	ServerConfig::getErrorPage() const {return (_errorPage);}
+
+const size_t&	ServerConfig::getClientMaxBodySize() const{return (_clientMaxBodySize);}
+
+const int&	ServerConfig::getPort() const{return _port;}
+
+/* ************************* member funcs / methods ************************* */
+
+void	ServerConfig::listenDirective(const t_directive& tk)
+{
+	std::cout << "Listen function: It's me, \"" << tk.name << "\".\n";
 	/*std::vector<t_directive>	tokens;
 	
 	tokenizer(lines, tokens, start, end);
@@ -291,51 +206,58 @@ ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, 
 		std::cout << _host  << "\n" << _port << std::endl;
 
 	}*/
+
 }
 
-ServerConfig::~ServerConfig(){}
+void	ServerConfig::serverNameDirective(const t_directive& tk)
+{	
+	if (tk.args.size() < 1)
+		throw ServerConfigInsufArgsException();
 
-/* ******************************** get & set ******************************* */
-
-const std::string&	ServerConfig::getHost() const{return _host;}
-
-int			ServerConfig::getPort() const{return _port;}
-
-
-/*ServerConfig::ServerConfig(const std::string& host, int port,
- 							const std::string& serverName,
-							const std::string& root) : 
-							_host(host), _port(port), 
-							_serverName(serverName),
-							_root(root) {};
-ServerConfig::~ServerConfig(){}
-ServerConfig::ServerConfig(const ServerConfig& other)
-{
- 	*this = other;
+	_serverName = tk.args;
 }
 
-ServerConfig&	ServerConfig::operator=(const ServerConfig& rhs)
+void	ServerConfig::errorPageDirective(const t_directive& tk)
 {
-	if (this != &rhs)
+	t_errorPage	nd;
+
+	if (tk.args.size() < 2)
+		throw ServerConfigInsufArgsException();
+
+	nd.src = tk.args.back();
+
+	for (size_t j = 0; j < tk.args.size() - 1; j++)
 	{
-        	_host = rhs._host;
-		_port = rhs._port;
-		_serverName = rhs._serverName;
-		_root = rhs._root;
-		_att1 = rhs._att1;
-		_att2 = rhs._att2;
-	        _locations = rhs._locations;
+		int	nCode;
+
+		nCode = atoi(tk.args[j].c_str());
+		if (nCode < 300 || nCode > 599)
+			throw ServerConfigErrorCodeOutLimitsException();
+		nd.codes.push_back(nCode);
 	}
+
+	_errorPage.push_back(nd);
+}
+
+void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
+{
+	if (tk.args.size() != 1)
+		throw ServerConfigInsufArgsException();
 	
-	return *this;
+	int	tmp = atoi(tk.args[0].c_str());
+
+	if (tmp < 1)
+		throw ServerConfigBodySizeException();
+
+	_clientMaxBodySize = tmp;
 }
 
-const std::vector<LocationConfig>& ServerConfig::getLocations() const
+void	ServerConfig::rootDirective(const t_directive& tk)
 {
-    return (_locations);
+	std::cout << "Root function: It's me, \"" << tk.name << "\".\n";
 }
 
-const std::string&	ServerConfig::getServerName() const
+void	ServerConfig::indexDirective(const t_directive& tk)
 {
-	return _serverName;
-}*/
+	std::cout << "Index function: It's me, \"" << tk.name << "\".\n";
+}

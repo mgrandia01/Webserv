@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/07/28 21:18:32 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/07/29 21:19:13 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,6 @@
 # include <string>
 # include <vector>
 # include <exception>
-
-/*typedef struct	s_location
-{
-	bool		cgi;
-	std::string	name;
-	std::string	type;
-	std::string	path;
-}	t_location;*/
-
 
 typedef struct	s_directive
 {
@@ -43,9 +34,18 @@ typedef struct	s_errorPage
 class ServerConfig
 {
 	public:
+		//CONSTRUCTOR
 		ServerConfig(const std::vector<std::string>& lines, size_t start, size_t end);
 		~ServerConfig();
 
+		//GETTERS
+		const std::string&				getHost() const;
+		const std::vector<std::string>&	getServerName() const;
+		const std::vector<t_errorPage>&	getErrorPage() const;
+		const size_t&					getClientMaxBodySize() const;
+		const int&						getPort() const;
+
+		//EXCEPTIONS
 		class ServerConfigSemicolonPosException : public std::exception
 		{
 			public:
@@ -60,58 +60,58 @@ class ServerConfig
 				{return ("There is not semicolon.");}
 		};
 
-		const std::string&	getHost() const;
-		int					getPort() const;
+		class ServerConfigMissedDirectiveException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Unknown directive.");}
+		};
+
+		class ServerConfigInsufArgsException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Insufficient arguments.");}
+		};
+
+		class ServerConfigErrorCodeOutLimitsException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("A error code is out of limits.");}
+		};
+		
+		class ServerConfigBodySizeException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Client max body size must be an unsigned number.");}
+		};
 	
 	private:
 		ServerConfig();
 		//ServerConfig(const ServerConfig& src);
 		//ServerConfig& operator=(const ServerConfig& rhs);
 
+		typedef void (ServerConfig::*directiveFunc)(const t_directive&);
 
+		//VARIABLES
 		std::string					_host;
 		int							_port;
 		bool						_defServ;
-		std::string					_serverName;
-		std::vector<t_errorPage>	_err_page;
-		size_t						_client_max_body_size;
+		std::vector<std::string>	_serverName;
+		std::vector<t_errorPage>	_errorPage;
+		size_t						_clientMaxBodySize;
 		std::string					_root;
 		std::vector<ServerConfig>	_locations;
 
-		//listen_directive(std::string& str);//
+		//FUNCTIONS
+		void	listenDirective(const t_directive& tk);
+		void	serverNameDirective(const t_directive& tk);
+		void	errorPageDirective(const t_directive& tk);
+		void	clientMaxBodySizeDirective(const t_directive& tk);
+		void	rootDirective(const t_directive& tk);
+		void	indexDirective(const t_directive& tk);
 };
-
-/*class ServerConfig {
-
-public:
-	ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root);
-	~ServerConfig();
-	ServerConfig(const ServerConfig& other);
-	ServerConfig& operator=(const ServerConfig& rhs);
-	
-	const std::string&	getHost() const;
-	int			getPort() const;
-	const std::string&	getServerName() const;
-	const std::string&	getRoot() const;
-
-	
-	const std::vector<LocationConfig>& getLocations() const;
-
-private:
-
-	ServerConfig();
-
-
-	std::string	_host;
-	int		_port;
-	std::string	_serverName;
-	std::string	_root;
-	std::string	_att1;
-	std::string	_att2;
-	std::vector<LocationConfig> _locations;
-	
-
-
-};*/
 
 #endif
