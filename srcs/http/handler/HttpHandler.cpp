@@ -6,13 +6,14 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 09:56:51 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 12:07:45 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp"
 #include <cerrno>
+#include <sstream>
 
 HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 {
@@ -23,11 +24,6 @@ HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 	//TODO usar stat() por si el usuario quiere un abrir un directorio
 	//y no directamente un fichero, ya que tendra que mirar index, autoindex...
 	int fd = open(fullPath.c_str(), O_RDONLY);
-	readFile(fd
-
-	if (fd == -1)
-	{
-//TODO mirar como anyadir content lenght content type... headers en general
 
 	if (fd == -1)
 	{
@@ -66,10 +62,15 @@ HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 	
 	response.statusCode = 200;
 	response.reasonPhrase = "OK";
+	response.headers["Content-Type"] = getContentType(fullPath);
+
+	std::stringstream ss;
+	ss << response.body.size();
+	response.headers["Content-Length"] = ss.str();
 	return response;
 }
 
-HttpResponse HttpHandler::handlePost(const HttpRequest&)
+HttpResponse HttpHandler::handlePost(const HttpRequest& )
 {
 	HttpResponse response;
 
@@ -78,7 +79,7 @@ HttpResponse HttpHandler::handlePost(const HttpRequest&)
 	return response;
 }
 
-HttpResponse HttpHandler::handleDelete(const HttpRequest&)
+HttpResponse HttpHandler::handleDelete(const HttpRequest& )
 {
 	HttpResponse response;
 
@@ -89,6 +90,10 @@ HttpResponse HttpHandler::handleDelete(const HttpRequest&)
 
 HttpResponse HttpHandler::handle(const HttpRequest& request)
 {
+	//TODO cgi
+	//if (config.isCGI(request.path))
+	//	return cgiHandler.execute(request);
+
 	if (request.method == "GET")
 		return handleGet(request);
 

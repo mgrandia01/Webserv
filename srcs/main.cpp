@@ -6,17 +6,21 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/28 11:19:35 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 12:08:56 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <exception>
+#include <map>
 #include <string>
+
 #include "Config.hpp"
 #include "ServerManager.hpp"
+
 #include "http/RequestParser.hpp"
-#include <map>
+#include "http/HttpResponse.hpp"
+#include "http/HttpHandler.hpp"
 
 int main(int argc, char **argv)
 {
@@ -68,6 +72,7 @@ parser.feed(buffer, bytes);
 if (parser.hasError())
 {
     // preparar respuesta de error
+    // TODO tenemos que crear paginas de error personalizadas?
 }
 else if (parser.isComplete())
 {
@@ -78,3 +83,4 @@ else if (parser.isComplete())
     // guardar la respuesta para enviarla cuando poll()
     // indique que el socket está listo para escribir
 }*/
+
