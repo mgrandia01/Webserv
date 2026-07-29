@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 08:16:17 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 09:53:15 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ class HttpHandler
 		HttpResponse handleGet(const HttpRequest& request);
 		HttpResponse handlePost(const HttpRequest& request);
 		HttpResponse handleDelete(const HttpRequest& request);
+
+		bool readFile(int fd, std::string& body);
 };
 
 

@@ -6,12 +6,13 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 08:29:02 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 09:56:51 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp"
+#include <cerrno>
 
 HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 {
@@ -22,32 +23,45 @@ HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 	//TODO usar stat() por si el usuario quiere un abrir un directorio
 	//y no directamente un fichero, ya que tendra que mirar index, autoindex...
 	int fd = open(fullPath.c_str(), O_RDONLY);
+	readFile(fd
 
 	if (fd == -1)
 	{
-		response.statusCode = 404;
-		response.reasonPhrase = "Not Found";
-		response.body = "404 Not Found";
+//TODO mirar como anyadir content lenght content type... headers en general
+
+	if (fd == -1)
+	{
+		if (errno == ENOENT)
+		{
+			response.statusCode = 404;
+			response.reasonPhrase = "Not Found";
+			response.body = "404 Not Found";
+		}
+		else if (errno == EACCES)
+		{
+			response.statusCode = 403;
+			response.reasonPhrase = "Forbidden";
+			response.body = "Forbidden";
+		}
+		else
+		{
+			response.statusCode = 500;
+			response.reasonPhrase = "Internal Server Error";
+			response.body = "500 Internal Server Error";
+		}
+
+		return response;
+	}
+	
+	if (!readFile(fd, response.body))
+	{
+		close(fd);
+		response.statusCode = 500;
+		response.reasonPhrase = "Internal Server Error";
+		response.body = "500 Internal Server Error";
 		return response;
 	}
 
-	//TODO extraer esto  una funcion
-	char buffer[1024];
-	while (true)
-	{
-		size_t bytesRead = read(fd, buffer, sizeof(buffer));
-		if (bytesRead < 0)
-		{
-			close(fd);
-			response.statusCode = 500;
-			return response;
-		}
-
-		if (bytesRead == 0)
-			break;
-		response.body.append(buffer, bytesRead);
-	
-	}
 	close(fd);
 	
 	response.statusCode = 200;
