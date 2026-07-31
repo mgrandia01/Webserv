@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 16:08:04 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/31 09:59:07 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,4 +83,3 @@ else if (parser.isComplete())
     // guardar la respuesta para enviarla cuando poll()
     // indique que el socket está listo para escribir
 }*/
-
