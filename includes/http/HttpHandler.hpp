@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 11:19:16 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/29 15:56:13 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,22 @@
 class HttpHandler
 {
 	public:
+		//TODO al hacer la integracion sera algo como:
+		//HttpResponse HttpHandler::handle
+		//(const HttpRequest& request,const LocationConfig& location)
 		HttpResponse handle(const HttpRequest& request);
 
 	private:
+		//HttpHandler.cpp
 		HttpResponse handleGet(const HttpRequest& request);
 		HttpResponse handlePost(const HttpRequest& request);
 		HttpResponse handleDelete(const HttpRequest& request);
 
-		//HandlerGet.cpp
+		//HttpHandlerUtils.cpp
+		void setHeaders(HttpResponse& response, const std::string& contentType);
 		std::string getContentType(const std::string& path);
 		bool readFile(int fd, std::string& body);
+		bool saveFile(const std::string& path, const std::string& buffer);
 };
 
 
