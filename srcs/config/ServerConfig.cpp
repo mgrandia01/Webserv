@@ -6,13 +6,14 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/07/29 21:20:04 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/07/31 14:12:48 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
-#include <stdlib.h>
 #include <map>
+#include <cstring>
+#include <stdlib.h>
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 
@@ -88,7 +89,7 @@ void	tokenizer(std::string str, std::vector<std::string>& tokens)
 	}
 }
 
-ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, size_t end)
+ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, size_t end) : _host("0.0.0.0"), _port(0), _defaultServer(false), _clientMaxBodySize(100)
 {
 	std::vector<std::string>	tokens;
 
@@ -119,13 +120,12 @@ ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, 
 
 	std::map<std::string, directiveFunc>	tkFuncMap;
 
-	//tkFuncMap["listen"] = &ServerConfig::listenDirective;
+	tkFuncMap["listen"] = &ServerConfig::listenDirective;
 	tkFuncMap["server_name"] = &ServerConfig::serverNameDirective;
 	tkFuncMap["error_page"] = &ServerConfig::errorPageDirective;
-	tkFuncMap["client_max_size_body"] = &ServerConfig::clientMaxBodySizeDirective;
-	//			^^^^							^^^
-	//tkFuncMap["root"] = &ServerConfig::rootDirective;
-	//tkFuncMap["index"] = &ServerConfig::indexDirective;
+	tkFuncMap["client_max_body_size"] = &ServerConfig::clientMaxBodySizeDirective;
+	tkFuncMap["root"] = &ServerConfig::rootDirective;
+	tkFuncMap["index"] = &ServerConfig::indexDirective;
 
 	for (std::vector<t_directive>::iterator tk = tokensStruct.begin();
 		tk != tokensStruct.end(); tk++)
@@ -138,6 +138,20 @@ ServerConfig::ServerConfig(const std::vector<std::string>& lines, size_t start, 
 		(this->*(func->second))(*tk);
 	}
 
+	//PRINT USABLE DATA
+	/*std::cout << _host << std::endl;
+	std::cout << _port << std::endl;
+	std::cout << "0 FALSE, 1 TRUE:\t" << _defaultServer << std::endl;
+	for (size_t k = 0; k < _errorPage.size(); k++)
+	{
+		for (size_t l = 0; l < _errorPage[k].codes.size(); l++)
+			std::cout << _errorPage[k].codes[l] << " ";
+		std::cout << _errorPage[k].src << std::endl;
+	}	
+	std::cout << _clientMaxBodySize <<std::endl; 
+	std::cout << _root <<std::endl; 
+	for (size_t k = 0; k < _index.size(); k++)
+		std::cout << _index[k] << std::endl;*/
 }
 
 ServerConfig::~ServerConfig(){}
@@ -146,67 +160,42 @@ ServerConfig::~ServerConfig(){}
 
 const std::string&	ServerConfig::getHost() const{return _host;}
 
+const int&	ServerConfig::getPort() const{return _port;}
+
+const bool&	ServerConfig::getDefaultServer() const{return _defaultServer;}
+
 const std::vector<std::string>&	ServerConfig::getServerName() const {return (_serverName);}
 
 const std::vector<t_errorPage>&	ServerConfig::getErrorPage() const {return (_errorPage);}
 
 const size_t&	ServerConfig::getClientMaxBodySize() const{return (_clientMaxBodySize);}
 
-const int&	ServerConfig::getPort() const{return _port;}
+const std::vector<std::string>&	ServerConfig::getIndex() const{return _index;}
 
 /* ************************* member funcs / methods ************************* */
 
 void	ServerConfig::listenDirective(const t_directive& tk)
 {
-	std::cout << "Listen function: It's me, \"" << tk.name << "\".\n";
-	/*std::vector<t_directive>	tokens;
-	
-	tokenizer(lines, tokens, start, end);
+	if (tk.args.size() > 2)
+		throw ServerConfigInsufArgsException();
 
-	for (size_t k = 0; k < tokens.size(); k++)
+	for (size_t j = 0; j < tk.args.size(); j++)
 	{
-		std::cout << k << " " << tokens[k].name << std::endl;
-		for (size_t l = 0; l < tokens[k].args.size(); l++)
-			std::cout << k << " " << l << " " << tokens[k].args[l] << std::endl;
-	}*/
-	
-	/*for (int i = start + 1; i < end; i++)
-	{
-		//listen_directive(lines[i]);
+		if (tk.args[j] == "default_server")
+			_defaultServer = true;
 
-		int	listenPos = lines[i].find("listen ");
-		int	listenLen = 7;
-		int	semicolonPos = lines[i].find(";"); 
-
-		if (semicolonPos == -1)
-			throw ServerConfigNotSemicolonException();
-		if (semicolonPos < listenPos)
-			throw ServerConfigSemicolonPosException();
-
-
-		int	colonPos = lines[i].find(":");
-		int	portPos = listenPos + listenLen;
-
-		if (colonPos != -1)
+		size_t	pos = tk.args[j].find(":");
+		if (pos != std::string::npos)//x.x.x.x
 		{
-			int	hostPos = listenPos + listenLen;
-			int	hostLen = colonPos- hostPos;
-
-			_host = lines[i].substr(hostPos, hostLen);
-			portPos = colonPos + 1;
+			if (tk.args[j] == "localhost")
+				_host = "127.0.0.1";
+			else
+				_host = tk.args[j].substr(0, pos);
+			_port = atoi(tk.args[j].substr(pos + 1).c_str());
 		}
 		else
-			_host = "";
-
-		int			portLen = semicolonPos - portPos;
-		std::string tmp = lines[i].substr(portPos, portLen);
-
-		_port = atoi(tmp.c_str());
-
-		std::cout << _host  << "\n" << _port << std::endl;
-
-	}*/
-
+			_port = atoi(tk.args[j].c_str());
+	}
 }
 
 void	ServerConfig::serverNameDirective(const t_directive& tk)
@@ -250,14 +239,26 @@ void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
 		throw ServerConfigBodySizeException();
 
 	_clientMaxBodySize = tmp;
+
+	int i = 0;
+	while (isdigit(tk.args[0][i]))
+		i++;
+
+	if (tk.args[0][i] == 'k')
+		_clientMaxBodySize *= 1000;
+	else if (tk.args[0][i] == 'M')
+		_clientMaxBodySize *= 1000000;
 }
 
 void	ServerConfig::rootDirective(const t_directive& tk)
 {
-	std::cout << "Root function: It's me, \"" << tk.name << "\".\n";
+	if (tk.args.size() != 1)
+		throw ServerConfigInsufArgsException();
+
+	_root = tk.args[0];
 }
 
 void	ServerConfig::indexDirective(const t_directive& tk)
 {
-	std::cout << "Index function: It's me, \"" << tk.name << "\".\n";
+	_index = tk.args;
 }

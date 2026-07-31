@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/07/29 21:19:13 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/07/31 13:54:40 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,12 @@ class ServerConfig
 
 		//GETTERS
 		const std::string&				getHost() const;
+		const int&						getPort() const;
+		const bool&						getDefaultServer() const;
 		const std::vector<std::string>&	getServerName() const;
 		const std::vector<t_errorPage>&	getErrorPage() const;
 		const size_t&					getClientMaxBodySize() const;
-		const int&						getPort() const;
+		const std::vector<std::string>&	getIndex() const;
 
 		//EXCEPTIONS
 		class ServerConfigSemicolonPosException : public std::exception
@@ -98,11 +100,12 @@ class ServerConfig
 		//VARIABLES
 		std::string					_host;
 		int							_port;
-		bool						_defServ;
+		bool						_defaultServer;
 		std::vector<std::string>	_serverName;
 		std::vector<t_errorPage>	_errorPage;
 		size_t						_clientMaxBodySize;
 		std::string					_root;
+		std::vector<std::string>	_index;
 		std::vector<ServerConfig>	_locations;
 
 		//FUNCTIONS
