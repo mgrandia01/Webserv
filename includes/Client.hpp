@@ -16,8 +16,15 @@
 
 #include "RequestParser.hpp"
 #include "Response.hpp"
+#include "Config.hpp"
 
-
+enum TimeoutState
+{
+    WAITING_HEADERS,
+    RECEIVING_BODY,
+    SENDING_RESPONSE,
+    KEEP_ALIVE
+};
 
 
 class Client
@@ -33,8 +40,8 @@ public:
 
     RequestParser& getParser();
 
-    Response getResponse() const;
-    void setResponse(Response response);
+    const Response& getResponse() const;
+    void setResponse(const Response& response);
 
     /*bool getKeepAlive() const;
     void setKeepAlive(bool keepAlive);
@@ -43,6 +50,26 @@ public:
     bool hasResponse() const;
     bool getKeepAlive() const;
     void clearResponse();
+
+    bool isRequestComplete() const;
+    bool hasParserError() const;
+
+    void setServerConfig(const ServerConfig* config);
+    const ServerConfig* getServerConfig() const;
+
+    //void setHasResponse(bool flag);
+    void setKeepAlive(bool flag);
+
+    size_t getBytesSent() const;
+    void addBytesSent(size_t bytes);
+    void resetBytesSent();
+
+    time_t getLastActivity() const;
+    void setLastActivity();
+
+    
+    TimeoutState getTimeoutState() const;
+    void setTimeoutState(TimeoutState state);
 
 private:
 
@@ -53,8 +80,19 @@ private:
     bool     _hasResponse;
     bool    _keepAlive;
 
+    size_t  _bytesSent;
+
+
+    time_t _lastActivity;
+    TimeoutState _timeoutState;
+
     RequestParser   _parser;
     Response     _response;
+
+    //TODO hay uno, pero habra que poner un vector de candidatos
+    const ServerConfig* _serverConfig;
+
+    
 
     
 };

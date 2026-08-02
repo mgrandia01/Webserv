@@ -27,6 +27,7 @@
 
 
 static const int LISTEN_BACKLOG = 128;
+static const int POLL_TIMEOUT = 1000;
 
 
 ServerManager::ServerManager(const Config& config) : _config(config) {}
@@ -71,6 +72,7 @@ void	ServerManager::createSockets()
 		bindSocket(socketFd, servers[i]);
 		listenSocket(socketFd);
 		_listenSockets.push_back(socketFd);
+		_listenConfigs.push_back(&servers[i]);
 	}
 	
 }
@@ -138,16 +140,25 @@ void	ServerManager::run()
 	while (true)
 	{
 		// -1, inifnite timoeut until at least one fd has an event
-		int	ret = poll(&_pollFds[0], _pollFds.size(), -1);
+		// POLL_TIMEOUT, maximum timoeut until at least one fd has an event
+		int	ret = poll(&_pollFds[0], _pollFds.size(), POLL_TIMEOUT);
 		if (ret == -1)
 			throw std::runtime_error("poll() failed");
 		
+		if (ret == 0)
+		{
+			// check all possible timeouts before executing main loop
+			checkTimeouts();
+			continue ;
+		}
+
 		std::cout << "Activity detected!" << std::endl;
 		
 		for (int i = 0; i < (int)_pollFds.size(); i++)
 		{
 			std::cout << "fd: " << _pollFds[i].fd << " revents: " << _pollFds[i].revents << std::endl;
-			if (_pollFds[i].revents & (POLLHUP | POLLERR | POLLNVAL)) // closing socket all information transmited
+			
+			if (_pollFds[i].revents & (POLLHUP | POLLERR | POLLNVAL)) // closed socket (all information transmited) or error
 			{
 				std::cout << "POLLHUP on fd: " << _pollFds[i].fd << std::endl;
 				int fd = _pollFds[i].fd;
@@ -156,78 +167,29 @@ void	ServerManager::run()
 				_clients.erase(fd);
 				i--;
 				continue ;	
-			} else if (_pollFds[i].revents & POLLIN) {
+			} 
+			else if (_pollFds[i].revents & POLLIN) // event POLLIN happened because there are data to be read
+			{
 				std::cout << "POLLIN on fd: " << _pollFds[i].fd << std::endl;
 				
 				int fd = _pollFds[i].fd;
+				
 				// type 1: LISTENING sockets : POLLIN means there are new connections waiting to be accepted
 				if (std::find(_listenSockets.begin(), _listenSockets.end(), fd) != _listenSockets.end())
 				{
 					std::cout << "Client activity on listening socket fd: " << _pollFds[i].fd << std::endl;
 					acceptClient(fd);
 				}
-				else // type 2: data sockets : POLLIN menss sockets have received data and are ready to be read
+				else // type 2: data sockets : event POLLIN indicates sockets have received data and are ready to be read
 				{
 					std::cout << "Client activity on fd: " << _pollFds[i].fd << std::endl;
-					//if (readClient(i))
-					//	i--;
-					if (!_clients.at(fd).receive())
+					if (readClient(i))
 					{
-        					std::cout << "CLIENT ERROR on fd: " << _pollFds[i].fd << std::endl;
-        					
-							close(fd);
-							_pollFds.erase(_pollFds.begin() + i);
-							_clients.erase(fd);
-							i--;
+						i--;
+						continue ;
 					}
-					else
-					{
-
-						if (_clients.at(fd).getParser().hasError())
-						{
-								// crear respuesta de error
-							   	// 400, 413, etc
-						}
-						else
-						{
-								if (_clients.at(fd).getParser().isComplete())
-								{
-								std::cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa for fd " << fd << std::endl;
-
-									Request request = _clients.at(fd).getParser().getRequest();
-									//Response response = _requestHandler.handle(request);
-    		
-    								//temporal
-    								Response response( "HTTP/1.1 200 OK\r\n""Content-Length: 5\r\n" "\r\n" "Hello");
-    								_clients.at(fd).setResponse(response);
-    							}
-    					}
-    					if (!_clients.at(fd).hasResponse()) // temporal forzadooooooooooooooooooooooooooo seria al reves
-    					{
-    						
-    						_pollFds[i].events = POLLOUT;
-    						std::cout << "Setting POLLOUT for fd " << fd << std::endl;
-    					}
-        			
-						/*if (_clients.at(fd).getParser().isComplete())
-						{
-							//prepareResponse();
-        					//enablePollout(fd);
-        				}
-        				else
-        				{
-        					std::cout << "CLIENT ERROR on fd: " << _pollFds[i].fd << std::endl;
-
-        					close(fd);
-							_pollFds.erase(_pollFds.begin() + i);
-							_clients.erase(fd);
-							i--;
-        				}*/
-
-					}
-					
 				}
-			}else if (_pollFds[i].revents & POLLOUT)  // temporal debug
+			} else if (_pollFds[i].revents & POLLOUT)  // temporal debug
 			{
 				sendResponse(i);
 				i--;
@@ -238,7 +200,7 @@ void	ServerManager::run()
 	}
 }
 
-bool	ServerManager::isListenSocket(int fd) const
+/*bool	ServerManager::isListenSocket(int fd) const
 {
 	for (size_t i = 0; i < _listenSockets.size(); i++)
 	{
@@ -247,148 +209,260 @@ bool	ServerManager::isListenSocket(int fd) const
 	}
 
 	return false;
-}
+}*/
 
 void	ServerManager::acceptClient(int socketFd)
 {
 	sockaddr_in		clientAddress;
-	struct pollfd	client;
+	struct pollfd	p_client;
 	
 	socklen_t clientLen = sizeof(clientAddress);
 	int clientFd = accept(socketFd, (sockaddr *)&clientAddress, &clientLen);
 
 	if (clientFd == -1)
 		throw std::runtime_error("accept() failed");
+
+	const ServerConfig* serverConfig = getServerConfigFromSocket(socketFd);
 		
 	//accept crea un nuevo socker que tienen que ser no bloquante
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
 	{
 		close(clientFd);
     	throw std::runtime_error("fcntl(F_SETFL) failed");
-    	}
+    }
     	
-	client.fd = clientFd;
-	client.events = POLLIN;
-	client.revents = 0;
+	p_client.fd = clientFd;
+	p_client.events = POLLIN;
+	p_client.revents = 0;
 	
-	_pollFds.push_back(client);
-	_clients.insert(std::make_pair(clientFd, Client(clientFd)));
+	_pollFds.push_back(p_client);
+	
+	Client client(clientFd);
+	client.setServerConfig(serverConfig);
+
+	if (serverConfig)
+		std::cout << "Assigned server: " << serverConfig->getServerName()  << std::endl;
+	else
+		std::cout << "ERROR: no ServerConfig assigned" << std::endl;
+
+	
+	client.setTimeoutState(WAITING_HEADERS);
+	_clients.insert(std::make_pair(clientFd, client));
+
+
+	
+	//_clients.insert(std::make_pair(clientFd, Client(clientFd)));
 
 	std::cout << "New client connected. fd = " << clientFd << std::endl;
 
 }
 
 
-bool	ServerManager::readClient(int indexPoll)
+bool ServerManager::readClient(int indexPoll)
 {
-	int clientFd = _pollFds[indexPoll].fd;
-	
-	// no se puede dar el caso de que no exista, pero por si acaso
-	std::map<int, Client>::iterator it = _clients.find(clientFd);
+    int clientFd = _pollFds[indexPoll].fd;
 
-	if (it == _clients.end())
-    	return false;
+    std::map<int, Client>::iterator it = _clients.find(clientFd);
 
-	Client& client = it->second;
+    if (it == _clients.end())
+        return true;
 
-	/*int bytes = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+    Client& client = it->second;
 
-	if (bytes == -1)
-	{
-		close(clientFd);
-		_pollFds.erase(_pollFds.begin() + indexPoll);
-		return false;
-	}
-	if (bytes == 0)
-	{
-		std::cout << "Client disconnected fd = " << clientFd << std::endl;
-		close(clientFd);
-		_pollFds.erase(_pollFds.begin() + indexPoll);
-		return true;
-	}
-
-	buffer[bytes] = '\0';
-
-	std::cout << "Request received:" << std::endl;
-	std::cout << buffer << std::endl;
-	
-	*/
-	if (client.receive())
+    if (!client.receive())
     {
-    	if (client.getParser().hasError())
-    	{
-        	// crear respuesta de error
-        	// 400, 413, etc
-        }
-    	else
-    	{
-        	Request request = client.getParser().getRequest();
+        std::cout << "Client disconnected fd = " << clientFd << std::endl;
 
-    		//Response response = _requestHandler.handle(request);
-    		
+        close(clientFd);
+        _clients.erase(clientFd);
+        _pollFds.erase(_pollFds.begin() + indexPoll);
 
-        	//temporal
-    		Response response( "HTTP/1.1 200 OK\r\n""Content-Length: 5\r\n" "\r\n" "Hello");
-
-    		client.setResponse(response);
-    		
-    	}
-    	if (client.hasResponse())
-    	{
-        	_pollFds[indexPoll].events = POLLOUT;
-        	std::cout << "Setting POLLOUT for fd " << clientFd << std::endl;
-    	}
-        
+        return true;
     }
 
-	
-	return false;
+    if (client.hasParserError())
+    {
+        Response response(
+            "HTTP/1.1 400 Bad Request\r\n Content-Length: 0\r\n\r\n");
+
+        client.setResponse(response);
+    }
+    else if (client.isRequestComplete())
+    {
+        const Request& request = client.getParser().getRequest();
+
+        const ServerConfig* server = client.getServerConfig();
+
+        if (!server)
+        {
+            Response response(
+                "HTTP/1.1 500 Internal Server Error\r\n"
+                "Content-Length: 0\r\n"
+                "\r\n"
+            );
+
+            client.setResponse(response);
+        }
+        else
+        {
+            Response response;
+            _requestHandler.handle(request, *server, response);
+            client.setResponse(response);
+        }
+    }
+
+    if (client.hasResponse())
+    {
+        client.setTimeoutState(SENDING_RESPONSE);
+        _pollFds[indexPoll].events = POLLOUT;
+        std::cout << "Setting POLLOUT for fd "
+                  << clientFd << std::endl;
+    }
+
+    return false;
 }
 
-/*
-//temporal debug
-void ServerManager::sendResponse(int index)
-{
-    std::string response =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Length: 12\r\n"
-        "\r\n"
-        "<b>Hello</b>";
 
-    int fd = _pollFds[index].fd;
-
-    send(fd, response.c_str(), response.size(), 0);
-    close(fd);
-    _pollFds.erase(_pollFds.begin() + index);
-
-    _pollFds[index].events = POLLIN;
-}*/
 
 void ServerManager::sendResponse(int index)
 {
     int fd = _pollFds[index].fd;
 
-    Client& client = _clients.find(fd)->second;
+    std::map<int, Client>::iterator it = _clients.find(fd);
+	
+	if (it == _clients.end())
+    	return ;
+	
+	Client& client = it->second;
 
     const std::string& data = client.getResponse().getStream();
 
-    //no hay que asumir que el send envia todo
-    send(fd, data.c_str(), data.size(), 0);
+    //temporal, no hay que asumir que el send envia todo
+    //send(fd, data.c_str(), data.size(), 0);
 
-    if (client.getKeepAlive())
-    {
-        client.getParser().reset();
-        client.clearResponse();
+    ssize_t bytesSent = send(fd, data.c_str() + client.getBytesSent(), data.size() - client.getBytesSent(), 0);
 
-        _pollFds[index].events = POLLIN;
-    }
-    else
+    if (bytesSent == -1)
     {
-        close(_pollFds[index].fd);
-    }
+    	std::cout << "send() failed on fd: " << fd << std::endl;
+    	close(fd);
+    	_clients.erase(fd);
+    	_pollFds.erase(_pollFds.begin() + index);
+    	return ;
+	}
+
+	if (bytesSent > 0)
+	{
+			client.addBytesSent(bytesSent);
+			client.setLastActivity();
+			client.setTimeoutState(SENDING_RESPONSE);
+	}
+
+	if (client.getBytesSent() == data.size())
+	{
+    	// respuesta completamente enviada
+    	if (client.getKeepAlive())
+    	{
+	        client.getParser().reset();
+        	client.clearResponse();
+        	client.setTimeoutState(KEEP_ALIVE);
+        	client.setLastActivity();
+    	    _pollFds[index].events = POLLIN;
+	    }
+    	else
+    	{
+	        close(fd);
+    	    _clients.erase(fd);
+        	_pollFds.erase(_pollFds.begin() + index);
+    	}
+	}
+	else
+	{
+		// todavía queda respuesta por enviar
+    	_pollFds[index].events = POLLOUT;
+    	return ;
+	}
+    
+
+    
 }
 
 
+const ServerConfig* ServerManager::getServerConfigFromSocket(int fd) const
+{
+    for (size_t i = 0; i < _listenSockets.size(); i++)
+    {
+        if (_listenSockets[i] == fd)
+            return _listenConfigs[i];
+    }
+
+    return NULL;
+}
 
 
+void ServerManager::checkTimeouts()
+{
+    time_t now = time(NULL);
 
+    std::map<int, Client>::iterator it = _clients.begin();
+
+    // only check timeouts if there are Clients connected
+    // si virtual servers, coger el default server en el primer acceso
+    // y luego los valores ya seran los correctos
+    // esto es indep de los timeouts globales que se usan al inicio de Config
+    while (it != _clients.end())
+    {
+        Client& client = it->second;
+        const ServerConfig* server = client.getServerConfig();
+
+        if (server)
+        {
+            int timeout = 0;
+
+            switch (client.getTimeoutState())
+			{
+			    case WAITING_HEADERS:
+			        timeout = server->getClientHeaderTimeout();
+			        break;
+
+			    case RECEIVING_BODY:
+			        timeout = server->getClientBodyTimeout();
+			        break;
+
+			    case SENDING_RESPONSE:
+			        timeout = server->getSendTimeout();
+			        break;
+
+			    case KEEP_ALIVE:
+			        timeout = server->getKeepAliveTimeout();
+			        break;
+			}
+
+			if (now - client.getLastActivity() > timeout)
+            {
+                int fd = client.getFd();
+                std::cout << "Client timeout fd: " << fd << std::endl;
+                
+                 Response response("HTTP/1.1 408 Request Timeout\r\n Content-Length: 0\r\n\r\n");
+                 client.setKeepAlive(false);
+                 client.setResponse(response);
+                 client.setTimeoutState(SENDING_RESPONSE);
+
+                for (size_t i = 0; i < _pollFds.size(); i++)
+                {
+                    if (_pollFds[i].fd == fd)
+                    {
+                       _pollFds[i].events = POLLOUT;
+            			break ;
+                    }
+                }
+                ++it;
+              
+            }
+            else
+                ++it;
+        }
+        else
+            ++it;
+    }
+}

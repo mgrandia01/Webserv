@@ -34,7 +34,7 @@ class RequestParser
 		bool isComplete() const;
 		bool hasError() const;
 
-		Request getRequest() const;
+		const Request& getRequest() const;
 		int getErrorCode() const;
 		void reset();
 
