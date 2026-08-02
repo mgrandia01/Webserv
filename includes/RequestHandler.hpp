@@ -14,7 +14,7 @@
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
-#include "Request.hpp"
+#include "http/HttpRequest.hpp"
 #include "Response.hpp"
 #include "Config.hpp"
 
@@ -27,7 +27,7 @@ class RequestHandler
 		RequestHandler &operator=(const RequestHandler &other);
 		~RequestHandler();
 
-		void handle(const Request& request, const ServerConfig& server, Response& response);
+		void handle(const HttpRequest& request, const ServerConfig& server, Response& response);
 
 	private:
 

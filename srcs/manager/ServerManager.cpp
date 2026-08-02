@@ -289,7 +289,7 @@ bool ServerManager::readClient(int indexPoll)
     }
     else if (client.isRequestComplete())
     {
-        const Request& request = client.getParser().getRequest();
+        const HttpRequest& request = client.getParser().getRequest();
 
         const ServerConfig* server = client.getServerConfig();
 

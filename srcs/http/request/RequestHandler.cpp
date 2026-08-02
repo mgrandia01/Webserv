@@ -39,7 +39,7 @@ RequestHandler::~RequestHandler()
 {
 }
 
-void RequestHandler::handle(const Request& request, const ServerConfig& server, Response& response)
+void RequestHandler::handle(const HttpRequest& request, const ServerConfig& server, Response& response)
 {
     (void)request;
 

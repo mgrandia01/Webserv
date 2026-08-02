@@ -14,7 +14,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "RequestParser.hpp"
+#include "http/RequestParser.hpp"
 #include "Response.hpp"
 #include "Config.hpp"
 
