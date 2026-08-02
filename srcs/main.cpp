@@ -6,18 +6,23 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 12:07:15 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/31 09:59:07 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <exception>
+#include <map>
 #include <string>
+
 #include "Config.hpp"
 #include "Response.hpp"
 #include "ServerManager.hpp"
-#include "RequestParser.hpp"
-#include <map>
+
+
+#include "http/RequestParser.hpp"
+#include "http/HttpResponse.hpp"
+#include "http/HttpHandler.hpp"
 
 
 /*
@@ -329,6 +334,9 @@ void test(const std::string &req)
 	}
 }
 */
+
+
+
 int main(int argc, char **argv)
 {
     
@@ -366,7 +374,31 @@ int main(int argc, char **argv)
 		std::cerr << e.what() << std::endl;
 		return (1);
 	}
+
 	
 	return (0);
 }
 
+
+
+
+//TODO demomento la llamada a las funciones de HTTP seria algo asi:
+/*
+bytes = recv(fd, buffer, sizeof(buffer), 0);
+
+parser.feed(buffer, bytes);
+
+if (parser.hasError())
+{
+    // preparar respuesta de error
+    // TODO tenemos que crear paginas de error personalizadas?
+}
+else if (parser.isComplete())
+{
+    HttpRequest request = parser.getRequest();
+
+    HttpResponse response = handler.handle(request);
+
+    // guardar la respuesta para enviarla cuando poll()
+    // indique que el socket está listo para escribir
+}*/

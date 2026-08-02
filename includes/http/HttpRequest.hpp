@@ -1,27 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpStatus.hpp                                     :+:      :+:    :+:   */
+/*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/17 11:55:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/17 12:00:57 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/07/27 12:59:03 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPSTATUS_HPP
-#define HTTPSTATUS_HPP
+#ifndef HTTPREQUEST_HPP
+#define HTTPREQUEST_HPP
 
-enum HttpStatus
+#include <string>
+#include <map>
+
+class HttpRequest
 {
-	OK = 200,
-	BAD_REQUEST = 400,
-	NOT_FOUND = 404,
-	METHOD_NOT_ALLOWED = 405,
-	INTERNAL_SERVER_ERROR = 500,
-	NOT_IMPLEMENTED = 501,
-	HTTP_VERSION_NOT_SUPPORTED = 505
+	public:
+		std::string method;
+		std::string target;
+		std::string path;
+		std::string query;
+		std::string version;
+
+		std::map<std::string, std::string> headers;
+		std::map<std::string, size_t> headerOccurrences;
+
+		std::string body;
 };
 
 #endif

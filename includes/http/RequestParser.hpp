@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 11:45:58 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 13:00:00 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@
 #include <cstddef>
 #include <string>
 #include <cctype>
+#include <iostream>
 
-#include "Request.hpp"
+#include "HttpRequest.hpp"
 
 class RequestParser
 {
@@ -34,7 +35,7 @@ class RequestParser
 		bool isComplete() const;
 		bool hasError() const;
 
-		const Request& getRequest() const;
+		HttpRequest getRequest() const;
 		int getErrorCode() const;
 		void reset();
 
@@ -44,13 +45,8 @@ class RequestParser
 		void parseHeaders();
 		bool parseHeaderLine(const std::string &line);
 
-		// RequestParserBody.cpp
-		void parseBody();
-
-		// RequestParserStartLine.cpp
-		bool parseRequestLine(const std::string &line);
-
 		// RequestParserHeadersValidation.cpp
+		bool isValidHeaderName(const std::string &key);
 		bool validateHeaders();
 		bool validateFramingHeaders();
 		bool validateTransferEncoding();
@@ -58,16 +54,33 @@ class RequestParser
 		bool validateHost();
 		bool isValidContentLength(const std::string &value);
 
+
+		// RequestParserStartLine.cpp
+		void parseRequestTarget(const std::string &target);
+		bool parseRequestLine(const std::string &line);
+
 		// RequestParserStartLineValidation.cpp
 		bool validateRequestLineStructure(const std::string &line);
 		bool validateMethod(const std::string &method);
 		bool validateVersion(const std::string &version);
 		bool validateTarget(const std::string &target);
+		
+		// RequestParserBody.cpp
+		void parseContentLengthBody();
+		void parseChunkedBody();
+		bool hasBody() const;
+		void parseBody();
+
+		// RequestParserBodyValidation.cpp
+		bool validateBodySize() const;
+		bool isValidHexSize (const std::string &hexSize);
+		size_t hexToDecimal(const std::string &hexSize);
 
 		// RequestParserUtils.cpp
 		std::string trimWhitespace(const std::string &str);
 		std::string toLower(const std::string &str);
 	private:
+		size_t _clientMaxBodySize;//TODO parche para tener valor del .config
 
 		enum State
 		{
@@ -83,9 +96,9 @@ class RequestParser
 
 		bool _requestLineParsed;
 
-		std::string _stream;
+		std::string _stream;//buffer recibido
 
-		Request _request;
+		HttpRequest _request;
 
 		size_t _contentLength;
 

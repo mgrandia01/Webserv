@@ -6,12 +6,12 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 11:25:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 12:30:24 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
-#include "HttpStatus.hpp"
+#include "http/RequestParser.hpp"
+#include "http/HttpStatus.hpp"
 
 bool RequestParser::parseHeaderLine(const std::string &line)
 {
@@ -23,12 +23,19 @@ bool RequestParser::parseHeaderLine(const std::string &line)
 		return false;
 	}
 
-	//TODO: en un futuro rechazar la key si hay espacios en su interior?
-	//HTTP/1.1 dice que los headers no son snsibles a las mayusculas, asi que todo es valido
-	//con trasfer encodint tbbn pasa
 	std::string key = toLower(line.substr(0, pos));
 	std::string value = trimWhitespace(line.substr(pos + 1));
-
+	
+	if (key.find(' ') != std::string::npos)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+	if (!isValidHeaderName(key))
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
 	if (key == "transfer-encoding")
 		value = toLower(value);
 
@@ -37,8 +44,7 @@ bool RequestParser::parseHeaderLine(const std::string &line)
 		_errorCode = BAD_REQUEST;
 		return false;
 	}
-	_request.headerOccurrences[key]++; //TODO: gracias a esto podremos ver que pasa 
-					    //con los headers duplicados
+	_request.headerOccurrences[key]++;
 	_request.headers[key] = value;
 
 	return true;
@@ -77,7 +83,19 @@ void RequestParser::parseHeaders()
 				return;
 
 			}
-			_state = PARSING_BODY;
+			
+			if (!validateBodySize())
+			{
+				_errorCode = PAYLOAD_TOO_LARGE;
+				_state = ERROR;
+				return;
+
+			}
+
+			if (hasBody())
+				_state = PARSING_BODY;
+			else
+				_state = COMPLETE;
 			return;
 		}
 

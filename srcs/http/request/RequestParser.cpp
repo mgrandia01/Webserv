@@ -6,11 +6,11 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/20 11:24:27 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/27 13:03:10 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
+#include "http/RequestParser.hpp"
 #include <iostream>
 
 RequestParser::RequestParser()
@@ -20,6 +20,7 @@ RequestParser::RequestParser()
 	_requestLineParsed = false;
 	_contentLength = 0;
 	_chunked = false;
+	_clientMaxBodySize = 1024*1024;//TODO es un parcheeee
 }
 	
 RequestParser::RequestParser(const RequestParser &other)
@@ -52,12 +53,12 @@ void RequestParser::reset()
 	_errorCode = 0;
 	_requestLineParsed = false;
 	_stream.clear();
-	_request = Request();
+	_request = HttpRequest();
 	_contentLength = 0;
 	_chunked = false;
 }
 
-const Request& RequestParser::getRequest() const
+HttpRequest RequestParser::getRequest() const
 {
 	return _request;
 }

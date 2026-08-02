@@ -6,15 +6,30 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:24:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 12:03:38 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/28 11:49:14 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
-#include "HttpStatus.hpp"
+#include "http/RequestParser.hpp"
+#include "http/HttpStatus.hpp"
 
 #include <limits>
 
+
+bool RequestParser::isValidHeaderName(const std::string &key)
+{
+ 	static const std::string valid = "!#$%&'*+-.^_`|~";
+
+ 	for (size_t i = 0; i < key.size(); i++)
+ 	{
+ 		unsigned char c = static_cast<unsigned char>(key[i]);
+
+		if (!isalnum(c) && valid.find(c) == std::string::npos)
+			return false;
+	}
+
+	return true;
+}
 
 bool RequestParser::validateFramingHeaders()
 {
@@ -49,12 +64,12 @@ bool RequestParser::validateTransferEncoding()
 			_errorCode = NOT_IMPLEMENTED;
 			return false;
 		}
+
+		_chunked = true;
 	}
 	return true;
 }
 
-
-//TODO anyadir a la classe
 bool RequestParser::isValidContentLength(const std::string &value)
 {
 	size_t result = 0;
@@ -71,13 +86,11 @@ bool RequestParser::isValidContentLength(const std::string &value)
 		result = result * 10 + (value[i] - '0');
 	}
 	_contentLength = result;
-	// TODO: Detectar overflow de Content-Length
 	return true;
 }
 bool RequestParser::validateContentLength()
 {
 	size_t occurrences = _request.headerOccurrences["content-length"];
-	//entero decimal, no negativo, no desborde, no vacio
 	if (occurrences > 1)
 	{
 		_errorCode = BAD_REQUEST;
@@ -90,7 +103,6 @@ bool RequestParser::validateContentLength()
 			_errorCode = BAD_REQUEST;
 			return false;
 		}
-		//validar que sea un numero...
 		
 		if (!isValidContentLength(_request.headers["content-length"]))
 		{
@@ -123,7 +135,6 @@ bool RequestParser::validateHeaders()
 	if (!validateHost())
 		return false;
 
-	//error de framing, si tenemos content-length y transfer encoding chunked a la vez
 	if (!validateFramingHeaders())
 		return false;
 
@@ -134,5 +145,3 @@ bool RequestParser::validateHeaders()
 		return false;
 	return true;
 }
-
-
