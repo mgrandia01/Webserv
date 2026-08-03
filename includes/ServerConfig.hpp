@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/07/31 13:54:40 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/03 21:00:37 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,14 @@
 # include <string>
 # include <vector>
 # include <exception>
-
-typedef struct	s_directive
-{
-	bool						isBlock;
-	std::string					name;
-	std::vector<std::string>	args;
-	std::vector<s_directive>	children;
-}	t_directive;
-
-typedef struct	s_errorPage
-{
-	std::vector<int>	codes;
-	std::string			src;
-}	t_errorPage;
+# include "LocationConfig.hpp"
+# include "structs.hpp"
 
 class ServerConfig
 {
 	public:
 		//CONSTRUCTOR
-		ServerConfig(const std::vector<std::string>& lines, size_t start, size_t end);
+		ServerConfig(std::vector<t_directive>& tokensStruct);
 		~ServerConfig();
 
 		//GETTERS
@@ -46,6 +34,10 @@ class ServerConfig
 		const std::vector<t_errorPage>&	getErrorPage() const;
 		const size_t&					getClientMaxBodySize() const;
 		const std::vector<std::string>&	getIndex() const;
+		const int&						getClientHeaderTimeout() const;
+		const int&						getClientBodyTimeout() const;
+		const int&						getSendTimeout() const;
+		const int&						getKeepAliveTimeout() const;
 
 		//EXCEPTIONS
 		class ServerConfigSemicolonPosException : public std::exception
@@ -83,11 +75,18 @@ class ServerConfig
 				{return ("A error code is out of limits.");}
 		};
 		
-		class ServerConfigBodySizeException : public std::exception
+		class ServerConfigUnisgnedNumberException : public std::exception
 		{
 			public:
 				virtual const char *what() const throw()
-				{return ("Client max body size must be an unsigned number.");}
+				{return ("Numeric values must be non-negative.");}
+		};
+
+		class ServerConfigInvalidUnitException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Invalid unit suffix.");}
 		};
 	
 	private:
@@ -106,7 +105,11 @@ class ServerConfig
 		size_t						_clientMaxBodySize;
 		std::string					_root;
 		std::vector<std::string>	_index;
-		std::vector<ServerConfig>	_locations;
+		int							_clientHeaderTimeout;
+		int							_clientBodyTimeout;
+		int							_sendTimeout;
+		int							_keepAliveTimeout;
+		std::vector<LocationConfig>	_locations;
 
 		//FUNCTIONS
 		void	listenDirective(const t_directive& tk);
@@ -115,6 +118,13 @@ class ServerConfig
 		void	clientMaxBodySizeDirective(const t_directive& tk);
 		void	rootDirective(const t_directive& tk);
 		void	indexDirective(const t_directive& tk);
+		void	locationDirective(const t_directive& tk);
+		void	clientHeaderTimeOut(const t_directive& tk);
+		void	clientBodyTimeOut(const t_directive& tk);
+		void	sendTimeOut(const t_directive& tk);
+		void	keepAliveTimeOut(const t_directive& tk);
+
+		void	timeoutParser(int& target, const t_directive& tk);
 };
 
 #endif
