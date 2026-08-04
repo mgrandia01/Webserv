@@ -14,7 +14,12 @@
 #define SERVERMANAGER_HPP
 
 #include <vector>
+#include <map>
 #include "Config.hpp"
+#include "http/RequestParser.hpp"
+#include "Response.hpp"
+#include "Client.hpp"
+#include "RequestHandler.hpp"
 
 
 class ServerManager {
@@ -28,15 +33,22 @@ public:
 	void	run();
 	void	printSockets() const;
 
+	const ServerConfig* getServerConfigFromSocket(int fd) const;
+
+	void checkTimeouts();
+
 private:
 
 	ServerManager();
 	ServerManager(const ServerManager& other);
 	ServerManager& operator=(const ServerManager& rhs);
 
-	const Config&		_config;
-	std::vector<int>	_listenSockets;
-	std::vector<struct pollfd> _pollFds;
+	const Config&				_config;
+	RequestHandler				_requestHandler;
+
+	std::vector<int>					_listenSockets;
+	std::vector<const ServerConfig*> 	_listenConfigs;
+	std::vector<struct pollfd>			_pollFds;
 
 	void	createSockets();
 	void	bindSocket(int socketFd, const ServerConfig& server);
@@ -45,11 +57,17 @@ private:
 	
 	
 	void	initPollFds();
-	bool	isListenSocket(int fd) const;
+	//bool	isListenSocket(int fd) const;
 	bool	readClient(int indexPoll);
-	
+
+	std::map<int, Client> _clients;
+		
 	//temporal debug
-	void sendResponse(int indexPoll);
+	//void sendResponse(int indexPoll);
+
+	void sendResponse(int index);
+
+
 	
 };
 

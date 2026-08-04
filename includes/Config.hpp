@@ -38,7 +38,8 @@ private:
 class ServerConfig {
 
 public:
-	ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root);
+	ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root,
+				int clientHeaderTimeout, int clientBodyTimeout, int sendTimeout, int keepAliveTimeout);
 	~ServerConfig();
 	ServerConfig(const ServerConfig& other);
 	ServerConfig& operator=(const ServerConfig& rhs);
@@ -51,11 +52,18 @@ public:
 	
 	const std::vector<LocationConfig>& getLocations() const;
 
+	int getClientHeaderTimeout() const;
+	int getClientBodyTimeout() const;
+	int getSendTimeout() const;
+	int getKeepAliveTimeout() const;
+
 private:
 
 	ServerConfig();
 
-
+	//void resolveTimeouts(const GlobalConfig& global);
+	// rellenar segun los timeouts globales sin necesidad de guardar los globales
+	
 	std::string	_host;
 	int		_port;
 	std::string	_serverName;
@@ -63,6 +71,11 @@ private:
 	std::string	_att1;
 	std::string	_att2;
 	std::vector<LocationConfig> _locations;
+
+	int _clientHeaderTimeout;
+	int _clientBodyTimeout;
+    int _sendTimeout;
+    int _keepAliveTimeout;
 	
 
 
@@ -98,6 +111,16 @@ private:
 	std::string	_att2;
 	int		_att3;
 	int		_att4;
+
+	
+	//timeouts globales. No vale la pena guardarlos, si cada server no tiene
+	// valor de timeout se asigna el default y ya esta, nunca mas se consultaran
+	//esto se resuelve la primera vez que se rellena la clase de configuracion leyendo el fichero
+
+	/*int defaultClientHeaderTimeout;
+    int defaultSendTimeout;
+    int defaultKeepAliveTimeout;*/
+
 };
 
 #endif

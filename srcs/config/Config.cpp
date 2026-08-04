@@ -18,10 +18,11 @@ Config::Config(const std::string& file)
 	(void) file;
 
 
-
+	//TODO parcheado para testing
+	//ServerConfig server("IP", port, "host", "root", timeoutHeader, timeoutBody, timeoutSend, timeoutKeepAlive);
 	
-	ServerConfig server("127.0.0.1", 8080, "webserv", "./www");
-	ServerConfig server2("127.0.0.1", 8081, "webserv2", "./www2");
+	ServerConfig server("127.0.0.1", 8080, "webserv", "./www", 5, 15, 1, 25);
+	ServerConfig server2("127.0.0.1", 8081, "webserv2", "./www2", 10, 15, 20, 25);
 	
 	_servers.push_back(server);
 	_servers.push_back(server2);
@@ -41,7 +42,10 @@ const std::vector<ServerConfig>& Config::getServers() const
 
 
 
-ServerConfig::ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root) : _host(host), _port(port), _serverName(serverName), _root(root) {};
+ServerConfig::ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root, int clientHeaderTimeout,
+							int clientBodyTimeout, int sendTimeout, int keepAliveTimeout) : _host(host), _port(port),  _serverName(serverName),
+							_root(root), _clientHeaderTimeout(clientHeaderTimeout), _clientBodyTimeout(clientBodyTimeout), _sendTimeout(sendTimeout),
+							_keepAliveTimeout(keepAliveTimeout) {};
 ServerConfig::~ServerConfig(){}
 ServerConfig::ServerConfig(const ServerConfig& other)
 {
@@ -58,7 +62,11 @@ ServerConfig&	ServerConfig::operator=(const ServerConfig& rhs)
 		_root = rhs._root;
 		_att1 = rhs._att1;
 		_att2 = rhs._att2;
-	        _locations = rhs._locations;
+	    _locations = rhs._locations;
+	    _clientHeaderTimeout = rhs._clientHeaderTimeout;
+	    _clientBodyTimeout = rhs._clientBodyTimeout;
+	    _sendTimeout = rhs._sendTimeout;
+	    _keepAliveTimeout = rhs._keepAliveTimeout;
 	}
 	
 	return *this;
@@ -87,6 +95,26 @@ const std::string&	ServerConfig::getServerName() const
 const std::string&	ServerConfig::getRoot() const
 {
 	return _root;
+}
+
+int ServerConfig::getClientHeaderTimeout() const
+{
+    return _clientHeaderTimeout;
+}
+
+int ServerConfig::getClientBodyTimeout() const
+{
+    return _clientBodyTimeout;
+}
+
+int ServerConfig::getSendTimeout() const
+{
+    return _sendTimeout;
+}
+
+int ServerConfig::getKeepAliveTimeout() const
+{
+    return _keepAliveTimeout;
 }
 
 
