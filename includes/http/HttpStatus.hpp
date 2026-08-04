@@ -6,12 +6,15 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 11:55:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/24 11:38:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/07/31 12:07:08 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPSTATUS_HPP
 #define HTTPSTATUS_HPP
+
+#include <string>
+#include <map>
 
 enum HttpStatus
 {
@@ -26,5 +29,16 @@ enum HttpStatus
 	NOT_IMPLEMENTED = 501,
 	HTTP_VERSION_NOT_SUPPORTED = 505
 };
+
+struct HttpStatusInfo
+{
+	std::string reasonPhrase;
+	std::string defaultBody;
+
+	HttpStatusInfo();
+	HttpStatusInfo(const std::string& reason, const std::string& body);
+};
+
+HttpStatusInfo getStatusInfo(int statusCode);
 
 #endif

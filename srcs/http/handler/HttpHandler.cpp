@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 16:07:10 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/04 11:21:36 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "http/HttpStatus.hpp"
 #include <cerrno>
 #include <sstream>
+#include <cstdio>
 
 HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 {
@@ -31,44 +32,34 @@ HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 	//TODO usar stat() por si el usuario quiere un abrir un directorio
 	//y no directamente un fichero, ya que tendra que mirar index, autoindex...
 	int fd = open(fullPath.c_str(), O_RDONLY);
+	int statusCode = 200;
 
 	if (fd == -1)
 	{
 		if (errno == ENOENT)
-		{
-			response.statusCode = 404;
-			response.reasonPhrase = "Not Found";
-			response.body = "404 Not Found";
-		}
+			statusCode = 404;	
 		else if (errno == EACCES)
-		{
-			response.statusCode = 403;
-			response.reasonPhrase = "Forbidden";
-			response.body = "Forbidden";
-		}
+			statusCode = 403;
 		else
-		{
-			response.statusCode = 500;
-			response.reasonPhrase = "Internal Server Error";
-			response.body = "500 Internal Server Error";
-		}
-
-		return response;
+			statusCode = 500;
+	
 	}
 	
-	if (!readFile(fd, response.body))
+	else
 	{
+		if (!readFile(fd, response.body))
+			statusCode = 500;
+	
 		close(fd);
-		response.statusCode = 500;
-		response.reasonPhrase = "Internal Server Error";
-		response.body = "500 Internal Server Error";
-		return response;
 	}
 
-	close(fd);
 	
-	response.statusCode = 200;
-	response.reasonPhrase = "OK";
+	HttpStatusInfo status = getStatusInfo(statusCode);
+	response.statusCode = statusCode;
+	response.reasonPhrase = status.reasonPhrase;
+	
+	if (statusCode != 200)
+		response.body = status.defaultBody;
 
 	setHeaders(response, getContentType(fullPath));
 	return response;
@@ -87,30 +78,51 @@ HttpResponse HttpHandler::handlePost(const HttpRequest& request)
 	
 	std::string filename = uploadStore + "/upload.txt";
 
-	if (!saveFile(filename, request.body))
-	{
-		response.statusCode = 500;
-		response.reasonPhrase = "Internal Server Error";
-		response.body = "500 Internal Server Error";
-		return response;
-	}
+	int statusCode = 201;
 
-	
-	response.statusCode = 201;
-	response.reasonPhrase = "Created";
-	response.body = "Upload successful";
-	
-	setHeaders(response, "text/plain");
+	if (!saveFile(filename, request.body))
+		statusCode = 500;
+
+	HttpStatusInfo status = getStatusInfo(statusCode);
+
+	response.statusCode = statusCode;
+	response.reasonPhrase = status.reasonPhrase;
+
+	if (statusCode == 201)
+	{
+		response.body = "Upload successful";
+		setHeaders(response, "text/plain");
+	}
+	else
+		response.body = status.defaultBody;
 
 	return response;
 }
 
-HttpResponse HttpHandler::handleDelete(const HttpRequest& )
+HttpResponse HttpHandler::handleDelete(const HttpRequest& request)
 {
 	HttpResponse response;
 
-	// TODO: Implement DELETE
+	std::string root = "./www";//TODO esto esta parcheado
+	std::string fullPath = root + request.path;
 
+	int result = std::remove(fullPath.c_str());
+	int statusCode = 200;
+
+	if (result != 0)
+	{
+		if (errno == ENOENT)
+			statusCode = 404;
+		else if (errno == EACCES || errno == EPERM)
+			statusCode = 403;	
+		else
+			statusCode = 500;	
+	}
+
+	HttpStatusInfo status = getStatusInfo(statusCode);
+	response.statusCode = statusCode;
+	response.reasonPhrase = status.reasonPhrase;
+	response.body = status.defaultBody;
 	return response;
 }
 
