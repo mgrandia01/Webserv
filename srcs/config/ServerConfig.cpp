@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/03 21:14:20 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/04 15:09:03 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,15 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 	tkFuncMap["keepalive_timeout"] = &ServerConfig::clientHeaderTimeOut;
 	tkFuncMap["location"] = &ServerConfig::locationDirective;
 	
-	for (std::vector<t_directive>::iterator tk = tokensStruct.begin();
-		tk != tokensStruct.end(); tk++)
+	for (std::vector<t_directive>::iterator it = tokensStruct.begin();
+		it != tokensStruct.end(); it++)
 	{
 		std::map<std::string, directiveFunc>::iterator func;
 		
-		func = tkFuncMap.find(tk->name);
+		func = tkFuncMap.find(it->name);
 		if (func == tkFuncMap.end())
 			throw ServerConfigMissedDirectiveException();
-		(this->*(func->second))(*tk);
+		(this->*(func->second))(*it);
 	}
 }
 

@@ -6,12 +6,14 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 13:06:43 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/03 18:46:27 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/04 19:00:33 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef STRUCTS_HPP
 # define STRUCTS_HPP
+
+#include <vector>
 
 typedef enum	e_methods
 {
