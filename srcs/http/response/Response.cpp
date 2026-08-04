@@ -1,16 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RequestParser.cpp                                  :+:      :+:    :+:   */
+/*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/20 11:24:27 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/04 13:17:50 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "http/HttpResponse.hpp"
 #include <string>
 
 Response::Response(){}
@@ -37,4 +38,17 @@ Response& Response::operator=(const Response& other)
 const std::string& Response::getStream() const
 {
 	return _stream;
+}
+
+HttpResponse HttpResponse::createError(HttpStatus status)
+{
+	HttpResponse response;
+
+	HttpStatusInfo info = getStatusInfo(status);
+
+	response.statusCode = status;
+	response.reasonPhrase = info.reasonPhrase;
+	response.body = info.defaultBody;
+
+	return response;
 }

@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/04 11:45:29 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/04 13:25:36 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,66 +25,45 @@
 #include "http/HttpHandler.hpp"
 
 
+#include <cstring>
+
 int main()
 {
- /*   std::string rawRequest =
-        "GET /noexist.html HTTP/1.1\r\n"
-        "Host: localhost\r\n"
-        "\r\n";
-*/
-    // Para probar POST:
-   
-   /* std::string rawRequest =
-        "POST /upload HTTP/1.1\r\n"
-        "Host: localhost\r\n"
-        "Content-Type: text/plain\r\n"
-        "Content-Length: 12\r\n"
-        "\r\n"
-        "Hello World!";
-    
-*/
-    // Para probar DELETE:
-   
-    std::string rawRequest =
-        "DELETE /index.html HTTP/1.1\r\n"
-        "Host: localhost\r\n"
-        "\r\n";
-   
+	RequestParser parser;
 
-    RequestParser parser;
-    parser.feed(rawRequest.c_str(), rawRequest.size());
+	const char *request =
+		"GET\r\n";
 
-    HttpRequest request = parser.getRequest();
+	parser.feed(request, strlen(request));
 
-    HttpHandler handler;
-    HttpResponse response = handler.handle(request);
+	if (parser.hasError())
+	{
+		HttpResponse response =
+			HttpResponse::createError(parser.getErrorCode());
 
-    std::cout << "===== REQUEST =====" << std::endl;
-    std::cout << "Method: " << request.method << std::endl;
-    std::cout << "Path:   " << request.path << std::endl;
-    std::cout << "Query:  " << request.query << std::endl;
+		std::cout << "STATUS: "
+				  << response.statusCode
+				  << std::endl;
 
-    std::cout << "\n===== RESPONSE =====" << std::endl;
-    std::cout << "Status: "
-              << response.statusCode
-              << " "
-              << response.reasonPhrase
-              << std::endl;
+		std::cout << "REASON: "
+				  << response.reasonPhrase
+				  << std::endl;
 
-    std::cout << "\nHeaders:" << std::endl;
-    for (std::map<std::string, std::string>::const_iterator it = response.headers.begin();
-         it != response.headers.end(); ++it)
-    {
-        std::cout << it->first << ": " << it->second << std::endl;
-    }
+		std::cout << "BODY: "
+				  << response.body
+				  << std::endl;
+	}
+	else if (parser.isComplete())
+	{
+		std::cout << "Request correcta" << std::endl;
+	}
+	else
+	{
+		std::cout << "Request incompleta" << std::endl;
+	}
 
-    std::cout << "\nBody:" << std::endl;
-    std::cout << response.body << std::endl;
-
-    return 0;
+	return 0;
 }
-
-
 
 /*
 int main(int argc, char **argv)
@@ -129,3 +108,13 @@ int main(int argc, char **argv)
 	return (0);
 }
 */
+
+/*
+ *if (parser.hasError())
+{
+    HttpResponse response =
+        HttpResponse::createError(parser.getErrorCode());
+
+    send(response);
+}
+ * */
