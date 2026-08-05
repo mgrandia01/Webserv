@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/04 13:25:36 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/05 13:05:21 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,45 +27,6 @@
 
 #include <cstring>
 
-int main()
-{
-	RequestParser parser;
-
-	const char *request =
-		"GET\r\n";
-
-	parser.feed(request, strlen(request));
-
-	if (parser.hasError())
-	{
-		HttpResponse response =
-			HttpResponse::createError(parser.getErrorCode());
-
-		std::cout << "STATUS: "
-				  << response.statusCode
-				  << std::endl;
-
-		std::cout << "REASON: "
-				  << response.reasonPhrase
-				  << std::endl;
-
-		std::cout << "BODY: "
-				  << response.body
-				  << std::endl;
-	}
-	else if (parser.isComplete())
-	{
-		std::cout << "Request correcta" << std::endl;
-	}
-	else
-	{
-		std::cout << "Request incompleta" << std::endl;
-	}
-
-	return 0;
-}
-
-/*
 int main(int argc, char **argv)
 {
     
@@ -107,14 +68,31 @@ int main(int argc, char **argv)
 	
 	return (0);
 }
-*/
+
 
 /*
- *if (parser.hasError())
-{
-    HttpResponse response =
-        HttpResponse::createError(parser.getErrorCode());
 
-    send(response);
+bytes = recv(fd, buffer, sizeof(buffer),0));
+parser.feed(buffer, bytes, server);
+
+if (parser.hasError())
+{
+	HttpResponse response = HttpResponse::createError(parser.getErrorCode(server));
+	//TODO mirar si existe una pagina de error para este codigo
+	ResponseFinalizer::finalize(response, server);
+	//TODO serializer:
+	std::string raw = HttpSerializer::serialize(response);
+	send(fd, raw.c_str(), raw.size(),0);	
 }
+else if (parser.isComplete())
+{
+	HttpRequest request = parser.getRequest();
+	HttpResponse response = handler.handle(request, server);
+	//TODO mirar si existe una pagina de error para este codigo
+	ResponseFinalizer::finalize(response, server);
+	//TODO serializer
+	send(respone)
+}
+
+
  * */

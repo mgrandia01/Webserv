@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 12:13:43 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 11:32:47 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/05 12:55:06 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,13 @@
 HttpStatusInfo::HttpStatusInfo(const std::string& reason, const std::string& body)
 {
 	reasonPhrase = reason;
-	//TODO tiene sentido pasar aqui el codigo de error para buscar si existe la pagina de error?
 	defaultBody = body;
 }
 
 HttpStatusInfo getStatusInfo(int statusCode)
 {
+	//TODO si pasan el server, buscar las paginas de error para dar la info de estas si existe
+	//si no existeuna por defoult como body
 	switch (statusCode)
 	{
 		case 200:
