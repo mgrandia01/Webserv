@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:19:10 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:32:01 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/04 16:05:45 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ bool RequestParser::validateMethod(const std::string &method)
 		return true;
 
 	_errorCode = NOT_IMPLEMENTED;
+	//TODO el servidor lo acepta?
 	return false;
 }
 
