@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/03 21:00:37 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/05 18:18:45 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,21 @@ class ServerConfig
 				virtual const char *what() const throw()
 				{return ("Invalid unit suffix.");}
 		};
+
+		class ServerConfigRootException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Location has no \'root\' and server does not provide a default \'root\'.");}
+		};
 	
+		class ServerConfigIndexException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Location has no \'index\' and server does not provide a default \'index\'.");}
+		};
+
 	private:
 		ServerConfig();
 		//ServerConfig(const ServerConfig& src);
@@ -112,9 +126,9 @@ class ServerConfig
 		std::vector<LocationConfig>	_locations;
 
 		//FUNCTIONS
-		void	listenDirective(const t_directive& tk);
+		void	listenDirective(const t_directive& tk);//atoi?
 		void	serverNameDirective(const t_directive& tk);
-		void	errorPageDirective(const t_directive& tk);
+		void	errorPageDirective(const t_directive& tk);//atoi?
 		void	clientMaxBodySizeDirective(const t_directive& tk);
 		void	rootDirective(const t_directive& tk);
 		void	indexDirective(const t_directive& tk);
@@ -125,6 +139,7 @@ class ServerConfig
 		void	keepAliveTimeOut(const t_directive& tk);
 
 		void	timeoutParser(int& target, const t_directive& tk);
+		void	resolveConfigDefaults();
 };
 
 #endif

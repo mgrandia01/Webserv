@@ -6,11 +6,12 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:45:44 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/04 20:25:18 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/05 18:29:02 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
+#include <stdlib.h>
 #include "structs.hpp"
 #include "LocationConfig.hpp"
 
@@ -22,6 +23,7 @@ LocationConfig::LocationConfig(const t_directive& tk)
 	_allowMethods[DELETE] = false;
 	_allowMethods[POST] = false;
 	_autoindex = false;
+	_return.isEnabled = false;
 
 	uriDirective(tk);
 	
@@ -49,17 +51,6 @@ LocationConfig::LocationConfig(const t_directive& tk)
 		}
 		(this->*(func->second))(*it);
 	}
-
-	std::cout << getUri() << std::endl;
-	std::cout << getMethodGet() << std::endl;
-	std::cout << getMethodPost() << std::endl;
-	std::cout << getMethodDelete() << std::endl;
-	std::cout << getRoot() << std::endl;
-	//INDEX
-	std::cout << getAutoindex() << std::endl;
-	std::cout << getUploadStore() << std::endl;
-	//CGI
-	//RETURN
 }
 
 
@@ -82,19 +73,39 @@ LocationConfig::~LocationConfig(){}
 
 /* ******************************** get & set ******************************* */
 
-const std::string&	LocationConfig::getUri(){return (_uri);}
+void	LocationConfig::setRoot(const std::string& serverRoot)
+{
+	if (_root.empty())
+		_root = serverRoot;
+}
 
-const bool&	LocationConfig::getMethodGet(){return (_allowMethods[GET]);}
+void	LocationConfig::setIndex(const std::vector<std::string>& serverIndex)
+{
+	if (_index.empty())
+		_index = serverIndex;
+}
 
-const bool&	LocationConfig::getMethodPost(){return (_allowMethods[POST]);}
+const std::string&	LocationConfig::getUri() const {return (_uri);}
 
-const bool&	LocationConfig::getMethodDelete(){return (_allowMethods[DELETE]);}
+const bool&	LocationConfig::getMethodGet() const {return (_allowMethods[GET]);}
 
-const std::string&	LocationConfig::getRoot(){return (_root);}
+const bool&	LocationConfig::getMethodPost() const {return (_allowMethods[POST]);}
 
-const bool&	LocationConfig::getAutoindex(){return (_autoindex);}
+const bool&	LocationConfig::getMethodDelete() const {return (_allowMethods[DELETE]);}
 
-const std::string&	LocationConfig::getUploadStore(){return (_uploadStore);}
+const std::string&	LocationConfig::getRoot() const {return (_root);}
+
+const std::vector<std::string>&	LocationConfig::getIndex() const {return _index;}
+
+const bool&	LocationConfig::getAutoindex() const {return (_autoindex);}
+
+const std::string&	LocationConfig::getUploadStore() const {return (_uploadStore);}
+
+const std::map<std::string, std::string>	LocationConfig::getCgi() const {return (_cgi);}
+
+const bool&	LocationConfig::getIsEnabledReturn() const {return (_return.isEnabled);}
+
+const t_return&	LocationConfig::getReturn() const {return (_return);}
 
 /* ************************* member funcs / methods ************************* */
 
@@ -113,7 +124,7 @@ void	LocationConfig::allowMethodsDirective(const t_directive& child)
 	methodsMap["GET"] = GET;
 	methodsMap["POST"] = POST;
 	methodsMap["DELETE"] = DELETE;
-
+	
 	for (size_t j = 0; j < child.args.size(); j++)//Este itera los elementos del vector en orden ascendente
 	{
 		//Este busca en el map que combina Xvar-Yvar, busca 'j' en Xvar.
@@ -132,12 +143,12 @@ void	LocationConfig::allowMethodsDirective(const t_directive& child)
 	}
 }
 
-void	LocationConfig::indexDirective(const t_directive& child)//YET
+void	LocationConfig::indexDirective(const t_directive& child)
 {
-	std::cout << "\t" << child.name << std::endl;//Server _index is vector, Location have to?
+	_index = child.args;
 }
 
-void	LocationConfig::rootDirective(const t_directive& child)//How heritate server root?
+void	LocationConfig::rootDirective(const t_directive& child)
 {
 	if (child.args.size() < 1)
 		throw LocationConfigInsufArgsException(); 
@@ -155,7 +166,7 @@ void	LocationConfig::autoindexDirective(const t_directive& child)
 	else if (child.args[0] == "off" || child.args[0] == "OFF")
 		_autoindex = false;
 	else
-		throw LocationCofigAutoindexException();
+		throw LocationConfigAutoindexException();
 }
 
 void	LocationConfig::uploadStoreDirective(const t_directive& child)
@@ -166,12 +177,28 @@ void	LocationConfig::uploadStoreDirective(const t_directive& child)
 	_uploadStore = child.args[0];
 }
 
-void	LocationConfig::cgiDirective(const t_directive& child)//YET
+void	LocationConfig::cgiDirective(const t_directive& child)
 {
-	std::cout << "\t" << child.name << std::endl;//
+	if (child.args.size() != 2)
+		throw LocationConfigInsufArgsException();
+
+	_cgi[child.args[0]] = child.args[1];
 }
 
-void	LocationConfig::returnDirective(const t_directive& child)//YET
+void	LocationConfig::returnDirective(const t_directive& child)
 {
-	std::cout << "\t" << child.name << std::endl;//
+	if (child.args.size() != 2)
+		throw LocationConfigInsufArgsException();
+
+	_return.isEnabled = true;
+
+	char		*end;
+	std::string	tmp = child.args[0];
+	long		value = std::strtol(tmp.c_str(), &end, 10);
+
+	if (*end != '\0')
+		throw LocationConfigUnisgnedNumberException();
+	_return.code = value;
+
+	_return.target = child.args[1];
 }

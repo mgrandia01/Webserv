@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:44:51 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/04 20:31:45 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/05 17:50:09 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,22 @@ class LocationConfig
 		LocationConfig(const t_directive& tk);
 		~LocationConfig();
 
+		//SETTERS
+		void	setRoot(const std::string& serverRoot);
+		void	setIndex(const std::vector<std::string>& serverIndex);
+
 		//GETTERS
-		const std::string&	getUri();
-		const bool&			getMethodGet();
-		const bool&			getMethodPost();
-		const bool&			getMethodDelete();
-		const std::string&	getRoot();
-		const bool&			getAutoindex();
-		const std::string&	getUploadStore();
+		const std::string&							getUri() const;
+		const bool&									getMethodGet() const;
+		const bool&									getMethodPost() const;
+		const bool&									getMethodDelete() const;
+		const std::string&							getRoot() const;
+		const std::vector<std::string>&				getIndex() const;
+		const bool&									getAutoindex() const;
+		const std::string&							getUploadStore() const;
+		const std::map<std::string, std::string>	getCgi() const;
+		const bool& 								getIsEnabledReturn() const;
+		const t_return& 							getReturn() const;
 		
 		//EXCEPTIONS
 		class LocationConfigMissedDirectiveException : public std::exception
@@ -63,11 +71,18 @@ class LocationConfig
 				{return ("Duplicated HTTP method.");}
 		};
 
-		class LocationCofigAutoindexException : public std::exception
+		class LocationConfigAutoindexException : public std::exception
 		{
 			public:
 				virtual const char *what() const throw()
 				{return ("Autoindex must be \"on\" or \"off\"");}
+		};
+
+		class LocationConfigUnisgnedNumberException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Location numeric values must be non-negative.");}
 		};
 
 	private:
@@ -79,12 +94,12 @@ class LocationConfig
 
 		std::string							_uri;
 		bool								_allowMethods[3];
-		std::string							_root;//How heritate server root?
-		std::string							_index;//YET//Server _index is vector, Location have to? 
+		std::string							_root;
+		std::vector<std::string>			_index; 
 		bool								_autoindex;
 		std::string							_uploadStore;
-		std::map<std::string, std::string>	_cgi;//YET
-		std::vector<t_return>				_return;//YET
+		std::map<std::string, std::string>	_cgi;
+		t_return							_return;
 
 		void	uriDirective(const t_directive& tk);
 		void	rootDirective(const t_directive& child);

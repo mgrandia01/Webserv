@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/04 15:09:03 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/05 19:55:25 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 										_host("0.0.0.0"),
 										_port(0),
 										_defaultServer(false),
-										_clientMaxBodySize(100),
-										_clientHeaderTimeout(100),
-										_clientBodyTimeout(100),
-										_sendTimeout(100),
-										_keepAliveTimeout(100)
+										_clientMaxBodySize(1048576),
+										_clientHeaderTimeout(60 * 1000),
+										_clientBodyTimeout(60 * 1000),
+										_sendTimeout(60 * 1000 ),
+										_keepAliveTimeout(75 * 1000)
 {
 	std::map<std::string, directiveFunc>	tkFuncMap;
 
@@ -56,6 +56,8 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 			throw ServerConfigMissedDirectiveException();
 		(this->*(func->second))(*it);
 	}
+	
+	resolveConfigDefaults();
 }
 
 ServerConfig::~ServerConfig(){}
@@ -155,7 +157,7 @@ void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
 	else if (unit == "k")
 		_clientMaxBodySize = value * 1000;
 	else if (unit == "M")
-		_clientMaxBodySize = value * 1000000;
+		_clientMaxBodySize = value * 1048576;
 	else
 		throw ServerConfigInvalidUnitException();
 }
@@ -187,11 +189,11 @@ void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 	if (unit == "")
 		target = value;
 	else if (unit == "ms")
-		target = value * 1000;
+		target = value;
 	else if (unit == "s")
-		target = value * 100;
+		target = value * 1000;
 	else if (unit == "m")
-		target = value * 10;
+		target = value * 60 * 1000;
 	else
 		throw ServerConfigInvalidUnitException();
 }
@@ -211,3 +213,32 @@ void	ServerConfig::locationDirective(const t_directive& tk)
 	_locations.push_back(tmp);
 }
 
+void	ServerConfig::resolveConfigDefaults()
+{
+	for (std::vector<LocationConfig>::iterator LocationIt = _locations.begin();
+			LocationIt != _locations.end(); LocationIt++)
+	{
+		const bool&	 returnDir = LocationIt->getIsEnabledReturn();
+		
+		const std::string&	locationRoot = LocationIt->getRoot();
+		const std::map<std::string, std::string> locationCgi = LocationIt->getCgi();
+		if (_root.empty())
+		{
+			if (locationRoot.empty() && (returnDir == false || locationCgi.size() > 0))
+				throw ServerConfigRootException();
+		}
+		else
+			if (locationRoot.empty())
+				LocationIt->setRoot(_root);
+
+		const std::vector<std::string>&	locationIndex = LocationIt->getIndex();
+		if (_index.size() == 0)
+		{
+			if (locationIndex.size() == 0 && returnDir == false)
+				throw ServerConfigIndexException();
+		}
+		else
+			if (locationIndex.size() == 0)
+				LocationIt->setIndex(_index);
+	}
+}
