@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 13:05:21 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/05 15:51:53 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,10 @@
 #include "http/RequestParser.hpp"
 #include "http/HttpResponse.hpp"
 #include "http/HttpHandler.hpp"
-
+#include "http/HttpSerializer.hpp"
 
 #include <cstring>
+
 
 int main(int argc, char **argv)
 {
@@ -69,7 +70,6 @@ int main(int argc, char **argv)
 	return (0);
 }
 
-
 /*
 
 bytes = recv(fd, buffer, sizeof(buffer),0));
@@ -77,9 +77,9 @@ parser.feed(buffer, bytes, server);
 
 if (parser.hasError())
 {
-	HttpResponse response = HttpResponse::createError(parser.getErrorCode(server));
+	HttpResponse response = HttpResponse::createError(parser.getErrorCode(), server);
 	//TODO mirar si existe una pagina de error para este codigo
-	ResponseFinalizer::finalize(response, server);
+	response.applyConfiguredErrorPage(server);
 	//TODO serializer:
 	std::string raw = HttpSerializer::serialize(response);
 	send(fd, raw.c_str(), raw.size(),0);	
@@ -89,7 +89,7 @@ else if (parser.isComplete())
 	HttpRequest request = parser.getRequest();
 	HttpResponse response = handler.handle(request, server);
 	//TODO mirar si existe una pagina de error para este codigo
-	ResponseFinalizer::finalize(response, server);
+	response.applyConfiguredErrorPage(server);
 	//TODO serializer
 	send(respone)
 }

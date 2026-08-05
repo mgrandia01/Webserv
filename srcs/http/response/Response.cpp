@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/04 13:17:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/05 15:27:01 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,3 +52,15 @@ HttpResponse HttpResponse::createError(HttpStatus status)
 
 	return response;
 }
+
+/*
+void HttpResponse::applyConfiguredErrorPage(const ServerConfig& server)
+{
+
+	// Buscar si server tiene una error_page para mi status
+	// Si existe:
+	//      _body = contenido del fichero
+	// Si no:
+	//      dejar _body como está (la página por defecto)
+
+}*/
