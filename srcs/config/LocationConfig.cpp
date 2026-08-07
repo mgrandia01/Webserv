@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:45:44 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/05 18:29:02 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/06 19:54:18 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,47 @@ LocationConfig::LocationConfig(const t_directive& tk)
 }*/
 
 LocationConfig::~LocationConfig(){}
+
+/* ******************************** operators ******************************* */
+
+std::ostream&	operator<<(std::ostream &out, const LocationConfig& location)
+{
+	out << "\tLocation: " << location.getUri() << std::endl;
+
+	out << "\t\tAllow methods: ";
+	if (location.getMethodGet())
+		out << "GET ";
+	if (location.getMethodPost())
+		out << "POST ";
+	if (location.getMethodDelete())
+		out << "DELETE";
+	out << std::endl;
+
+	out << "\t\tRoot: " << location.getRoot() <<std::endl;
+
+	std::vector<std::string>	index = location.getIndex();
+	out << "\t\tIndex: ";
+	for (size_t k = 0; k < index.size(); k++)
+		out << index[k] << " ";
+	out << std::endl;
+
+	if (location.getAutoindex())
+		out << "\t\tAutoindex: true" << std::endl;
+	else
+		out << "\t\tAutoindex: false" << std::endl;
+
+	out << "\t\tUpload store: " << location.getUploadStore() << std::endl;
+
+	std::map<std::string, std::string>	cgi = location.getCgi();
+	for (std::map<std::string, std::string>::iterator mit = cgi.begin();
+			mit != cgi.end(); mit++)
+		out << "\t\tCGI: " << mit->first << " " << mit->second << std::endl;
+
+	t_return	tmpReturn = location.getReturn();
+	if (tmpReturn.isEnabled)
+		out << "\t\treturn: " << tmpReturn.code << " " << tmpReturn.target << std::endl;
+	return (out);
+}
 
 /* ******************************** get & set ******************************* */
 

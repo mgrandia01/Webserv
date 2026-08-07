@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:25:51 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/03 20:49:26 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/06 18:00:24 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,32 +18,16 @@
 # include <exception>
 # include "ServerConfig.hpp"
 
-/*class LocationConfig {
-
-public:
-	LocationConfig();
-	~LocationConfig();
-	LocationConfig(const LocationConfig& other);
-	LocationConfig& operator=(const LocationConfig& rhs);
-	
-
-private:
-
-
-	
-	std::string	_att1;
-	int		_att2;
-
-};*/
-
 class Config {
 
 	public:
+		//CONSTRUCTORS
 		Config(const char* file);
 		~Config();
-		
-		const std::vector<ServerConfig>& getServers() const;
 
+		//GETTERS
+		const std::vector<ServerConfig>& getServers() const;
+		//EXCEPTIONS
 		class ConfigBlockException : public std::exception
 		{
 			public:
@@ -64,12 +48,6 @@ class Config {
 				virtual const char *what() const throw()
 				{return ("Expected '{' after 'server'.");}
 		};
-		/*class ConfigException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Configuration file error");}
-		};*/
 
 	private:
 
@@ -87,5 +65,7 @@ class Config {
 		size_t	findStart(std::vector<std::string>& tokens, size_t size, size_t & n);
 		size_t	findEnd(std::vector<std::string>& tokens, size_t size, size_t& n);
 };
+
+std::ostream& operator<<(std::ostream &out, const Config& config);
 
 #endif

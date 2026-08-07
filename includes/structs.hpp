@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 13:06:43 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/04 19:00:33 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/06 18:52:04 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct	s_directive
 typedef struct	s_errorPage
 {
 	std::vector<int>	codes;
-	std::string			src;
+	std::string			errorFile;
 }	t_errorPage;
 
 typedef struct	s_return

@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/05 19:55:25 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/07 13:36:28 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,33 +62,95 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 
 ServerConfig::~ServerConfig(){}
 
+/* ******************************** operators ******************************* */
+
+std::ostream& operator<<(std::ostream &out, const ServerConfig& server)
+{
+	//std::right << std::setw(10)
+	//std::left	
+	std::cout << "\n\tSERVER" << std::endl;
+
+	out << "\tIP: " << server.getHost() << std::endl;
+	out << "\tPort:" << server.getPort() << std::endl;
+	
+	if (server.getDefaultServer())
+		out << "\tDefault: true" << std::endl;
+	else
+		out << "\tDefault: false" << std::endl;
+
+	std::vector<std::string>	serverName = server.getServerName();
+	out << "\tServer name: ";
+	for (size_t k = 0; k < serverName.size(); k++)
+		out << serverName[k] << " ";
+	out << std::endl;
+
+	std::vector<t_errorPage> errorPage = server.getErrorPage();
+	for (size_t k = 0; k < errorPage.size(); k++)
+	{
+		out << "\tError page: ";
+		for (size_t l = 0; l < errorPage[k].codes.size(); l++)
+			out << errorPage[k].codes[l] << " ";
+		out << errorPage[k].errorFile << std::endl;
+	}
+
+	out << "\tClient max body size: " << server.getClientMaxBodySize() <<std::endl;
+	
+	out << "\tRoot: " << server.getRoot() <<std::endl;
+	
+	std::vector<std::string>	index = server.getIndex();
+	out << "\tIndex: ";
+	for (size_t k = 0; k < index.size(); k++)
+		out << index[k] << " ";
+	out << std::endl;
+	
+	out << "\tClient header timeout: " << server.getClientHeaderTimeout() <<std::endl;
+	
+	out << "\tClient body timeout: " <<  server.getClientBodyTimeout() <<std::endl;
+	
+	out << "\tSend timeout: " << server.getSendTimeout() <<std::endl;
+	
+	out << "\tKeep alive timeout: " << server.getKeepAliveTimeout() <<std::endl;
+
+	std::vector<LocationConfig>	location = server.getLocations();
+	for (std::vector<LocationConfig>::const_iterator it = location.begin();
+			it != location.end(); it++)
+			out << *it;
+
+	return (out);
+}
+
+
 /* ******************************** get & set ******************************* */
 
-const std::string&	ServerConfig::getHost() const{return _host;}
+const std::string&	ServerConfig::getHost() const {return _host;}
 
-const int&	ServerConfig::getPort() const{return _port;}
+const int&	ServerConfig::getPort() const {return _port;}
 
-const bool&	ServerConfig::getDefaultServer() const{return _defaultServer;}
+const bool&	ServerConfig::getDefaultServer() const {return _defaultServer;}
 
 const std::vector<std::string>&	ServerConfig::getServerName() const {return (_serverName);}
 
 const std::vector<t_errorPage>&	ServerConfig::getErrorPage() const {return (_errorPage);}
 
-const size_t&	ServerConfig::getClientMaxBodySize() const{return (_clientMaxBodySize);}
+const size_t&	ServerConfig::getClientMaxBodySize() const {return (_clientMaxBodySize);}
 
-const std::vector<std::string>&	ServerConfig::getIndex() const{return _index;}
+const std::string&	ServerConfig::getRoot() const {return (_root);}
 
-const int&	ServerConfig::getClientHeaderTimeout() const{return _clientHeaderTimeout;}
+const std::vector<std::string>&	ServerConfig::getIndex() const {return _index;}
 
-const int&	ServerConfig::getClientBodyTimeout() const{return _clientBodyTimeout;}
+const int&	ServerConfig::getClientHeaderTimeout() const {return _clientHeaderTimeout;}
 
-const int&	ServerConfig::getSendTimeout() const{return _sendTimeout;}
+const int&	ServerConfig::getClientBodyTimeout() const {return _clientBodyTimeout;}
 
-const int&	ServerConfig::getKeepAliveTimeout() const{return _keepAliveTimeout;}
+const int&	ServerConfig::getSendTimeout() const {return _sendTimeout;}
+
+const int&	ServerConfig::getKeepAliveTimeout() const {return _keepAliveTimeout;}
+
+const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_locations);}
 
 /* ************************* member funcs / methods ************************* */
 
-void	ServerConfig::listenDirective(const t_directive& tk)
+void	ServerConfig::listenDirective(const t_directive& tk)//atoi?
 {
 	if (tk.args.size() > 2)
 		throw ServerConfigInsufArgsException();
@@ -97,18 +159,25 @@ void	ServerConfig::listenDirective(const t_directive& tk)
 	{
 		if (tk.args[j] == "default_server")
 			_defaultServer = true;
-
-		size_t	pos = tk.args[j].find(":");
-		if (pos != std::string::npos)//x.x.x.x
-		{
-			if (tk.args[j] == "localhost")
-				_host = "127.0.0.1";
-			else
-				_host = tk.args[j].substr(0, pos);
-			_port = atoi(tk.args[j].substr(pos + 1).c_str());
-		}
 		else
-			_port = atoi(tk.args[j].c_str());
+		{
+			size_t	pos = tk.args[j].find(":");
+			std::string	tmp;
+			char		*end;
+			if (pos != std::string::npos)//x.x.x.x
+			{
+				if (tk.args[j] == "localhost")
+					_host = "127.0.0.1";
+				else
+					_host = tk.args[j].substr(0, pos);
+				tmp = tk.args[j].substr(pos + 1);
+				_port = std::strtol(tmp.c_str(), &end, 10);
+			}
+			else
+				_port = std::strtol(tk.args[j].c_str(), &end, 10);
+			if (*end != '\0')
+				throw ServerConfigUnisgnedNumberException();
+		}
 	}
 }
 
@@ -127,16 +196,19 @@ void	ServerConfig::errorPageDirective(const t_directive& tk)
 	if (tk.args.size() < 2)
 		throw ServerConfigInsufArgsException();
 
-	nd.src = tk.args.back();
+	nd.errorFile = tk.args.back();
 
 	for (size_t j = 0; j < tk.args.size() - 1; j++)
 	{
-		int	nCode;
-
-		nCode = atoi(tk.args[j].c_str());
-		if (nCode < 300 || nCode > 599)
+		char	*end;
+		std::string	tmp = tk.args[j];
+		long	value = std::strtol(tmp.c_str(), &end, 10);
+		
+		if (*end != '\0')
+			throw ServerConfigUnisgnedNumberException();
+		else if (value < 300 || value > 599)
 			throw ServerConfigErrorCodeOutLimitsException();
-		nd.codes.push_back(nCode);
+		nd.codes.push_back(value);
 	}
 
 	_errorPage.push_back(nd);
@@ -185,7 +257,7 @@ void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 	long		value = std::strtol(tmp.c_str(), &end, 10);
 	std::string	unit = tmp.substr(end - tmp.c_str());
 
-	//Units are wrong. Ask to Arcadio whitch unit he uses.
+	//NGINX uses ms and Arcadio uses seconds. Check it.
 	if (unit == "")
 		target = value;
 	else if (unit == "ms")
@@ -228,7 +300,7 @@ void	ServerConfig::resolveConfigDefaults()
 				throw ServerConfigRootException();
 		}
 		else
-			if (locationRoot.empty())
+			if (locationRoot.empty() && returnDir == false)
 				LocationIt->setRoot(_root);
 
 		const std::vector<std::string>&	locationIndex = LocationIt->getIndex();
@@ -238,7 +310,7 @@ void	ServerConfig::resolveConfigDefaults()
 				throw ServerConfigIndexException();
 		}
 		else
-			if (locationIndex.size() == 0)
+			if (locationIndex.size() == 0 && returnDir == false)
 				LocationIt->setIndex(_index);
 	}
 }

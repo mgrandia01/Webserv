@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/05 18:18:45 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/07 13:36:48 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,19 @@ class ServerConfig
 		~ServerConfig();
 
 		//GETTERS
-		const std::string&				getHost() const;
-		const int&						getPort() const;
-		const bool&						getDefaultServer() const;
-		const std::vector<std::string>&	getServerName() const;
-		const std::vector<t_errorPage>&	getErrorPage() const;
-		const size_t&					getClientMaxBodySize() const;
-		const std::vector<std::string>&	getIndex() const;
-		const int&						getClientHeaderTimeout() const;
-		const int&						getClientBodyTimeout() const;
-		const int&						getSendTimeout() const;
-		const int&						getKeepAliveTimeout() const;
+		const std::string&					getHost() const;
+		const int&							getPort() const;
+		const bool&							getDefaultServer() const;
+		const std::vector<std::string>&		getServerName() const;
+		const std::vector<t_errorPage>&		getErrorPage() const;
+		const size_t&						getClientMaxBodySize() const;
+		const std::string&					getRoot() const;
+		const std::vector<std::string>&		getIndex() const;
+		const int&							getClientHeaderTimeout() const;
+		const int&							getClientBodyTimeout() const;
+		const int&							getSendTimeout() const;
+		const int&							getKeepAliveTimeout() const;
+		const std::vector<LocationConfig>&	getLocations() const;
 
 		//EXCEPTIONS
 		class ServerConfigSemicolonPosException : public std::exception
@@ -126,9 +128,9 @@ class ServerConfig
 		std::vector<LocationConfig>	_locations;
 
 		//FUNCTIONS
-		void	listenDirective(const t_directive& tk);//atoi?
+		void	listenDirective(const t_directive& tk);
 		void	serverNameDirective(const t_directive& tk);
-		void	errorPageDirective(const t_directive& tk);//atoi?
+		void	errorPageDirective(const t_directive& tk);
 		void	clientMaxBodySizeDirective(const t_directive& tk);
 		void	rootDirective(const t_directive& tk);
 		void	indexDirective(const t_directive& tk);
@@ -141,5 +143,7 @@ class ServerConfig
 		void	timeoutParser(int& target, const t_directive& tk);
 		void	resolveConfigDefaults();
 };
+
+std::ostream& operator<<(std::ostream &out, const ServerConfig& server);
 
 #endif

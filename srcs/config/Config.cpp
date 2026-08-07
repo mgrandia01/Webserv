@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/03 21:01:25 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/06 18:36:13 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,20 @@ Config::Config(const char* file)
 //Config::operator=(const Config& rhs){}
 
 Config::~Config(){}
+
+/* ******************************** operators ******************************* */
+
+std::ostream& operator<<(std::ostream &out, const Config& config)
+{
+	std::vector<ServerConfig>	tmp = config.getServers();
+
+	std::cout << "CONFIG FILE" << std::endl;
+	for (std::vector<ServerConfig>::const_iterator it = tmp.begin();
+			it != tmp.end(); it++)
+		out << *it;
+
+	return (out);
+}
 
 /* ******************************** get & set ******************************* */
 
@@ -135,7 +149,7 @@ void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens)
 		}
 		if (str[i] && (str[i] == '{' || str[i] == '}' || str[i] == ';'))
 			tokens.push_back(std::string(1, str[i]));
-		/*Careful rong chars*/
+		/*Careful wrong chars*/
 	}
 }
 
@@ -174,22 +188,3 @@ size_t	Config::jumpHeader(std::vector<std::string>& lines)
 		j++;
 	return (j);
 }
-
-/*int	find_closing_line(const std::vector<std::string>& lines, size_t& start)
-{
-	int		braces = 0;
-
-	for (size_t j = start; j < lines.size(); j++)
-	{
-		for (size_t i = 0; lines[j][i]; i++)
-		{
-			if (lines[j][i] == '{')
-				braces++;
-			if (lines[j][i] == '}')
-				braces--;
-		}
-		if (braces == 0)
-			return (j);
-	}
-	return (-1);
-}*/

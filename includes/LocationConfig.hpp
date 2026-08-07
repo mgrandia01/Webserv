@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:44:51 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/05 17:50:09 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/06 19:32:10 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,13 +102,15 @@ class LocationConfig
 		t_return							_return;
 
 		void	uriDirective(const t_directive& tk);
-		void	rootDirective(const t_directive& child);
 		void	allowMethodsDirective(const t_directive& child);
+		void	rootDirective(const t_directive& child);
 		void	indexDirective(const t_directive& child);
 		void	autoindexDirective(const t_directive& child);
 		void	uploadStoreDirective(const t_directive& child);
 		void	cgiDirective(const t_directive& child);
 		void	returnDirective(const t_directive& child);
 };
+
+std::ostream&	operator<<(std::ostream &out, const LocationConfig& location);
 
 #endif
