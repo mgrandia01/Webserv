@@ -1,33 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpResponse.hpp                                   :+:      :+:    :+:   */
+/*   HttpSerializer.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/27 11:56:09 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 15:43:03 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/08/05 15:25:46 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/08/05 15:33:00 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPRESPONSE_HPP
-#define HTTPRESPONSE_HPP
+#ifndef HTTPSERIALIZER_HPP
+#define HTTPSERIALIZER_HPP
 
-#include "http/HttpStatus.hpp"
+#include <string>
+#include "HttpResponse.hpp"
 
-struct HttpResponse
+class HttpSerializer
 {
 	public:
-		int statusCode;
-		std::string reasonPhrase;
-
-		std::map<std::string, std::string> headers;
-
-		std::string body;
-
-		static HttpResponse createError(HttpStatus status);
-		//TODO
-		//void applyConfiguredErrorPage(const ServerConfig& server);
+		static std::string serialize(const HttpResponse& response);
 };
 
 #endif

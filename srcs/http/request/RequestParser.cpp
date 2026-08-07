@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 13:03:10 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/04 13:36:36 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 RequestParser::RequestParser()
 {
 	_state = PARSING_HEADERS;
-	_errorCode = 0;
+	_errorCode = NO_ERROR;
 	_requestLineParsed = false;
 	_contentLength = 0;
 	_chunked = false;
@@ -50,7 +50,7 @@ RequestParser::~RequestParser()
 void RequestParser::reset()
 {
 	_state = PARSING_HEADERS;
-	_errorCode = 0;
+	_errorCode = NO_ERROR;
 	_requestLineParsed = false;
 	_stream.clear();
 	_request = HttpRequest();
@@ -63,7 +63,7 @@ HttpRequest RequestParser::getRequest() const
 	return _request;
 }
 
-int RequestParser::getErrorCode() const
+HttpStatus RequestParser::getErrorCode() const
 {
 	return _errorCode;
 }

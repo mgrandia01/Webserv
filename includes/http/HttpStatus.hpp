@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 11:55:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/31 12:07:08 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/04 13:33:03 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 enum HttpStatus
 {
+	NO_ERROR = 0,
 	OK = 200,
 
 	BAD_REQUEST = 400,
