@@ -58,7 +58,7 @@ void RequestParser::reset()
 	_chunked = false;
 }
 
-HttpRequest RequestParser::getRequest() const
+const HttpRequest& RequestParser::getRequest() const
 {
 	return _request;
 }
