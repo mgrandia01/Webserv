@@ -42,8 +42,7 @@ SRC = main.cpp \
       http/request/RequestParserStartLine.cpp http/request/RequestParserStartLineValidation.cpp \
       http/request/RequestParserBody.cpp http/request/RequestParserBodyValidation.cpp \
       http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp \
-      http/response/HttpStatus.cpp http/request/RequestHandler.cpp \
-      http/response/HttpSerializer.cpp \
+      http/response/HttpStatus.cpp http/response/HttpSerializer.cpp \
       config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)

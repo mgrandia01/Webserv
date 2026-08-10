@@ -41,7 +41,7 @@ RequestHandler::~RequestHandler()
 
 void RequestHandler::handle(const HttpRequest& request, const ServerConfig& server, Response& response)
 {
-    (void)request;
+    /*(void)request;
 
 
     std::cout << "Handling request with server: " << server.getServerName() << std::endl;
@@ -58,5 +58,5 @@ oss << body;
 response = Response(oss.str());*/
 
     // temporal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    response = Response("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nHello");
+    //response = Response("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nHello");
 }
