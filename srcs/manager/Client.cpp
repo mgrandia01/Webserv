@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 13:40:12 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/07/22 13:40:13 by arcmarti         ###   ########.fr       */
+/*   Updated: 2026/08/10 11:30:31 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ bool Client::receive()
     std::cout.write(buffer, bytes);
     std::cout << std::endl;
 
-    _parser.feed(buffer, bytes);
+    _parser.feed(buffer, bytes, *_serverConfig);
     setLastActivity();
 
     if (!_parser.isComplete())
