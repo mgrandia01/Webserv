@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/06 18:36:13 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/10 16:04:20 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ std::ostream& operator<<(std::ostream &out, const Config& config)
 const std::vector<ServerConfig>& Config::getServers() const{return (_servers);}
 
 /* ************************* member funcs / methods ************************* */
+
 void	parserDirective(std::vector<t_directive>& tkStruct,
 				std::vector<std::string>& tokens,
 				size_t& j)
@@ -127,17 +128,20 @@ void	Config::tokenizerStruct(std::vector<t_directive>& tokensStruct,
 //PASAR DE LECTURA A TOKEN
 void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens)
 {
+	size_t		i = 0;
+	size_t		size = str.size();
 	size_t 		start = 0;
 	size_t		len = 0;
 	std::string	tmp;
 
-	for (int i = 0; str[i]; i++)
+	
+	while (i < size)
 	{
 		while (str[i] && isspace(str[i]))
 			i++;
 		start = i;
 		len = 0;
-		while (str[i] && str[i] != '{' && str[i] != '}' && str[i] != ';' && !isspace(str[i]))
+		while (i < size && str[i] != '{' && str[i] != '}' && str[i] != ';' && !isspace(str[i]))
 		{
 			i++;
 			len++;
@@ -147,9 +151,10 @@ void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens)
 			tmp = str.substr(start, len);
 			tokens.push_back(tmp);
 		}
-		if (str[i] && (str[i] == '{' || str[i] == '}' || str[i] == ';'))
+		if (i < size && (str[i] == '{' || str[i] == '}' || str[i] == ';'))
 			tokens.push_back(std::string(1, str[i]));
 		/*Careful wrong chars*/
+		i++;
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/07 13:36:48 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/10 16:26:39 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,10 +135,10 @@ class ServerConfig
 		void	rootDirective(const t_directive& tk);
 		void	indexDirective(const t_directive& tk);
 		void	locationDirective(const t_directive& tk);
-		void	clientHeaderTimeOut(const t_directive& tk);
-		void	clientBodyTimeOut(const t_directive& tk);
-		void	sendTimeOut(const t_directive& tk);
-		void	keepAliveTimeOut(const t_directive& tk);
+		void	clientHeaderTimeout(const t_directive& tk);
+		void	clientBodyTimeout(const t_directive& tk);
+		void	sendTimeout(const t_directive& tk);
+		void	keepAliveTimeout(const t_directive& tk);
 
 		void	timeoutParser(int& target, const t_directive& tk);
 		void	resolveConfigDefaults();
