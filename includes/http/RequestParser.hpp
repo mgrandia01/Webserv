@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/04 13:35:59 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/07 11:25:13 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 #include "HttpRequest.hpp"
 #include "http/HttpStatus.hpp"
+#include "Config.hpp"
 
 class RequestParser
 {
@@ -31,7 +32,7 @@ class RequestParser
 		~RequestParser();
 
 
-		void feed(const char *buffer, size_t bytes);
+		void feed(const char *buffer, size_t bytes, const ServerConfig& server);
 
 		bool isComplete() const;
 		bool hasError() const;
@@ -107,5 +108,7 @@ class RequestParser
 		size_t _contentLength;
 
 		bool _chunked;
+
+		const 	ServerConfig* _server;
 };
 #endif
