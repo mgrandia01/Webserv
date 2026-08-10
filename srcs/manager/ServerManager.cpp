@@ -282,8 +282,7 @@ bool ServerManager::readClient(int indexPoll)
 
     if (client.hasParserError())
     {
-        Response response(
-            "HTTP/1.1 400 Bad Request\r\n Content-Length: 0\r\n\r\n");
+        Response response("HTTP/1.1 400 Bad Request\r\n Content-Length: 0\r\n\r\n");
 
         client.setResponse(response);
     }
@@ -305,8 +304,8 @@ bool ServerManager::readClient(int indexPoll)
         }
         else
         {
-            Response response;
-            _requestHandler.handle(request, *server, response);
+            
+	    Response response = _requestHandler.handle(request);//, *server);
             client.setResponse(response);
         }
     }

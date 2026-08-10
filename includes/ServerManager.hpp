@@ -17,9 +17,9 @@
 #include <map>
 #include "Config.hpp"
 #include "http/RequestParser.hpp"
-#include "Response.hpp"
 #include "Client.hpp"
-#include "RequestHandler.hpp"
+#include "http/HttpHandler.hpp"
+#include "Response.hpp"
 
 
 class ServerManager {
@@ -44,7 +44,7 @@ private:
 	ServerManager& operator=(const ServerManager& rhs);
 
 	const Config&				_config;
-	RequestHandler				_requestHandler;
+	HttpHandler					_requestHandler;
 
 	std::vector<int>					_listenSockets;
 	std::vector<const ServerConfig*> 	_listenConfigs;

@@ -15,6 +15,7 @@
 
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "Response.hpp"
 
 #include <cassert>
 #include <cstdlib>
@@ -28,7 +29,7 @@ class HttpHandler
 		//TODO al hacer la integracion sera algo como:
 		//HttpResponse HttpHandler::handle
 		//(const HttpRequest& request,const LocationConfig& location)
-		HttpResponse handle(const HttpRequest& request);
+		Response handle(const HttpRequest& request);
 
 	private:
 		//HttpHandler.cpp

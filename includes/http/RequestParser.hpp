@@ -40,7 +40,6 @@ class RequestParser
 		// valorar si cambiar a
 		const HttpRequest& getRequest() const;
 
-		HttpRequest getRequest() const;
 		HttpStatus getErrorCode() const;
 		void reset();
 

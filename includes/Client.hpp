@@ -15,8 +15,9 @@
 #define CLIENT_HPP
 
 #include "http/RequestParser.hpp"
-#include "Response.hpp"
+#include "http/HttpResponse.hpp"
 #include "Config.hpp"
+#include "Response.hpp"
 
 enum TimeoutState
 {

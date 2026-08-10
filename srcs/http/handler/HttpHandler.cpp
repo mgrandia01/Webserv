@@ -12,6 +12,7 @@
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp"
+#include "Response.hpp"
 #include <cerrno>
 #include <sstream>
 #include <cstdio>
@@ -126,16 +127,18 @@ HttpResponse HttpHandler::handleDelete(const HttpRequest& request)
 	return response;
 }
 
-HttpResponse HttpHandler::handle(const HttpRequest& request)
+Response HttpHandler::handle(const HttpRequest& request)
 {
-	if (request.method == "GET")
+	/*if (request.method == "GET")
 		return handleGet(request);
 
 	else if (request.method == "POST")
 		return handlePost(request);
 
 	else if (request.method == "DELETE")
-		return handleDelete(request);
+		return handleDelete(request);*/
+		(void) request;
+	return (Response("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nHello"));
 
 	assert(false && "Unexpected HTTP method");
 	std::abort();
