@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/04 13:36:36 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/07 11:19:49 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ RequestParser::RequestParser()
 	_contentLength = 0;
 	_chunked = false;
 	_clientMaxBodySize = 1024*1024;//TODO es un parcheeee
+	_server = NULL;
 }
 	
 RequestParser::RequestParser(const RequestParser &other)
@@ -39,6 +40,7 @@ RequestParser &RequestParser::operator=(const RequestParser &other)
 		_requestLineParsed = other._requestLineParsed;
 		_contentLength = other._contentLength;
 		_chunked = other._chunked;
+		_server = other._server;
 	}
 	return *this;
 }
@@ -47,6 +49,7 @@ RequestParser::~RequestParser()
 {
 }
 
+//TODO lo uso? 
 void RequestParser::reset()
 {
 	_state = PARSING_HEADERS;
@@ -56,6 +59,7 @@ void RequestParser::reset()
 	_request = HttpRequest();
 	_contentLength = 0;
 	_chunked = false;
+	_server = NULL;
 }
 
 HttpRequest RequestParser::getRequest() const
@@ -78,8 +82,9 @@ bool RequestParser::isComplete() const
 	return (_state == COMPLETE);
 }
 
-void RequestParser::feed(const char *buffer, size_t bytes)
+void RequestParser::feed(const char *buffer, size_t bytes, const ServerConfig& server)
 {
+	_server = &server;
 	_stream.append(buffer, bytes);
 
 	if (_state == PARSING_HEADERS)
