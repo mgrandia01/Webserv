@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 13:00:00 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/04 13:35:59 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include "HttpRequest.hpp"
+#include "http/HttpStatus.hpp"
 
 class RequestParser
 {
@@ -38,8 +39,8 @@ class RequestParser
 		// valorar si cambiar a
 		const HttpRequest& getRequest() const;
 
-		//HttpRequest getRequest() const;
-		int getErrorCode() const;
+		HttpRequest getRequest() const;
+		HttpStatus getErrorCode() const;
 		void reset();
 
 	private:
@@ -95,7 +96,7 @@ class RequestParser
 
 		State _state;
 
-		int _errorCode;
+		HttpStatus _errorCode;
 
 		bool _requestLineParsed;
 

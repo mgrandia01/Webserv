@@ -1,38 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Response.hpp                                       :+:      :+:    :+:   */
+/*   HttpSerializer.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/22 10:32:40 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/08/05 15:25:46 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/08/05 15:33:00 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef RESPONSE_HPP
-#define RESPONSE_HPP
+#ifndef HTTPSERIALIZER_HPP
+#define HTTPSERIALIZER_HPP
 
 #include <string>
-#include <map>
+#include "HttpResponse.hpp"
 
-class Response
+class HttpSerializer
 {
 	public:
-		Response();
-		Response(std::string data);
-		~Response();
-		Response& operator=(const Response& rhs);
-		Response(const Response& other);
-
-		const std::string& getStream() const;
-		
-	private:
-		
-		
-		
-		std::string _stream;
-	
+		static std::string serialize(const HttpResponse& response);
 };
 
 #endif

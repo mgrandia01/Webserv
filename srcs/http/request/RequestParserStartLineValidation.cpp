@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:19:10 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:32:01 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/05 12:48:54 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ bool RequestParser::validateTarget(const std::string &target)
 
 bool RequestParser::validateVersion(const std::string &version)
 {
-	if (version != "HTTP/1.1" && version != "HTTP/1.0")
+	if (version != "HTTP/1.1")
 	{
 		_errorCode = HTTP_VERSION_NOT_SUPPORTED;
 		return false;
@@ -79,6 +79,7 @@ bool RequestParser::validateMethod(const std::string &method)
 		return true;
 
 	_errorCode = NOT_IMPLEMENTED;
+	//TODO el servidor lo acepta?
 	return false;
 }
 
