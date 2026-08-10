@@ -36,9 +36,9 @@ class RequestParser
 		bool hasError() const;
 
 		// valorar si cambiar a
-		//const HttpRequest& getRequest() const;
+		const HttpRequest& getRequest() const;
 
-		HttpRequest getRequest() const;
+		//HttpRequest getRequest() const;
 		int getErrorCode() const;
 		void reset();
 
