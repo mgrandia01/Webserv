@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/07/18 09:50:09 by arcmarti         ###   ########.fr       */
+/*   Updated: 2026/08/10 13:07:24 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ void	ServerManager::bindSocket(int socketFd, const ServerConfig& server)
 		throw std::runtime_error("invalid host");
 	}
 
+	std::cout << server.getPort() << "..."  << server.getHost() << "..." << socketFd << std::endl;
 	if (bind(socketFd, (sockaddr *)&address, sizeof(address)) == -1)
 	{
 		close(socketFd);
@@ -241,7 +242,7 @@ void	ServerManager::acceptClient(int socketFd)
 	client.setServerConfig(serverConfig);
 
 	if (serverConfig)
-		std::cout << "Assigned server: " << serverConfig->getServerName()  << std::endl;
+		std::cout << "Assigned server: " << serverConfig->getServerName()[0]  << std::endl;
 	else
 		std::cout << "ERROR: no ServerConfig assigned" << std::endl;
 

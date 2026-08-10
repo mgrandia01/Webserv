@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/07 11:19:01 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/10 13:07:21 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,18 +43,8 @@ int main(int argc, char **argv)
 	{
 		Config config(argv[1]);
 		
-		const std::vector<ServerConfig>& servers = config.getServers();
-		
-		for (size_t i = 0; i < servers.size(); i++)
-		{
-			std::cout << "Server " << i << std::endl;
-			std::cout << "Host : " << servers[i].getHost() << std::endl;
-			std::cout << "Port : " << servers[i].getPort() << std::endl;
-			std::cout << "Name : " << servers[i].getServerName() << std::endl;
-			std::cout << "Root : " << servers[i].getRoot() << std::endl;
-			std::cout << std::endl;
-		}
-		
+		//std::cout << config << std::endl;
+
 		ServerManager manager(config);
 		manager.init();
 		manager.printSockets();
