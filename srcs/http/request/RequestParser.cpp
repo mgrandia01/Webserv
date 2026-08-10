@@ -6,20 +6,22 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/20 11:24:27 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/07 11:19:49 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestParser.hpp"
+#include "http/RequestParser.hpp"
 #include <iostream>
 
 RequestParser::RequestParser()
 {
 	_state = PARSING_HEADERS;
-	_errorCode = 0;
+	_errorCode = NO_ERROR;
 	_requestLineParsed = false;
 	_contentLength = 0;
 	_chunked = false;
+	_clientMaxBodySize = 1024*1024;//TODO es un parcheeee
+	_server = NULL;
 }
 	
 RequestParser::RequestParser(const RequestParser &other)
@@ -38,6 +40,7 @@ RequestParser &RequestParser::operator=(const RequestParser &other)
 		_requestLineParsed = other._requestLineParsed;
 		_contentLength = other._contentLength;
 		_chunked = other._chunked;
+		_server = other._server;
 	}
 	return *this;
 }
@@ -46,23 +49,25 @@ RequestParser::~RequestParser()
 {
 }
 
+//TODO lo uso? 
 void RequestParser::reset()
 {
 	_state = PARSING_HEADERS;
-	_errorCode = 0;
+	_errorCode = NO_ERROR;
 	_requestLineParsed = false;
 	_stream.clear();
-	_request = Request();
+	_request = HttpRequest();
 	_contentLength = 0;
 	_chunked = false;
+	_server = NULL;
 }
 
-Request RequestParser::getRequest() const
+const HttpRequest& RequestParser::getRequest() const
 {
 	return _request;
 }
 
-int RequestParser::getErrorCode() const
+HttpStatus RequestParser::getErrorCode() const
 {
 	return _errorCode;
 }
@@ -77,8 +82,9 @@ bool RequestParser::isComplete() const
 	return (_state == COMPLETE);
 }
 
-void RequestParser::feed(const char *buffer, size_t bytes)
+void RequestParser::feed(const char *buffer, size_t bytes, const ServerConfig& server)
 {
+	_server = &server;
 	_stream.append(buffer, bytes);
 
 	if (_state == PARSING_HEADERS)

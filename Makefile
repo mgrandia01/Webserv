@@ -36,7 +36,15 @@ DIR_SRC = srcs/
 # ─────────────────────────────────────────────────────────────
 # ARCHIVOS
 # ─────────────────────────────────────────────────────────────
-SRC = main.cpp http/request/RequestParser.cpp http/request/RequestParserHeaders.cpp http/request/RequestParserBody.cpp http/request/RequestParserValidation.cpp manager/ServerManager.cpp config/Config.cpp config/ServerConfig.cpp config/LocationConfig.cpp
+SRC = main.cpp \
+      http/request/RequestParser.cpp http/request/RequestParserUtils.cpp \
+      http/request/RequestParserHeaders.cpp http/request/RequestParserHeadersValidation.cpp \
+      http/request/RequestParserStartLine.cpp http/request/RequestParserStartLineValidation.cpp \
+      http/request/RequestParserBody.cpp http/request/RequestParserBodyValidation.cpp \
+      http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp \
+      http/response/HttpStatus.cpp http/response/HttpSerializer.cpp \
+      config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp \
+      config/ServerConfig.cpp config/LocationConfig.cp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 

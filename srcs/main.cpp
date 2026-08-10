@@ -1,61 +1,31 @@
 /* ************************************************************************** */
-/*																			*/
-/*														:::	  ::::::::   */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
-/*													+:+ +:+		 +:+	 */
-/*   By: mgrandia <mgrandia@student.42barcelon	  +#+  +:+	   +#+		*/
-/*												+#+#+#+#+#+   +#+		   */
-/*   Created: 2026/07/16 13:35:01 by mgrandia		  #+#	#+#			 */
-/*   Updated: 2026/07/17 15:04:04 by mgrandia         ###   ########.fr       */
-/*																			*/
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/08/07 11:19:01 by mgrandia         ###   ########.fr       */
+/*                                                                            */
 /* ************************************************************************** */
-
 
 #include <iostream>
 #include <exception>
-#include <string>
-#include "Config.hpp"
-#include "ServerManager.hpp"
-#include "RequestParser.hpp"
-
-#include <iostream>
 #include <map>
+#include <string>
 
-#include "RequestParser.hpp"
+#include "Config.hpp"
+#include "Response.hpp"
+#include "ServerManager.hpp"
 
-void test(const std::string &req)
-{
-	RequestParser parser;
 
-	parser.feed(req.c_str(), req.size());
+#include "http/RequestParser.hpp"
+#include "http/HttpResponse.hpp"
+#include "http/HttpHandler.hpp"
+#include "http/HttpSerializer.hpp"
 
-	if (parser.hasError())
-	{
-		std::cout << "ERROR " << parser.getErrorCode() << std::endl;
-		return;
-	}
-
-	if (parser.isComplete())
-	{
-		Request r = parser.getRequest();
-
-		std::cout << "Method : " << r.method << std::endl;
-		std::cout << "Target : " << r.target << std::endl;
-		std::cout << "Version: " << r.version << std::endl;
-
-		std::cout << "Headers:" << std::endl;
-
-		for (std::map<std::string, std::string>::const_iterator it = r.headers.begin();
-			it != r.headers.end(); ++it)
-		{
-			std::cout << "  [" << it->first << "] = [" << it->second << "]" << std::endl;
-		}
-	}
-	else
-	{
-		std::cout << "INCOMPLETE" << std::endl;
-	}
-}
+#include <cstring>
 
 
 int main(int argc, char **argv)
@@ -95,6 +65,34 @@ int main(int argc, char **argv)
 		std::cerr << e.what() << std::endl;
 		return (1);
 	}
+
 	
 	return (0);
 }
+
+/*
+
+bytes = recv(fd, buffer, sizeof(buffer),0));
+parser.feed(buffer, bytes, server);
+
+if (parser.hasError())
+{
+	HttpResponse response = HttpResponse::createError(parser.getErrorCode(), server);
+	//TODO mirar si existe una pagina de error para este codigo
+	response.applyConfiguredErrorPage(server);
+	//TODO serializer:
+	std::string raw = HttpSerializer::serialize(response);
+	send(fd, raw.c_str(), raw.size(),0);	
+}
+else if (parser.isComplete())
+{
+	HttpRequest request = parser.getRequest();
+	HttpResponse response = handler.handle(request, server);
+	//TODO mirar si existe una pagina de error para este codigo
+	response.applyConfiguredErrorPage(server);
+	//TODO serializer
+	send(respone)
+}
+
+
+ * */

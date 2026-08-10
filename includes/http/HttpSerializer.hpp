@@ -1,31 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Request.hpp                                        :+:      :+:    :+:   */
+/*   HttpSerializer.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/20 10:57:42 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/08/05 15:25:46 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/08/05 15:33:00 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#ifndef HTTPSERIALIZER_HPP
+#define HTTPSERIALIZER_HPP
 
 #include <string>
-#include <map>
+#include "HttpResponse.hpp"
 
-class Request
+class HttpSerializer
 {
 	public:
-		std::string method;
-		std::string target;
-		std::string version;
-
-		std::map<std::string, std::string> headers;
-
-		std::string body;
+		static std::string serialize(const HttpResponse& response);
 };
 
 #endif

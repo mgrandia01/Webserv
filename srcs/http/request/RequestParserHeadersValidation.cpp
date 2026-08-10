@@ -1,0 +1,147 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   RequestParserHeadersValidation.cpp                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/22 11:24:48 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/07/28 11:49:14 by mgrandia         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "http/RequestParser.hpp"
+#include "http/HttpStatus.hpp"
+
+#include <limits>
+
+
+bool RequestParser::isValidHeaderName(const std::string &key)
+{
+ 	static const std::string valid = "!#$%&'*+-.^_`|~";
+
+ 	for (size_t i = 0; i < key.size(); i++)
+ 	{
+ 		unsigned char c = static_cast<unsigned char>(key[i]);
+
+		if (!isalnum(c) && valid.find(c) == std::string::npos)
+			return false;
+	}
+
+	return true;
+}
+
+bool RequestParser::validateFramingHeaders()
+{
+	if (_request.headerOccurrences["content-length"] > 0 &&
+			_request.headerOccurrences["transfer-encoding"] > 0)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+
+	return true;
+}
+
+bool RequestParser::validateTransferEncoding()
+{
+	size_t occurrences = _request.headerOccurrences["transfer-encoding"];
+	if (occurrences > 1)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+
+	if (occurrences == 1)
+	{
+		if (_request.headers["transfer-encoding"].empty())
+		{
+			_errorCode = BAD_REQUEST;
+			return false;
+		}
+		if (_request.headers["transfer-encoding"] != "chunked")
+		{
+			_errorCode = NOT_IMPLEMENTED;
+			return false;
+		}
+
+		_chunked = true;
+	}
+	return true;
+}
+
+bool RequestParser::isValidContentLength(const std::string &value)
+{
+	size_t result = 0;
+
+	for (size_t i = 0; i < value.size(); i++)
+	{
+		if (!std::isdigit(static_cast<unsigned char>(value[i])))
+			return false;
+
+		size_t digit = value[i] - '0';
+		if (result > (std::numeric_limits<size_t>::max() - digit) / 10)
+			return false;
+
+		result = result * 10 + (value[i] - '0');
+	}
+	_contentLength = result;
+	return true;
+}
+bool RequestParser::validateContentLength()
+{
+	size_t occurrences = _request.headerOccurrences["content-length"];
+	if (occurrences > 1)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+	if (occurrences == 1)
+	{
+		if (_request.headers["content-length"].empty())
+		{
+			_errorCode = BAD_REQUEST;
+			return false;
+		}
+		
+		if (!isValidContentLength(_request.headers["content-length"]))
+		{
+			_errorCode = BAD_REQUEST;
+			return false;
+
+		}
+	}
+	return true;
+}
+
+
+bool RequestParser::validateHost()
+{
+	if (_request.headerOccurrences["host"] != 1)
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+	if (_request.headers["host"].empty())
+	{
+		_errorCode = BAD_REQUEST;
+		return false;
+	}
+	return true;
+}
+
+bool RequestParser::validateHeaders()
+{
+	if (!validateHost())
+		return false;
+
+	if (!validateFramingHeaders())
+		return false;
+
+	if (!validateContentLength())
+		return false;
+
+	if (!validateTransferEncoding())
+		return false;
+	return true;
+}

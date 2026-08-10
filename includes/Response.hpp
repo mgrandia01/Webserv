@@ -1,27 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpStatus.hpp                                     :+:      :+:    :+:   */
+/*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/17 11:55:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/17 12:00:57 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/07/22 10:32:40 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPSTATUS_HPP
-#define HTTPSTATUS_HPP
+#ifndef RESPONSE_HPP
+#define RESPONSE_HPP
 
-enum HttpStatus
+#include <string>
+#include <map>
+
+class Response
 {
-	OK = 200,
-	BAD_REQUEST = 400,
-	NOT_FOUND = 404,
-	METHOD_NOT_ALLOWED = 405,
-	INTERNAL_SERVER_ERROR = 500,
-	NOT_IMPLEMENTED = 501,
-	HTTP_VERSION_NOT_SUPPORTED = 505
+	public:
+		Response();
+		Response(std::string data);
+		~Response();
+		Response& operator=(const Response& rhs);
+		Response(const Response& other);
+
+		const std::string& getStream() const;
+		
+	private:
+		
+		
+		
+		std::string _stream;
+	
 };
 
 #endif
