@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/08/05 15:26:09 by mgrandia         ###   ########.fr        #
+#    Updated: 2026/08/06 16:07:04 by mcuenca-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,7 +43,8 @@ SRC = main.cpp \
       http/request/RequestParserBody.cpp http/request/RequestParserBodyValidation.cpp \
       http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp \
       http/response/HttpStatus.cpp http/response/HttpSerializer.cpp \
-      config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp
+      config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp \
+      config/ServerConfig.cpp config/LocationConfig.cp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 

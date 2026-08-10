@@ -6,137 +6,185 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/07/18 09:29:25 by arcmarti         ###   ########.fr       */
+/*   Updated: 2026/08/06 18:36:13 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string>
+#include <string.h>
+#include <cerrno>
+#include <iostream>
+#include <fstream>
 #include "Config.hpp"
+#include "ServerConfig.hpp"
+#include "structs.hpp"
 
-Config::Config(const std::string& file)
+/* ***************************** constr & destr ***************************** */
+
+Config::Config(){}
+
+Config::Config(const char* file)
 {
-	(void) file;
+	std::ifstream				fd(file);
+	std::string					buff;
+	std::vector<std::string>	lines;
 
+	//READ
+	if (!fd.is_open())
+		throw std::runtime_error(strerror(errno));
+	while (getline(fd, buff))
+		lines.push_back(buff);
 
-	//TODO parcheado para testing
-	//ServerConfig server("IP", port, "host", "root", timeoutHeader, timeoutBody, timeoutSend, timeoutKeepAlive);
-	
-	ServerConfig server("127.0.0.1", 8080, "webserv", "./www", 5, 15, 1, 25);
-	ServerConfig server2("127.0.0.1", 8081, "webserv2", "./www2", 10, 15, 20, 25);
-	
-	_servers.push_back(server);
-	_servers.push_back(server2);
+	//TOKENS
+	std::vector<std::string>	tokens;
+
+	size_t	header = jumpHeader(lines);
+	for (size_t j = header; j < lines.size(); j++)
+		tokenizer(lines[j], tokens);
+
+	//TOKEN STRUCT && VECTOR<SERVERS>	
+	const	size_t	size = tokens.size();
+	for (size_t n = 0; n < size; n++)
+	{
+		size_t	start = findStart(tokens, size, n) + 2;
+		n++;
+		size_t	end = findEnd(tokens, size, n) - 1;
+		
+		std::vector<t_directive>	tokensStruct;
+		tokenizerStruct(tokensStruct, tokens, start, end);
+
+		ServerConfig	tmp(tokensStruct);
+		_servers.push_back(tmp);
+	}
 }
+
+//Config::Config(const Config& src){}
+
+//Config::operator=(const Config& rhs){}
 
 Config::~Config(){}
 
-const std::vector<ServerConfig>& Config::getServers() const
+/* ******************************** operators ******************************* */
+
+std::ostream& operator<<(std::ostream &out, const Config& config)
 {
-    return (_servers);
+	std::vector<ServerConfig>	tmp = config.getServers();
+
+	std::cout << "CONFIG FILE" << std::endl;
+	for (std::vector<ServerConfig>::const_iterator it = tmp.begin();
+			it != tmp.end(); it++)
+		out << *it;
+
+	return (out);
 }
 
+/* ******************************** get & set ******************************* */
 
+const std::vector<ServerConfig>& Config::getServers() const{return (_servers);}
 
-
-
-
-
-
-ServerConfig::ServerConfig(const std::string& host, int port, const std::string& serverName, const std::string& root, int clientHeaderTimeout,
-							int clientBodyTimeout, int sendTimeout, int keepAliveTimeout) : _host(host), _port(port),  _serverName(serverName),
-							_root(root), _clientHeaderTimeout(clientHeaderTimeout), _clientBodyTimeout(clientBodyTimeout), _sendTimeout(sendTimeout),
-							_keepAliveTimeout(keepAliveTimeout) {};
-ServerConfig::~ServerConfig(){}
-ServerConfig::ServerConfig(const ServerConfig& other)
+/* ************************* member funcs / methods ************************* */
+void	parserDirective(std::vector<t_directive>& tkStruct,
+				std::vector<std::string>& tokens,
+				size_t& j)
 {
- 	*this = other;
-}
+	t_directive	nd;
 
-ServerConfig&	ServerConfig::operator=(const ServerConfig& rhs)
-{
-	if (this != &rhs)
+	nd.name = tokens[j];
+	j++;
+	while (tokens[j] != ";" && tokens[j] != "{")
 	{
-        	_host = rhs._host;
-		_port = rhs._port;
-		_serverName = rhs._serverName;
-		_root = rhs._root;
-		_att1 = rhs._att1;
-		_att2 = rhs._att2;
-	    _locations = rhs._locations;
-	    _clientHeaderTimeout = rhs._clientHeaderTimeout;
-	    _clientBodyTimeout = rhs._clientBodyTimeout;
-	    _sendTimeout = rhs._sendTimeout;
-	    _keepAliveTimeout = rhs._keepAliveTimeout;
+		nd.args.push_back(tokens[j]);
+		j++;
 	}
-	
-	return *this;
-}
-
-const std::vector<LocationConfig>& ServerConfig::getLocations() const
-{
-    return (_locations);
-}
-
-const std::string&	ServerConfig::getHost() const
-{
-	return _host;
-}
-
-int			ServerConfig::getPort() const
-{
-	return _port;
-}
-
-const std::string&	ServerConfig::getServerName() const
-{
-	return _serverName;
-}
-
-const std::string&	ServerConfig::getRoot() const
-{
-	return _root;
-}
-
-int ServerConfig::getClientHeaderTimeout() const
-{
-    return _clientHeaderTimeout;
-}
-
-int ServerConfig::getClientBodyTimeout() const
-{
-    return _clientBodyTimeout;
-}
-
-int ServerConfig::getSendTimeout() const
-{
-    return _sendTimeout;
-}
-
-int ServerConfig::getKeepAliveTimeout() const
-{
-    return _keepAliveTimeout;
-}
-
-
-
-
-LocationConfig::LocationConfig(){}
-LocationConfig::~LocationConfig(){}
-LocationConfig::LocationConfig(const LocationConfig& other)
-{
- 	*this = other;
-}
-
-LocationConfig&	LocationConfig::operator=(const LocationConfig& rhs)
-{
-	if (this != &rhs)
+	if (tokens[j] == ";")
+		nd.isBlock = false;
+	else if (tokens[j] == "{")
 	{
-        	_att1 = rhs._att1;
-		_att2 = rhs._att2;
-	        
-	}
-	
-	return *this;
+		nd.isBlock = true;
+		j++;
+		while (tokens[j] != "}")
+		{
+			parserDirective(nd.children, tokens, j);
+			j++;
+		}
+	}	
+	tkStruct.push_back(nd);
 }
 
+void	Config::tokenizerStruct(std::vector<t_directive>& tokensStruct,
+								std::vector<std::string>& tokens,
+								size_t& start, size_t& end)
+{
+	size_t	j = start;
 
+	while (j < end)
+	{
+		parserDirective(tokensStruct, tokens, j);
+		j++;
+	}
+}
+
+//PASAR DE LECTURA A TOKEN
+void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens)
+{
+	size_t 		start = 0;
+	size_t		len = 0;
+	std::string	tmp;
+
+	for (int i = 0; str[i]; i++)
+	{
+		while (str[i] && isspace(str[i]))
+			i++;
+		start = i;
+		len = 0;
+		while (str[i] && str[i] != '{' && str[i] != '}' && str[i] != ';' && !isspace(str[i]))
+		{
+			i++;
+			len++;
+		}
+		if (len > 0)
+		{
+			tmp = str.substr(start, len);
+			tokens.push_back(tmp);
+		}
+		if (str[i] && (str[i] == '{' || str[i] == '}' || str[i] == ';'))
+			tokens.push_back(std::string(1, str[i]));
+		/*Careful wrong chars*/
+	}
+}
+
+size_t  Config::findEnd(std::vector<std::string>& tokens, size_t size, size_t& n)
+{
+	int		braces = 0;
+
+	while (n < size)
+	{
+		if (tokens[n] == "{")
+			braces++;
+		else if (tokens[n] == "}")
+			braces--;
+		if (braces == 0)
+			return (n);
+		n++;
+	}
+	throw ConfigBlockException();
+}
+size_t	Config::findStart(std::vector<std::string>& tokens, size_t size, size_t& n)
+{
+	while (n < size && tokens[n] != "server")
+		n++;
+	if (n == size)
+		throw ConfigAnyServerException();
+	else if (n + 1 >= size || tokens[n + 1] != "{")
+		throw ConfigOpenBraceException();
+	return (n);
+}
+
+size_t	Config::jumpHeader(std::vector<std::string>& lines)
+{
+	int	j = 0;
+
+	while (lines[j].find ("server"))
+		j++;
+	return (j);
+}
