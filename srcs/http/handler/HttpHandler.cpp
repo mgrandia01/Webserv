@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 11:52:17 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 12:15:54 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,14 @@
 #include <iostream>
 
 
-Response HttpHandler::handleGet(const HttpRequest& request)
+Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location)
 {
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
 
 
-
-
-	std::string root = "./www";//TODO esto esta parcheado
+	std::string root = location.getRoot();//"./www"parcheado TODO 
 	std::string fullPath = root + request.path;
 	Response response;
 
@@ -70,13 +68,13 @@ Response HttpHandler::handleGet(const HttpRequest& request)
 	return response;
 }
 
-Response HttpHandler::handlePost(const HttpRequest& request)
+Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location)
 {
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
 
-
+	(void)location;
 	Response response;
 
 	std::string uploadStore = "./uploads";//TODO desparchear
@@ -105,8 +103,9 @@ Response HttpHandler::handlePost(const HttpRequest& request)
 	return response;
 }
 
-Response HttpHandler::handleDelete(const HttpRequest& request)
+Response HttpHandler::handleDelete(const HttpRequest& request, const LocationConfig& location)
 {
+	(void)location;
 	Response response;
 
 	std::string root = "./www";//TODO esto esta parcheado
@@ -136,40 +135,25 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 {
 	const LocationConfig* location = findLocation(request, server);
         if (!location)
-        {
-		std::cout << "Location no encontrada. Path: " << request.path << std::endl;
 		return Response::createError(NOT_FOUND);
-        }
 
 	else if (request.method == "GET")
 	{
-		 std::cout << "------------------ESTIC AL GEEEET---------------" << std::endl;
-
 		if (location->getMethodGet())
-			return handleGet(request);
-
+			return handleGet(request, *location);
 		return Response::createError(METHOD_NOT_ALLOWED);
-	
 	}
 	else if (request.method == "POST")
 	{
-		 std::cout << "------------------ESTIC AL POSTTT---------------" << std::endl;
-
 		if (location->getMethodPost())
-			return handlePost(request);
-
+			return handlePost(request, *location);
 		return Response::createError(METHOD_NOT_ALLOWED);
 	}
 	else if (request.method == "DELETE")
 	{
-		 std::cout << "------------------ESTIC AL DELETE---------------" << std::endl;
-
-
 		if (location->getMethodDelete())
-			return handleDelete(request);
-
+			return handleDelete(request, *location);
 		return Response::createError(METHOD_NOT_ALLOWED);
-	
 	}
 	return Response::createError(NOT_IMPLEMENTED);
 }

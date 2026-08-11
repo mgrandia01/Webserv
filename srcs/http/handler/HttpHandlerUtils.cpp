@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/29 07:57:57 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 11:46:09 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 11:59:50 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,7 @@ const LocationConfig* HttpHandler::findLocation(const HttpRequest& request, cons
 
 	for (std::vector<LocationConfig>::const_iterator it = locations.begin(); it != locations.end();++it)
 	{
-		//TODO fer aquesta comprobacio de method allowed dins de handler
 		const LocationConfig& location = *it;
-		std::cout << "URI: " << location.getUri() << " | PATH: " << request.path << std::endl;
 		if (location.getUri() == request.path)
 			return &location;
 	}

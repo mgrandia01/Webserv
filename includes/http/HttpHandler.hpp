@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 11:49:34 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 12:13:52 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ class HttpHandler
 
 	private:
 		//HttpHandler.cpp
-		Response handleGet(const HttpRequest& request);
-		Response handlePost(const HttpRequest& request);
-		Response handleDelete(const HttpRequest& request);
+		Response handleGet(const HttpRequest& request, const LocationConfig& location);
+		Response handlePost(const HttpRequest& request, const LocationConfig& location);
+		Response handleDelete(const HttpRequest& request, const LocationConfig& location);
 
 		//HttpHandlerUtils.cpp
 		void setHeaders(Response& response, const std::string& contentType);
