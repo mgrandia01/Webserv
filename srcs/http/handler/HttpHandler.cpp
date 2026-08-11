@@ -6,29 +6,31 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/04 11:21:36 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 12:15:54 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp"
+#include "ServerConfig.hpp"
+#include "LocationConfig.hpp"
 #include "Response.hpp"
 #include <cerrno>
 #include <sstream>
 #include <cstdio>
+#include <iostream>
 
-HttpResponse HttpHandler::handleGet(const HttpRequest& request)
+
+Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location)
 {
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
 
 
-
-
-	std::string root = "./www";//TODO esto esta parcheado
+	std::string root = location.getRoot();//"./www"parcheado TODO 
 	std::string fullPath = root + request.path;
-	HttpResponse response;
+	Response response;
 
 	//TODO usar stat() por si el usuario quiere un abrir un directorio
 	//y no directamente un fichero, ya que tendra que mirar index, autoindex...
@@ -66,17 +68,18 @@ HttpResponse HttpHandler::handleGet(const HttpRequest& request)
 	return response;
 }
 
-HttpResponse HttpHandler::handlePost(const HttpRequest& request)
+Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location)
 {
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
 
-
-	HttpResponse response;
+	(void)location;
+	Response response;
 
 	std::string uploadStore = "./uploads";//TODO desparchear
 	
+	//TODO debe crear con el nombre que me pasa por terminal... no?
 	std::string filename = uploadStore + "/upload.txt";
 
 	int statusCode = 201;
@@ -100,9 +103,10 @@ HttpResponse HttpHandler::handlePost(const HttpRequest& request)
 	return response;
 }
 
-HttpResponse HttpHandler::handleDelete(const HttpRequest& request)
+Response HttpHandler::handleDelete(const HttpRequest& request, const LocationConfig& location)
 {
-	HttpResponse response;
+	(void)location;
+	Response response;
 
 	std::string root = "./www";//TODO esto esta parcheado
 	std::string fullPath = root + request.path;
@@ -127,21 +131,31 @@ HttpResponse HttpHandler::handleDelete(const HttpRequest& request)
 	return response;
 }
 
-Response HttpHandler::handle(const HttpRequest& request)
+Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& server)
 {
-	/*if (request.method == "GET")
-		return handleGet(request);
+	const LocationConfig* location = findLocation(request, server);
+        if (!location)
+		return Response::createError(NOT_FOUND);
 
+	else if (request.method == "GET")
+	{
+		if (location->getMethodGet())
+			return handleGet(request, *location);
+		return Response::createError(METHOD_NOT_ALLOWED);
+	}
 	else if (request.method == "POST")
-		return handlePost(request);
-
+	{
+		if (location->getMethodPost())
+			return handlePost(request, *location);
+		return Response::createError(METHOD_NOT_ALLOWED);
+	}
 	else if (request.method == "DELETE")
-		return handleDelete(request);*/
-		(void) request;
-	return (Response("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nHello"));
-
-	assert(false && "Unexpected HTTP method");
-	std::abort();
+	{
+		if (location->getMethodDelete())
+			return handleDelete(request, *location);
+		return Response::createError(METHOD_NOT_ALLOWED);
+	}
+	return Response::createError(NOT_IMPLEMENTED);
 }
 
 

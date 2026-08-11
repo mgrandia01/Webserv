@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/10 13:07:24 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/11 11:42:20 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,7 +306,7 @@ bool ServerManager::readClient(int indexPoll)
         else
         {
             
-	    Response response = _requestHandler.handle(request);//, *server);
+	    Response response = _requestHandler.handle(request, *server);
             client.setResponse(response);
         }
     }

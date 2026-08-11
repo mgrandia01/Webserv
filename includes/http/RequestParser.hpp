@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/07 11:25:13 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 10:55:43 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ class RequestParser
 
 
 		void feed(const char *buffer, size_t bytes, const ServerConfig& server);
-
 		bool isComplete() const;
 		bool hasError() const;
 
@@ -84,7 +83,6 @@ class RequestParser
 		std::string trimWhitespace(const std::string &str);
 		std::string toLower(const std::string &str);
 	private:
-		size_t _clientMaxBodySize;//TODO parche para tener valor del .config
 
 		enum State
 		{
