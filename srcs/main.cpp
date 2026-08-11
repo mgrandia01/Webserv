@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/10 13:07:21 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/10 14:42:42 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 
 
 #include "http/RequestParser.hpp"
-#include "http/HttpResponse.hpp"
 #include "http/HttpHandler.hpp"
 #include "http/HttpSerializer.hpp"
 

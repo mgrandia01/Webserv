@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 13:40:12 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/10 11:30:31 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/10 15:16:21 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,11 @@ int Client::getFd() const
 
 bool Client::receive()
 {
-    
+   
     char buffer[4096];
 
     int bytes = recv(_fd, buffer, sizeof(buffer), 0);
-
     std::cout << "Client fd " << _fd << " recv returned " << bytes << std::endl;
-
     if (bytes <= 0)
         return false;
 

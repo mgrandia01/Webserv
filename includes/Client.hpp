@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 13:37:22 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/07/22 13:37:23 by arcmarti         ###   ########.fr       */
+/*   Updated: 2026/08/10 14:42:11 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #define CLIENT_HPP
 
 #include "http/RequestParser.hpp"
-#include "http/HttpResponse.hpp"
 #include "Config.hpp"
 #include "Response.hpp"
 

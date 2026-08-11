@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 11:19:10 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 12:48:54 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 10:48:22 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,45 @@ bool RequestParser::validateVersion(const std::string &version)
 }
 
 bool RequestParser::validateMethod(const std::string &method)
-{
+{/*
+	const LocationConfig* location = findLocation();
+	if (!location)
+	{
+		std::cout << "EROOOOORRRRR----------------------metodo usado: " <<method << std::endl;
+		_errorCode = NOT_FOUND;
+		return false;
+	}
 	if (method == "GET")
-		return true;
+	{
+		std::cout << method << std::endl;
+		if (location->getMethodGet())
+			return true;
+		_errorCode = METHOD_NOT_ALLOWED;
+		return false;
+	}
 
 	if (method == "POST")
-		return true;
+	{
+		std::cout << "metodo usado: " <<method << std::endl;
+		if (location->getMethodPost())
+			return true;
+		_errorCode = METHOD_NOT_ALLOWED;
+		return false;
+	}
 
+	if (method == "DELETE")
+	{
+		std::cout << method << std::endl;
+		if (location->getMethodDelete())
+			return true;
+		_errorCode = METHOD_NOT_ALLOWED;
+		return false;
+	}
+*/
+	if (method == "GET")
+		return true;
+	if (method == "POST")
+		return true;
 	if (method == "DELETE")
 		return true;
 

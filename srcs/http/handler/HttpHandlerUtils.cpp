@@ -6,16 +6,36 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/29 07:57:57 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 15:58:29 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 11:46:09 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp" //TODO 
-
+#include "ServerConfig.hpp"
+#include "LocationConfig.hpp"
 
 #include <sstream>
-void HttpHandler::setHeaders(HttpResponse& response, const std::string& contentType)
+#include <vector>
+#include <iostream>
+
+const LocationConfig* HttpHandler::findLocation(const HttpRequest& request, const ServerConfig& server) const
+{
+	const std::vector<LocationConfig>& locations = server.getLocations();
+
+	for (std::vector<LocationConfig>::const_iterator it = locations.begin(); it != locations.end();++it)
+	{
+		//TODO fer aquesta comprobacio de method allowed dins de handler
+		const LocationConfig& location = *it;
+		std::cout << "URI: " << location.getUri() << " | PATH: " << request.path << std::endl;
+		if (location.getUri() == request.path)
+			return &location;
+	}
+
+	return NULL;
+}
+
+void HttpHandler::setHeaders(Response& response, const std::string& contentType)
 {
 	response.headers["Content-Type"] = contentType;
 
@@ -29,12 +49,14 @@ void HttpHandler::setHeaders(HttpResponse& response, const std::string& contentT
 	// response.headers["Connection"] = ...
 }
 
+
 bool HttpHandler::saveFile(const std::string& path, const std::string& buffer)
 {
 	int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		return false;
 	ssize_t bytesWritten = write(fd, buffer.c_str(), buffer.size());
+
 	close(fd);
 
 	if (bytesWritten < 0)

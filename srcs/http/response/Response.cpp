@@ -6,12 +6,11 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 15:27:01 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/10 14:45:29 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
-#include "http/HttpResponse.hpp"
 #include <string>
 
 Response::Response(){}
@@ -40,9 +39,9 @@ const std::string& Response::getStream() const
 	return _stream;
 }
 
-HttpResponse HttpResponse::createError(HttpStatus status)
+Response Response::createError(HttpStatus status)
 {
-	HttpResponse response;
+	Response response;
 
 	HttpStatusInfo info = getStatusInfo(status);
 
