@@ -15,8 +15,8 @@
 #include <iostream>
 #include <ctime>
 
-Client::Client(int fd) : _fd(fd), _hasResponse(false), _keepAlive (false), _bytesSent(0), _lastActivity(time(NULL)),
-                        _timeoutState(WAITING_HEADERS), _parser(), _response(), _serverConfig(NULL){}
+Client::Client(int fd) : _fd(fd), _hasResponse(false), _keepAlive (true), _bytesSent(0), _lastActivity(time(NULL)),
+                        _timeoutState(WAITING_REQUEST), _parser(), _response(), _serverConfig(NULL){}
 Client::~Client() {}
 
 Client::Client(const Client& other)
@@ -53,12 +53,13 @@ bool Client::receive()
 
     int bytes = recv(_fd, buffer, sizeof(buffer), 0);
 
-    std::cout << "Client fd " << _fd << " recv returned " << bytes << std::endl;
+    std::cout << "CLIENT data on fd " << _fd << " received " << bytes << std::endl;
 
+    // there is no more data or some error has happened
     if (bytes <= 0)
         return false;
 
-    std::cout << "Received:\n";
+    std::cout << "Information Received is: ";
     std::cout.write(buffer, bytes);
     std::cout << std::endl;
 
@@ -66,7 +67,7 @@ bool Client::receive()
     setLastActivity();
 
     if (!_parser.isComplete())
-        _timeoutState = WAITING_HEADERS;
+        _timeoutState = WAITING_REQUEST;
     
     //para el CGI podria ser necesario diferenciar el body y entonces aprovchamos aqui
     /*else if (_parser.hasBody())
