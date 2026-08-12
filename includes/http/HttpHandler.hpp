@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 12:13:52 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 11:11:15 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define HTTPHANDLER_HPP
 
 #include "HttpRequest.hpp"
+#include "RequestParser.hpp"
 #include "Response.hpp"
 
 #include <cassert>

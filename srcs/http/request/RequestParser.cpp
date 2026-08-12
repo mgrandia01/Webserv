@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 10:56:41 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 11:34:54 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ RequestParser::RequestParser()
 	_contentLength = 0;
 	_chunked = false;
 	_server = NULL;
+	_request.isKeepAlive = true;
 }
 	
 RequestParser::RequestParser(const RequestParser &other)

@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:59:03 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 11:09:15 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 #include <string>
 #include <map>
 
-class HttpRequest
+/*struct HttpRequest
 {
-	public:
+//	public:
 		std::string method;
 		std::string target;
 		std::string path;
@@ -30,5 +30,5 @@ class HttpRequest
 
 		std::string body;
 };
-
+*/
 #endif

@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/12 09:42:25 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 10:41:54 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ Response HttpHandler::handleDelete(const HttpRequest& request, const LocationCon
 	(void)location;
 	Response response;
 
-	std::string root = "./www";//TODO esto esta parcheado
+	std::string root = location.getRoot();// "./www";TODO esto esta parcheado
 	std::string fullPath = root + request.path;
 
 	int result = std::remove(fullPath.c_str());
