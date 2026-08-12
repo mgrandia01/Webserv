@@ -6,15 +6,16 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 15:27:01 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 14:29:05 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
-#include "http/HttpResponse.hpp"
 #include <string>
+#include <iostream>
+#include "http/HttpSerializer.hpp"
 
-Response::Response(){}
+Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream(){}
 
 Response::Response(std::string stream) : _stream(stream){}
 
@@ -30,19 +31,25 @@ Response& Response::operator=(const Response& other)
 {
     if (this != &other)
     {
-        _stream = other._stream;
+	statusCode = other.statusCode;
+	reasonPhrase = other.reasonPhrase;
+	headers = other.headers;
+	body = other.body;
+	_stream = other._stream;
     }
     return *this;
 }
 
 const std::string& Response::getStream() const
 {
+	std::cout << "------arriba aquii----------" << std::endl;
+	_stream = HttpSerializer::serialize(*this);
 	return _stream;
 }
 
-HttpResponse HttpResponse::createError(HttpStatus status)
+Response Response::createError(HttpStatus status)
 {
-	HttpResponse response;
+	Response response;
 
 	HttpStatusInfo info = getStatusInfo(status);
 

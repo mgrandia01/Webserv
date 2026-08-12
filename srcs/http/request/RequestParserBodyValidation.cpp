@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/24 11:46:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:31:03 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/10 15:03:07 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,7 @@
 
 bool RequestParser::validateBodySize() const
 {
-
-//TODO if (request.contentLength > serverConfig.clientMaxBodySize) TODO mas adelante
-	if (_contentLength > _clientMaxBodySize)
+	if (_contentLength > _server->getClientMaxBodySize())
 		return false;
 	return true;
 }
