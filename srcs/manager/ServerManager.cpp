@@ -449,7 +449,7 @@ bool ServerManager::readClient(int indexPoll)
         const HttpRequest& request = client.getParser().getRequest();
         const ServerConfig* server = client.getServerConfig();
 
-        //client.setKeepAlive(request.getRequest().isKeepAlive()) // TO DO habra que sacarlo de httpRequest quee habra parseado el header
+        client.setKeepAlive(request.isKeepAlive); // TO DO habra que sacarlo de httpRequest quee habra parseado el header
 
         if (!server)
         {
