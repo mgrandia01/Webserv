@@ -30,12 +30,15 @@ public:
 	~ServerManager();
 
 	void	init();
-	void	run();
 	void	printSockets() const;
+	void	run();
+	
+
+
 
 	const ServerConfig* getServerConfigFromSocket(int fd) const;
 
-	void checkTimeouts();
+	
 
 private:
 
@@ -44,30 +47,28 @@ private:
 	ServerManager& operator=(const ServerManager& rhs);
 
 	const Config&				_config;
-	HttpHandler					_requestHandler;
-
+	
 	std::vector<int>					_listenSockets;
 	std::vector<const ServerConfig*> 	_listenConfigs;
 	std::vector<struct pollfd>			_pollFds;
 
+	
+
+
+	HttpHandler					_requestHandler;
+	std::map<int, Client> _clients;
+	
+	
 	void	createSockets();
 	void	bindSocket(int socketFd, const ServerConfig& server);
 	void	listenSocket(int socketFd);
-	void	acceptClient(int socketFd);
-	
-	
 	void	initPollFds();
-	//bool	isListenSocket(int fd) const;
+	
+	void	acceptClient(int socketFd);
 	bool	readClient(int indexPoll);
+	bool	sendResponse(int index);
 
-	std::map<int, Client> _clients;
-		
-	//temporal debug
-	//void sendResponse(int indexPoll);
-
-	void sendResponse(int index);
-
-
+	void	checkTimeouts();
 	
 };
 

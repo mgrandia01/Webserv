@@ -20,8 +20,7 @@
 
 enum TimeoutState
 {
-    WAITING_HEADERS,
-    RECEIVING_BODY,
+    WAITING_REQUEST,
     SENDING_RESPONSE,
     KEEP_ALIVE
 };
@@ -43,12 +42,11 @@ public:
     const Response& getResponse() const;
     void setResponse(const Response& response);
 
-    /*bool getKeepAlive() const;
+    bool getKeepAlive() const;
     void setKeepAlive(bool keepAlive);
-*/    
+    
     bool receive();
     bool hasResponse() const;
-    bool getKeepAlive() const;
     void clearResponse();
 
     bool isRequestComplete() const;
@@ -58,8 +56,7 @@ public:
     const ServerConfig* getServerConfig() const;
 
     //void setHasResponse(bool flag);
-    void setKeepAlive(bool flag);
-
+    
     size_t getBytesSent() const;
     void addBytesSent(size_t bytes);
     void resetBytesSent();
@@ -78,6 +75,8 @@ private:
 
     int     _fd;
     bool     _hasResponse;
+    
+    // TO DO se instancia desde el parserrrrrrrrrrrrrrrrrrrrrrrrrrr
     bool    _keepAlive;
 
     size_t  _bytesSent;

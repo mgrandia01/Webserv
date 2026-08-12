@@ -29,20 +29,32 @@
 
 int main(int argc, char **argv)
 {
-    
-
-
-	if (argc != 2)
+	
+	if ((argc > 2))
 	{
-		std::cerr << "Usage: ./webserv config.conf\n";
+		std::cerr << "Usage: ./webserv [config.conf]\n";
 		return (1);
 	}
 	
 	try
 	{
-		Config config(argv[1]);
+		const char *fileName;
+
+		if (argc == 1)
+		{
+			std::cout << "Loading default file configuration" << std::endl;
+			fileName = "config/default.conf";
+		}
+		else
+		{
+			std::cout << "Loading " << argv[1] << " configuration file..." << std::endl;
+			fileName = argv[1];
+		}
 		
-		//std::cout << config << std::endl;
+		Config config(fileName);
+
+		std::cout << config << std::endl;
+
 
 		ServerManager manager(config);
 		manager.init();
