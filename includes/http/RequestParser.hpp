@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/12 11:23:45 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 11:54:45 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 #include <cctype>
 #include <iostream>
 
-#include "HttpRequest.hpp"
 #include "http/HttpStatus.hpp"
 #include "Config.hpp"
 
@@ -37,7 +36,6 @@ typedef struct s_HttpRequest
 		std::string body;
 
 		bool isKeepAlive;
-		//TODO anyadir el iskeepalive
 } HttpRequest;
 
 class RequestParser
