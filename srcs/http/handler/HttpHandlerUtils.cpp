@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/29 07:57:57 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 11:59:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 09:39:53 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,24 @@
 const LocationConfig* HttpHandler::findLocation(const HttpRequest& request, const ServerConfig& server) const
 {
 	const std::vector<LocationConfig>& locations = server.getLocations();
+	const LocationConfig* bestMatch = NULL;
+	std::size_t bestLength = 0;
 
 	for (std::vector<LocationConfig>::const_iterator it = locations.begin(); it != locations.end();++it)
 	{
 		const LocationConfig& location = *it;
-		if (location.getUri() == request.path)
-			return &location;
-	}
-
-	return NULL;
+		const std::string& locationUri = location.getUri();
+		
+		if (request.path.compare(0, locationUri.length(), locationUri) == 0)
+		{
+			if (locationUri.length() > bestLength)
+			{
+				bestMatch = &location;
+				bestLength = locationUri.length();
+			}
+		}
+	}	
+	return bestMatch;
 }
 
 void HttpHandler::setHeaders(Response& response, const std::string& contentType)
