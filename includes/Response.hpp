@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/10 14:50:00 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 14:20:42 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class Response
 		
 		
 		
-		std::string _stream;
+		mutable std::string _stream;//FIXME mutable??
 	
 };
 

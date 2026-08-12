@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/11 11:42:20 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/11 14:02:17 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -337,11 +337,14 @@ void ServerManager::sendResponse(int index)
 
     const std::string& data = client.getResponse().getStream();
 
+
     //temporal, no hay que asumir que el send envia todo
     //send(fd, data.c_str(), data.size(), 0);
 
     ssize_t bytesSent = send(fd, data.c_str() + client.getBytesSent(), data.size() - client.getBytesSent(), 0);
 
+    std::cout << "-------- Data.c_str = " << data.c_str() << std::endl;
+    std::cout << "-------- Data.size = " << data.size() << std::endl;
     if (bytesSent == -1)
     {
     	std::cout << "send() failed on fd: " << fd << std::endl;

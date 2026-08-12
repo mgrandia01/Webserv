@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 12:15:54 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 10:41:54 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location)
 {
+
+
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
@@ -31,6 +33,8 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 	std::string root = location.getRoot();//"./www"parcheado TODO 
 	std::string fullPath = root + request.path;
 	Response response;
+	
+	std::cout << "==Full path ==" << fullPath << std::endl;
 
 	//TODO usar stat() por si el usuario quiere un abrir un directorio
 	//y no directamente un fichero, ya que tendra que mirar index, autoindex...
@@ -108,7 +112,7 @@ Response HttpHandler::handleDelete(const HttpRequest& request, const LocationCon
 	(void)location;
 	Response response;
 
-	std::string root = "./www";//TODO esto esta parcheado
+	std::string root = location.getRoot();// "./www";TODO esto esta parcheado
 	std::string fullPath = root + request.path;
 
 	int result = std::remove(fullPath.c_str());
@@ -136,9 +140,10 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 	const LocationConfig* location = findLocation(request, server);
         if (!location)
 		return Response::createError(NOT_FOUND);
-
+	
 	else if (request.method == "GET")
 	{
+
 		if (location->getMethodGet())
 			return handleGet(request, *location);
 		return Response::createError(METHOD_NOT_ALLOWED);

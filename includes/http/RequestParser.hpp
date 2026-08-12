@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 11:07:13 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 10:55:43 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 11:54:45 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,25 @@
 #include <cctype>
 #include <iostream>
 
-#include "HttpRequest.hpp"
 #include "http/HttpStatus.hpp"
 #include "Config.hpp"
+
+typedef struct s_HttpRequest
+{
+//	public:
+		std::string method;
+		std::string target;
+		std::string path;
+		std::string query;
+		std::string version;
+
+		std::map<std::string, std::string> headers;
+		std::map<std::string, size_t> headerOccurrences;
+
+		std::string body;
+
+		bool isKeepAlive;
+} HttpRequest;
 
 class RequestParser
 {
@@ -82,6 +98,7 @@ class RequestParser
 		// RequestParserUtils.cpp
 		std::string trimWhitespace(const std::string &str);
 		std::string toLower(const std::string &str);
+
 	private:
 
 		enum State

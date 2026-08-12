@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 15:14:21 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/27 12:30:24 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 11:52:26 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,12 @@ bool RequestParser::parseHeaderLine(const std::string &line)
 		_errorCode = BAD_REQUEST;
 		return false;
 	}
+
+	if (key == "connection" && toLower(value) == "close")
+		_request.isKeepAlive = false;
 	_request.headerOccurrences[key]++;
 	_request.headers[key] = value;
-
+	
 	return true;
 }
 
