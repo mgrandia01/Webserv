@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/12 11:54:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/13 15:28:05 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class HttpHandler
 		Response handleDelete(const HttpRequest& request, const LocationConfig& location);
 
 		//HttpHandlerUtils.cpp
-		void setHeaders(Response& response, const std::string& contentType);
+		//void setHeaders(Response& response, const std::string& contentType);
 		std::string getContentType(const std::string& path);
 		bool readFile(int fd, std::string& body);
 		bool saveFile(const std::string& path, const std::string& buffer);

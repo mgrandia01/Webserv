@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/12 10:41:54 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/13 15:34:01 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 	if (statusCode != 200)
 		response.body = status.defaultBody;
 
-	setHeaders(response, getContentType(fullPath));
+	response.setHeaders(getContentType(fullPath));
 	return response;
 }
 
@@ -85,7 +85,6 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 	
 	//TODO debe crear con el nombre que me pasa por terminal... no?
 	std::string filename = uploadStore + "/upload.txt";
-
 	int statusCode = 201;
 
 	if (!saveFile(filename, request.body))
@@ -99,7 +98,7 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 	if (statusCode == 201)
 	{
 		response.body = "Upload successful";
-		setHeaders(response, "text/plain");
+		response.setHeaders("text/plain");
 	}
 	else
 		response.body = status.defaultBody;

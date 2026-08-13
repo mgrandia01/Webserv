@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/11 14:20:42 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/13 15:35:06 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class Response
 
 		const std::string& getStream() const;
 		
+		void setHeaders(const std::string& contentType);
 	private:
 		
 		
