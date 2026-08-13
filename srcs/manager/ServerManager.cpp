@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/11 14:02:17 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/13 15:14:18 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,7 +310,8 @@ void ServerManager::checkTimeouts()
                 {
     				std::cout << "CLIENT data timeout WAITING REQUEST on fd: " << fd << std::endl;
                 
-                 	Response response("HTTP/1.1 408 Request Timeout\r\n Content-Length: 0\r\n\r\n");
+				Response response(Response::createError(NOT_FOUND));//TODO 408
+                 	//Response response("HTTP/1.1 408 Request Timeout\r\n Content-Length: 0\r\n\r\n");
                  	client.setKeepAlive(false);
                  	client.setResponse(response);
                 	client.setLastActivity();
