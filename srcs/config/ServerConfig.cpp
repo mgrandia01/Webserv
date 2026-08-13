@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/10 16:26:36 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/13 20:21:31 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
+#include "utils.hpp"
 
 /* ***************************** constr & destr ***************************** */
 
@@ -53,7 +54,7 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 		
 		func = tkFuncMap.find(it->name);
 		if (func == tkFuncMap.end())
-			throw ServerConfigMissedDirectiveException();
+			throw ServerConfigDirectiveUnknowException(it->name);
 		(this->*(func->second))(*it);
 	}
 	
@@ -71,7 +72,7 @@ std::ostream& operator<<(std::ostream &out, const ServerConfig& server)
 	std::cout << "\n\tSERVER" << std::endl;
 
 	out << "\tIP: " << server.getHost() << std::endl;
-	out << "\tPort:" << server.getPort() << std::endl;
+	out << "\tPort: " << server.getPort() << std::endl;
 	
 	if (server.getDefaultServer())
 		out << "\tDefault: true" << std::endl;
@@ -150,13 +151,20 @@ const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_
 
 /* ************************* member funcs / methods ************************* */
 
-void	ServerConfig::listenDirective(const t_directive& tk)//atoi?
+void	ServerConfig::listenDirective(const t_directive& tk)
 {
+	std::string	directive("listen");	
+
 	if (tk.args.size() > 2)
-		throw ServerConfigInsufArgsException();
+		throw ServerConfigArgsException(directive, 2, tk.args);//es menor a 2, no 2
+	//AQUI, controlar el contecto REGEX, ver que las directives no tengan comillas, y que el tk no tenga childre ( excepto location)
+	//else if (tk.children.size() != 0)
+	//	throw ServerConfigWrongChildrenException()
 
 	for (size_t j = 0; j < tk.args.size(); j++)
 	{
+		std::string	token = tk.args[j];
+	
 		if (tk.args[j] == "default_server")
 			_defaultServer = true;
 		else
@@ -176,15 +184,17 @@ void	ServerConfig::listenDirective(const t_directive& tk)//atoi?
 			else
 				_port = std::strtol(tk.args[j].c_str(), &end, 10);
 			if (*end != '\0')
-				throw ServerConfigUnisgnedNumberException();
+				throw ServerConfigUnsignedNumberException(directive, token);
 		}
 	}
 }
 
 void	ServerConfig::serverNameDirective(const t_directive& tk)
-{	
+{
+	std::string	directive("sever_name");	
+
 	if (tk.args.size() < 1)
-		throw ServerConfigInsufArgsException();
+		throw ServerConfigArgsException(directive, 2, tk.args);
 
 	_serverName = tk.args;
 }
@@ -192,20 +202,22 @@ void	ServerConfig::serverNameDirective(const t_directive& tk)
 void	ServerConfig::errorPageDirective(const t_directive& tk)
 {
 	t_errorPage	nd;
+	std::string	directive("error_page");	
 
 	if (tk.args.size() < 2)
-		throw ServerConfigInsufArgsException();
+		throw ServerConfigArgsException(directive, 2, tk.args);
 
 	nd.errorFile = tk.args.back();
 
 	for (size_t j = 0; j < tk.args.size() - 1; j++)
 	{
+		std::string	token = tk.args[j];
 		char	*end;
 		std::string	tmp = tk.args[j];
 		long	value = std::strtol(tmp.c_str(), &end, 10);
 		
 		if (*end != '\0')
-			throw ServerConfigUnisgnedNumberException();
+			throw ServerConfigUnsignedNumberException(directive, token);
 		else if (value < 300 || value > 599)
 			throw ServerConfigErrorCodeOutLimitsException();
 		nd.codes.push_back(value);
@@ -216,13 +228,18 @@ void	ServerConfig::errorPageDirective(const t_directive& tk)
 
 void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
 {
+	std::string	directive("client_max_body_size");
+
 	if (tk.args.size() != 1)
-		throw ServerConfigInsufArgsException();
+		throw ServerConfigArgsException(directive, 1, tk.args);
 	
 	char		*end;
 	std::string	tmp = tk.args[0];
 	long		value = std::strtol(tmp.c_str(), &end, 10);
 	std::string	unit = tmp.substr(end - tmp.c_str());
+
+	//if (*end != '\0')
+	//	throw ServerConfigUnsignedNumberException(directive, tmp);
 
 	if (unit == "")
 		_clientMaxBodySize = value;
@@ -231,13 +248,15 @@ void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
 	else if (unit == "M")
 		_clientMaxBodySize = value * 1048576;
 	else
-		throw ServerConfigInvalidUnitException();
+		throw ServerConfigInvalidUnitException(directive, tmp, unit);
 }
 
 void	ServerConfig::rootDirective(const t_directive& tk)
 {
+	std::string	directive("root");
+
 	if (tk.args.size() != 1)
-		throw ServerConfigInsufArgsException();
+		throw ServerConfigArgsException(directive, 1, tk.args);
 
 	_root = tk.args[0];
 }
@@ -249,13 +268,15 @@ void	ServerConfig::indexDirective(const t_directive& tk)
 
 void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 {
+	std::string	directive = tk.name;
+	
 	if (tk.args.size() != 1)
-		throw ServerConfigInsufArgsException();
-
+		throw ServerConfigArgsException(directive, 1, tk.args);
 	char		*end;
 	std::string	tmp = tk.args[0];
 	long		value = std::strtol(tmp.c_str(), &end, 10);
 	std::string	unit = tmp.substr(end - tmp.c_str());
+
 
 	//NGINX uses ms and Arcadio uses seconds. Check it.
 	if (unit == "")
@@ -266,8 +287,10 @@ void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 		target = value * 1000;
 	else if (unit == "m")
 		target = value * 60 * 1000;
+	else if (value == 0 && *end != '\0')
+		throw ServerConfigUnsignedNumberException(directive, tmp);
 	else
-		throw ServerConfigInvalidUnitException();
+		throw ServerConfigInvalidUnitException(directive, tmp, unit);
 }
 
 void	ServerConfig::clientHeaderTimeout(const t_directive& tk){timeoutParser(_clientHeaderTimeout, tk);}
@@ -314,3 +337,4 @@ void	ServerConfig::resolveConfigDefaults()
 				LocationIt->setIndex(_index);
 	}
 }
+

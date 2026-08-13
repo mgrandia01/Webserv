@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:44:51 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/06 19:32:10 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/11 16:01:52 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <iostream>
 # include <map>
 # include <vector>
-# include "structs.hpp"
+# include "utils.hpp"
 
 class LocationConfig
 {

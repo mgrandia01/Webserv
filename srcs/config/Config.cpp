@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/10 16:04:20 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/13 18:08:54 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <fstream>
 #include "Config.hpp"
 #include "ServerConfig.hpp"
-#include "structs.hpp"
+#include "utils.hpp"
 
 /* ***************************** constr & destr ***************************** */
 
@@ -40,7 +40,7 @@ Config::Config(const char* file)
 
 	size_t	header = jumpHeader(lines);
 	for (size_t j = header; j < lines.size(); j++)
-		tokenizer(lines[j], tokens);
+		tokenizer(lines[j], tokens, j);
 
 	//TOKEN STRUCT && VECTOR<SERVERS>	
 	const	size_t	size = tokens.size();
@@ -52,6 +52,22 @@ Config::Config(const char* file)
 		
 		std::vector<t_directive>	tokensStruct;
 		tokenizerStruct(tokensStruct, tokens, start, end);
+	
+///
+	for (size_t k = 0; k < tokensStruct.size(); k++)
+	{
+		std::cout << k << "\t" << tokensStruct[k].name << std::endl;
+		//std::cout << std::setw(10) << tokensStruct[k].args[l] << std::endl;
+		for (size_t l = 0; l < tokensStruct[k].args.size(); l++)
+			std::cout << k << " " << l << "\t\t" << tokensStruct[k].args[l] << std::endl;
+		for (size_t l = 0; l < tokensStruct[k].children.size(); l++)
+		{
+			std::cout << k << " " << l << "\t\t>" << tokensStruct[k].children[l].name << std::endl;
+			for (size_t m = 0; m < tokensStruct[k].children[l].args.size(); m++)
+				std::cout << k << " " << l << " " << m << "\t\t\t" << tokensStruct[k].children[l].args[m] << std::endl;
+		}
+	}
+//
 
 		ServerConfig	tmp(tokensStruct);
 		_servers.push_back(tmp);
@@ -126,6 +142,157 @@ void	Config::tokenizerStruct(std::vector<t_directive>& tokensStruct,
 }
 
 //PASAR DE LECTURA A TOKEN
+std::string	Config::markerMisplaceQuote(std::string& line, char c, size_t cPos)
+{
+	std::string	mark;
+
+	for (size_t i = 0; i < cPos; i++)
+	{
+		if (line[i] == '\t')
+			mark += '\t';
+		else
+			mark += ' ';
+	}
+	mark += '^';
+	for (size_t i = cPos + 1; i < static_cast<size_t>(line.size()) - 1; i++)
+	{
+		if (line[i] == '\t')
+			mark += '\t';
+		else if (line[i] == c)
+		{
+			mark += '^';
+			break ;
+		}
+		else
+			mark += '_';
+	}
+	return (mark);
+}
+
+std::string	Config::markerQuote(std::string& line, size_t cPos)
+{
+	std::string	mark;
+
+	for (size_t i = 0; i < cPos; i++)
+	{
+		if (line[i] == '\t')
+			mark += '\t';
+		else
+			mark += ' ';
+	}
+	mark += '^';
+	for (size_t i = cPos; i < static_cast<size_t>(line.size()) - 1; i++)
+	{
+		if (line[i] == '\t')
+			mark += '\t';
+		else
+			mark += '_';
+	}
+	return (mark);
+}
+
+std::string	Config::marker(std::string& line, size_t cPos)
+{
+	std::string	mark;
+
+	for (size_t i = 0; i < cPos && i < static_cast<size_t>(line.size()); i++)
+	{
+		if (line[i] == '\t')
+			mark += '\t';
+		else
+			mark += ' ';
+	}
+	mark += '^';
+	return (mark);
+}
+
+bool	Config::isSeparator(char c)
+{
+	return (std::isspace(static_cast<unsigned char>(c))
+		|| c == '{'
+		|| c == '}'
+		|| c == ';'
+		|| c == '#');
+		//|| c == '\''
+		//|| c == '\"');
+}
+
+/*bool	Config::isValidChar(char c)
+{
+	return (std::isalnum(static_cast<unsigned char>(c))
+        || c == '_'
+		|| c == '-'
+       	|| c == '.'
+       	|| c == ':'
+		|| c == '/');
+}*/
+
+void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens, size_t j)
+{
+	char		quote;
+	size_t		i = 0;
+	size_t		size = str.size();
+	size_t 		start = 0;
+	size_t		len = 0;
+
+
+//caso 1: "example.com" valido
+//caso 2: "example .com" valido
+//caso 3: example".com" no valido, siempre comienza con comillas
+//caso 4: "example\n.com" no valido, no aceptamos saltos de linea, comilla no cerrada
+//caso 5: "example.com //y// example.com" no valido, comillas sin cerrar
+	while (i < size)
+	{
+		
+		while (std::isspace(static_cast<unsigned char>(str[i])))
+			i++;
+		
+		if (str[i] == '\'' || str[i] == '\"')
+		{
+			quote = str[i];
+			start = i;
+			len = 0;
+			i++;
+			while (i < size && str[i] != quote)
+			{
+				i++;
+				len++;
+			}
+			if (i >= size)
+				throw ConfigUnclosedQuoteException(quote, start, j, str);
+			else if(i < size && !isSeparator(str[i + 1]))
+				throw ConfigInvalidQuotePlacementException(quote, start, j, str);
+			tokens.push_back(str.substr(start, len + 2));
+			i++;
+		}
+
+		if (str[i] == '#')
+			return ;
+		if (str[i] == '{' || str[i] == '}' || str[i] == ';')
+		{
+			tokens.push_back(std::string(1, str[i]));
+			i++;
+		}
+
+		start = i;
+		len = 0;
+		while (i < size && !isSeparator(str[i]))
+		{
+			if (str[i] == '\'' || str[i] == '\"')
+				throw ConfigInvalidQuotePlacementException(str[i], i, j, str);
+			i++;
+			len++;
+		}
+		if (len > 0)
+			tokens.push_back(str.substr(start, len));
+		else
+			i++;
+		//if (i < size && !isValidChar(str[i]) && !isSeparator(str[i]))
+		//	throw  ConfigGraphException(str[i], i, j, str);
+	}
+}
+
+/*
 void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens)
 {
 	size_t		i = 0;
@@ -153,10 +320,10 @@ void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens)
 		}
 		if (i < size && (str[i] == '{' || str[i] == '}' || str[i] == ';'))
 			tokens.push_back(std::string(1, str[i]));
-		/*Careful wrong chars*/
+		//Careful wrong chars
 		i++;
 	}
-}
+}*/
 
 size_t  Config::findEnd(std::vector<std::string>& tokens, size_t size, size_t& n)
 {

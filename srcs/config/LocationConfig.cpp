@@ -6,13 +6,12 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:45:44 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/06 19:54:18 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/11 16:08:30 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <stdlib.h>
-#include "structs.hpp"
 #include "LocationConfig.hpp"
 
 LocationConfig::LocationConfig(){}

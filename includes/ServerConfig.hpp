@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/10 16:26:39 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/13 20:21:38 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <vector>
 # include <exception>
 # include "LocationConfig.hpp"
-# include "structs.hpp"
+# include "utils.hpp"
 
 class ServerConfig
 {
@@ -56,18 +56,28 @@ class ServerConfig
 				{return ("There is not semicolon.");}
 		};
 
-		class ServerConfigMissedDirectiveException : public std::exception
+		class ServerConfigDirectiveUnknowException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Unknown directive.");}
+				ServerConfigDirectiveUnknowException(std::string& directive)
+										: std::runtime_error(
+										"\'" + directive + "\' unknown directive."){}
 		};
 
-		class ServerConfigInsufArgsException : public std::exception
+		class ServerConfigArgsException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Insufficient arguments.");}
+				ServerConfigArgsException(std::string& directive,
+										int expected,		
+										const std::vector<std::string>& args)
+										: std::runtime_error(
+										"Directive " + directive +
+										" expects " + intToString(expected) +
+										" arguments, but " + intToString(args.size()) +
+										" were provided: " + vectorToString(args)){}
+
+				//virtual const char *what() const throw()
+				//{return ("Insufficient arguments.");}
 		};
 
 		class ServerConfigErrorCodeOutLimitsException : public std::exception
@@ -77,18 +87,29 @@ class ServerConfig
 				{return ("A error code is out of limits.");}
 		};
 		
-		class ServerConfigUnisgnedNumberException : public std::exception
+		class ServerConfigUnsignedNumberException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Numeric values must be non-negative.");}
+				ServerConfigUnsignedNumberException (const std::string& directive,
+													const std::string& token)
+													: std::runtime_error(
+													"Directive " + directive +
+													" \'" + token +
+													"\' has invalid value, numeric values must be non-negative."){}
+				//virtual const char *what() const throw()
+				//{return ("Invalid value, numeric values must be non-negative.");}
 		};
 
-		class ServerConfigInvalidUnitException : public std::exception
+		class ServerConfigInvalidUnitException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Invalid unit suffix.");}
+				ServerConfigInvalidUnitException(std::string& directive, std::string& arg, std::string& unit)
+												: std::runtime_error(
+												"Directive " + directive +
+												" in arg \'" + arg +
+												"\' contains an invalid \'" + unit +
+												"\' unit suffix."){}
+
 		};
 
 		class ServerConfigRootException : public std::exception
@@ -104,6 +125,7 @@ class ServerConfig
 				virtual const char *what() const throw()
 				{return ("Location has no \'index\' and server does not provide a default \'index\'.");}
 		};
+
 
 	private:
 		ServerConfig();
