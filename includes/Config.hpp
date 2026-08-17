@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:25:51 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/13 17:56:20 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/17 19:57:35 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class Config {
 		{
 			public:
 				virtual const char *what() const throw()
-				{return ("Brace is open.");}
+				{return ("Mismatched braces.");}
 		};
 
 		class ConfigAnyServerException : public std::exception
@@ -44,11 +44,18 @@ class Config {
 				{return ("\'Server\' not found.");}
 		};
 
-		class ConfigOpenBraceException : public std::exception
+		class ConfigBraceServerException : public std::exception
 		{
 			public:
 				virtual const char *what() const throw()
 				{return ("Expected '{' after 'server'.");}
+		};
+
+		class ConfigMissedCharException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Invalid character between server blocks.");}
 		};
 		
 		/*class ConfigGraphException : public std::runtime_error
@@ -62,7 +69,7 @@ class Config {
 									".\n" + line +
 									"\n" + marker(line, cPos)){}
 		};*/
-
+		
 		class ConfigUnclosedQuoteException : public std::runtime_error
 		{
 			public:
@@ -85,6 +92,15 @@ class Config {
 									//quoted value must be a separate token
 		};
 
+		class ConfigSemiColonException : public std::runtime_error
+		{
+			public:
+				ConfigSemiColonException(std::string& directive)
+									: std::runtime_error(
+									"Previous directive \"" + directive +
+									"\" does not have a ';' before closing the block."){}
+		};
+
 
 	private:
 
@@ -99,6 +115,8 @@ class Config {
 		void		tokenizerStruct(std::vector<t_directive>& tokensStruct,
 						std::vector<std::string>& tokens,
 						size_t& start, size_t& end);
+		void		parserDirective(std::vector<t_directive>& tkStruct,
+						std::vector<std::string>& tokens, size_t& j);
 		size_t		findStart(std::vector<std::string>& tokens, size_t size, size_t & n);
 		size_t		findEnd(std::vector<std::string>& tokens, size_t size, size_t& n);
 		//bool		isValidChar(char c);

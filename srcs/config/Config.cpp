@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/13 18:08:54 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/17 19:57:28 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ const std::vector<ServerConfig>& Config::getServers() const{return (_servers);}
 
 /* ************************* member funcs / methods ************************* */
 
-void	parserDirective(std::vector<t_directive>& tkStruct,
+void	Config::parserDirective(std::vector<t_directive>& tkStruct,
 				std::vector<std::string>& tokens,
 				size_t& j)
 {
@@ -110,6 +110,8 @@ void	parserDirective(std::vector<t_directive>& tkStruct,
 	j++;
 	while (tokens[j] != ";" && tokens[j] != "{")
 	{
+		if (tokens[j] == "}")
+				throw ConfigSemiColonException(nd.name);
 		nd.args.push_back(tokens[j]);
 		j++;
 	}
@@ -266,14 +268,15 @@ void	Config::tokenizer(std::string& str, std::vector<std::string>& tokens, size_
 			i++;
 		}
 
-		if (str[i] == '#')
-			return ;
-		if (str[i] == '{' || str[i] == '}' || str[i] == ';')
+		while (str[i] == '{' || str[i] == '}' || str[i] == ';')
 		{
 			tokens.push_back(std::string(1, str[i]));
 			i++;
 		}
 
+		if (str[i] == '#')
+			return ;
+		
 		start = i;
 		len = 0;
 		while (i < size && !isSeparator(str[i]))
@@ -343,12 +346,14 @@ size_t  Config::findEnd(std::vector<std::string>& tokens, size_t size, size_t& n
 }
 size_t	Config::findStart(std::vector<std::string>& tokens, size_t size, size_t& n)
 {
-	while (n < size && tokens[n] != "server")
-		n++;
-	if (n == size)
+	//while (n < size && tokens[n] != "server")
+		//n++;
+	if (n < size && tokens[n] != "server")
+		throw ConfigMissedCharException();
+	else if (n >= size)
 		throw ConfigAnyServerException();
 	else if (n + 1 >= size || tokens[n + 1] != "{")
-		throw ConfigOpenBraceException();
+		throw ConfigBraceServerException();
 	return (n);
 }
 
