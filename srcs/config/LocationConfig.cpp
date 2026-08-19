@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:45:44 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/11 16:08:30 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/19 21:02:55 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ LocationConfig::LocationConfig(const t_directive& tk)
 	std::map<std::string, locationDirFunc>	childFuncMap;
 
 	childFuncMap["allow_methods"] = &LocationConfig::allowMethodsDirective;
-	childFuncMap["root"] = &LocationConfig::rootDirective;//How heritate server root?
+	childFuncMap["root"] = &LocationConfig::rootDirective;
 	childFuncMap["index"] = &LocationConfig::indexDirective;
 	childFuncMap["autoindex"] = &LocationConfig::autoindexDirective;
 	childFuncMap["upload_store"] = &LocationConfig::uploadStoreDirective;
@@ -153,6 +153,8 @@ void	LocationConfig::uriDirective(const t_directive& tk)
 {
 	if (tk.args.size() < 1)
 		throw LocationConfigInsufArgsException();
+	else if (tk.args[0] == "~" || tk.args[0] == "~*" || tk.args[0] == "~/")
+		throw LocationConfigRegex();
 
 	_uri = tk.args[0];
 }
@@ -192,6 +194,8 @@ void	LocationConfig::rootDirective(const t_directive& child)
 {
 	if (child.args.size() < 1)
 		throw LocationConfigInsufArgsException(); 
+	else if (child.args[0][0] != '/')
+		throw LocationConfigSlashException(child.name);
 
 	_root = child.args[0];
 }
@@ -213,6 +217,8 @@ void	LocationConfig::uploadStoreDirective(const t_directive& child)
 {
 	if (child.args.size() < 1)
 		throw LocationConfigInsufArgsException();
+	else if (child.args[0][0] != '/')
+		throw LocationConfigSlashException(child.name);
 	
 	_uploadStore = child.args[0];
 }

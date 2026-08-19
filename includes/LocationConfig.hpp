@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:44:51 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/11 16:01:52 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/19 21:03:44 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,25 @@ class LocationConfig
 				virtual const char *what() const throw()
 				{return ("Location numeric values must be non-negative.");}
 		};
+
+		class LocationConfigRegex : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Regex is not supported for directive 'location'");}
+		};
+
+		class LocationConfigSlashException : public std::runtime_error
+		{
+			public:
+				LocationConfigSlashException(const std::string& directive)
+												: std::runtime_error(
+												"Directive \'" + directive +
+												"\' must start with \'/\'."){}
+		};
+
+
+
 
 	private:
 		typedef void (LocationConfig::*locationDirFunc)(const t_directive&);

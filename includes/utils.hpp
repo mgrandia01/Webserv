@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 13:06:43 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/12 14:28:35 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/19 21:04:28 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,4 +75,6 @@ std::string intToString(const T& value)
 	outstr << value;
 	return (outstr.str());
 }
+
+std::string	directiveToString(const s_directive& directive, int lvl);
 #endif

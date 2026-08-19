@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/13 20:21:31 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/19 20:47:17 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,6 @@ ServerConfig::~ServerConfig(){}
 
 std::ostream& operator<<(std::ostream &out, const ServerConfig& server)
 {
-	//std::right << std::setw(10)
-	//std::left	
 	std::cout << "\n\tSERVER" << std::endl;
 
 	out << "\tIP: " << server.getHost() << std::endl;
@@ -156,10 +154,9 @@ void	ServerConfig::listenDirective(const t_directive& tk)
 	std::string	directive("listen");	
 
 	if (tk.args.size() > 2)
-		throw ServerConfigArgsException(directive, 2, tk.args);//es menor a 2, no 2
-	//AQUI, controlar el contecto REGEX, ver que las directives no tengan comillas, y que el tk no tenga childre ( excepto location)
-	//else if (tk.children.size() != 0)
-	//	throw ServerConfigWrongChildrenException()
+		throw ServerConfigArgsException(directive, '>', 2, tk.args);
+	else if (tk.children.size() != 0)
+		throw ServerConfigWrongChildrenException(tk, 0);
 
 	for (size_t j = 0; j < tk.args.size(); j++)
 	{
@@ -194,7 +191,11 @@ void	ServerConfig::serverNameDirective(const t_directive& tk)
 	std::string	directive("sever_name");	
 
 	if (tk.args.size() < 1)
-		throw ServerConfigArgsException(directive, 2, tk.args);
+		throw ServerConfigArgsException(directive, '<', 1, tk.args);
+
+	for (size_t j = 0; j < tk.args.size(); j++)
+		if (tk.args[j] == "~" || tk.args[j] == "~*" || tk.args[j] == "~/")
+			throw ServerConfigServerNameRegex();
 
 	_serverName = tk.args;
 }
@@ -205,7 +206,9 @@ void	ServerConfig::errorPageDirective(const t_directive& tk)
 	std::string	directive("error_page");	
 
 	if (tk.args.size() < 2)
-		throw ServerConfigArgsException(directive, 2, tk.args);
+		throw ServerConfigArgsException(directive, '=', 2, tk.args);
+	else if (tk.children.size() != 0)
+		throw ServerConfigWrongChildrenException(tk, 0);
 
 	nd.errorFile = tk.args.back();
 
@@ -231,15 +234,14 @@ void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
 	std::string	directive("client_max_body_size");
 
 	if (tk.args.size() != 1)
-		throw ServerConfigArgsException(directive, 1, tk.args);
+		throw ServerConfigArgsException(directive, '=', 1, tk.args);
+	else if (tk.children.size() != 0)
+		throw ServerConfigWrongChildrenException(tk, 0);
 	
 	char		*end;
 	std::string	tmp = tk.args[0];
 	long		value = std::strtol(tmp.c_str(), &end, 10);
 	std::string	unit = tmp.substr(end - tmp.c_str());
-
-	//if (*end != '\0')
-	//	throw ServerConfigUnsignedNumberException(directive, tmp);
 
 	if (unit == "")
 		_clientMaxBodySize = value;
@@ -256,7 +258,11 @@ void	ServerConfig::rootDirective(const t_directive& tk)
 	std::string	directive("root");
 
 	if (tk.args.size() != 1)
-		throw ServerConfigArgsException(directive, 1, tk.args);
+		throw ServerConfigArgsException(directive, '=', 1, tk.args);
+	else if (tk.children.size() != 0)
+		throw ServerConfigWrongChildrenException(tk, 0);
+	else if (tk.args[0][0] != '/')
+		throw ServerConfigSlashException(directive);
 
 	_root = tk.args[0];
 }
@@ -271,12 +277,13 @@ void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 	std::string	directive = tk.name;
 	
 	if (tk.args.size() != 1)
-		throw ServerConfigArgsException(directive, 1, tk.args);
+		throw ServerConfigArgsException(directive, '=', 1, tk.args);
+	else if (tk.children.size() != 0)
+		throw ServerConfigWrongChildrenException(tk, 0);
 	char		*end;
 	std::string	tmp = tk.args[0];
 	long		value = std::strtol(tmp.c_str(), &end, 10);
 	std::string	unit = tmp.substr(end - tmp.c_str());
-
 
 	//NGINX uses ms and Arcadio uses seconds. Check it.
 	if (unit == "")

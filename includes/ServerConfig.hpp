@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/13 20:21:38 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/19 20:12:31 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,16 +68,15 @@ class ServerConfig
 		{
 			public:
 				ServerConfigArgsException(std::string& directive,
+										char sign,
 										int expected,		
 										const std::vector<std::string>& args)
 										: std::runtime_error(
 										"Directive " + directive +
-										" expects " + intToString(expected) +
+										" expects " + std::string(1, sign) + intToString(expected) +
 										" arguments, but " + intToString(args.size()) +
 										" were provided: " + vectorToString(args)){}
 
-				//virtual const char *what() const throw()
-				//{return ("Insufficient arguments.");}
 		};
 
 		class ServerConfigErrorCodeOutLimitsException : public std::exception
@@ -96,8 +95,6 @@ class ServerConfig
 													"Directive " + directive +
 													" \'" + token +
 													"\' has invalid value, numeric values must be non-negative."){}
-				//virtual const char *what() const throw()
-				//{return ("Invalid value, numeric values must be non-negative.");}
 		};
 
 		class ServerConfigInvalidUnitException : public std::runtime_error
@@ -125,6 +122,32 @@ class ServerConfig
 				virtual const char *what() const throw()
 				{return ("Location has no \'index\' and server does not provide a default \'index\'.");}
 		};
+
+		class ServerConfigWrongChildrenException : public std::runtime_error
+		{
+			public:
+				ServerConfigWrongChildrenException(const t_directive& directive, int lvl)
+												: std::runtime_error(
+												"Some children do not belong to this directive.\n" + directiveToString(directive, lvl)){}
+
+		};
+
+		class ServerConfigServerNameRegex : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Regex is not supported for directive 'server_name'");}
+		};
+
+		class ServerConfigSlashException : public std::runtime_error
+		{
+			public:
+				ServerConfigSlashException(std::string& directive)
+												: std::runtime_error(
+												"Directive \'" + directive +
+												"\' must start with \'/\'."){}
+		};
+
 
 
 	private:
