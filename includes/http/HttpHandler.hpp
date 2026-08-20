@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/13 16:19:08 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/20 12:42:22 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
 
 class ServerConfig;
 class LocationConfig;
@@ -35,6 +36,10 @@ class HttpHandler
 
 	private:
 		//HttpHandler.cpp
+		Response serveFile(const std::string& fullPath);
+		Response serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath);
+		std::string createAutoindexHtml(const std::string& requestPath, const std::vector<std::string>& entries);
+		Response generateAutoindex(const std::string& fullPath, const std::string& requestPath);
 		Response handleGet(const HttpRequest& request, const LocationConfig& location);
 		Response handlePost(const HttpRequest& request, const LocationConfig& location);
 		Response handleDelete(const HttpRequest& request, const LocationConfig& location);

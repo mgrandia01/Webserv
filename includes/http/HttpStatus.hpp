@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/17 11:55:22 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/04 13:33:03 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/20 11:01:14 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ enum HttpStatus
 	OK = 200,
 
 	BAD_REQUEST = 400,
+	FORBIDDEN = 403,
 	NOT_FOUND = 404,
 	METHOD_NOT_ALLOWED = 405,
 	PAYLOAD_TOO_LARGE = 413,
