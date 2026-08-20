@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/13 15:34:01 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/20 08:37:55 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 	//	return cgiHandler.execute(request);
 
 
-	std::string root = location.getRoot();//"./www"parcheado TODO 
+	std::string root = location.getRoot(); 
 	std::string fullPath = root + request.path;
 	Response response;
 	
@@ -134,31 +134,54 @@ Response HttpHandler::handleDelete(const HttpRequest& request, const LocationCon
 	return response;
 }
 
+Response Response::createRedirect(int code, const std::string& target)
+{
+	Response response;
+
+	response.statusCode = code;
+
+
+	if (code == 301)
+		response.reasonPhrase = "Moved Permanently";
+	else if (code == 302)
+		response.reasonPhrase = "Found";
+
+	response.headers["Location"] = target;
+	response.headers["Content-Length"] = "0";
+	response.body = "";
+
+	return response;
+
+}
+
 Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& server)
 {
+
 	const LocationConfig* location = findLocation(request, server);
         if (!location)
 		return Response::createError(NOT_FOUND);
 	
-	else if (request.method == "GET")
-	{
+	else if (request.method == "GET" && !location->getMethodGet())
+			return Response::createError(METHOD_NOT_ALLOWED);
+	else if (request.method == "POST" && !location->getMethodPost())
+			return Response::createError(METHOD_NOT_ALLOWED);
+	else if (request.method == "DELETE" && !location->getMethodDelete())
+			return Response::createError(METHOD_NOT_ALLOWED);
+	else
+		return Response::createError(NOT_IMPLEMENTED);
 
-		if (location->getMethodGet())
-			return handleGet(request, *location);
-		return Response::createError(METHOD_NOT_ALLOWED);
-	}
-	else if (request.method == "POST")
+	if (location->getIsEnabledReturn())
 	{
-		if (location->getMethodPost())
-			return handlePost(request, *location);
-		return Response::createError(METHOD_NOT_ALLOWED);
+		const t_return& redirect = location->getReturn();
+		return Response::createRedirect(redirect.code,redirect.target);
 	}
-	else if (request.method == "DELETE")
-	{
-		if (location->getMethodDelete())
-			return handleDelete(request, *location);
-		return Response::createError(METHOD_NOT_ALLOWED);
-	}
+
+	if (request.method == "GET")
+		return handleGet(request, *location);
+	if (request.method == "POST")
+		return handlePost(request, *location);
+	if (request.method == "DELETE")
+		return handleDelete(request, *location);
 	return Response::createError(NOT_IMPLEMENTED);
 }
 
