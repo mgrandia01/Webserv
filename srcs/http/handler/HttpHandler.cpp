@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/20 13:01:40 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/20 15:33:08 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ Response HttpHandler::serveFile(const std::string& fullPath)
 Response HttpHandler::serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath)
 {
 	const std::vector<std::string>& indexes = location.getIndex();
-
 	for (size_t i = 0; i< indexes.size(); i++)
 	{
 		std::string indexPath = fullPath + "/" + indexes[i];
@@ -78,7 +77,6 @@ Response HttpHandler::serveDirectory(const std::string& fullPath, const Location
 		if (S_ISREG(indexInfo.st_mode))
 			return serveFile(indexPath);
 	}
-
 	if (location.getAutoindex())
 		return generateAutoindex(fullPath, requestPath);
 
@@ -181,12 +179,15 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 			return Response::createError(FORBIDDEN);	
 		else
 			return Response::createError(INTERNAL_SERVER_ERROR);	
-		return Response::createError(NOT_FOUND);
 	}
 	if (S_ISREG(fileInfo.st_mode))
 		return serveFile(fullPath);
 	else if (S_ISDIR(fileInfo.st_mode))
+	{
+		if (request.path[request.path.size() - 1] != '/')
+			return Response::createRedirect(301, request.path + "/");
 		return serveDirectory(fullPath, location, request.path);
+	}
 	return Response::createError(FORBIDDEN);
 }
 
