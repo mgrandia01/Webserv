@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/27 12:24:51 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/20 15:33:08 by mgrandia         ###   ########.fr       */
+/*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
+/*   Updated: 2026/08/21 13:08:10 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,9 @@ std::string HttpHandler::createAutoindexHtml(const std::string& requestPath, con
 	{
 		std::string href = path + entries[i];
 		
-	        html += "<li><a href=\"" + href + "\">";
-	        html += entries[i];
-	        html += "</a></li>\n";
+			html += "<li><a href=\"" + href + "\">";
+			html += entries[i];
+			html += "</a></li>\n";
 	}
 
 	html += "</ul>\n";
@@ -191,19 +191,59 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 	return Response::createError(FORBIDDEN);
 }
 
+int HttpHandler::validatePostPath(const std::string& path)
+{
+	if (path.empty() || path == "/")
+		return 400;
+
+	// No permitimos subdirectorios
+	if (path.find('/', 1) != std::string::npos)
+		return 400;
+
+	// No permitimos ".." como componente del path
+	if (path == "/.." ||
+		path.find("/../") != std::string::npos)
+		return 400;
+
+	return 0;
+}
 Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location)
 {
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
 
-	(void)location;
 	Response response;
-
-	std::string uploadStore = "./uploads";//TODO desparchear
+	std::string uploadStore = location.getUploadStore();
 	
-	//TODO debe crear con el nombre que me pasa por terminal... no?
-	std::string filename = uploadStore + "/upload.txt";
+	if (uploadStore.empty())
+	{
+		HttpStatusInfo status = getStatusInfo(403);
+
+		response.statusCode = 403;
+		response.reasonPhrase = status.reasonPhrase;
+		response.body = status.defaultBody;
+		response.setHeaders("text/plain");
+
+		return response;
+	}
+	 int pathError = validatePostPath(request.path);
+	if (pathError != 0)
+	{
+	
+		HttpStatusInfo status = getStatusInfo(pathError);
+
+		response.statusCode = pathError;
+		response.reasonPhrase = status.reasonPhrase;
+		response.body = status.defaultBody;
+		response.setHeaders("text/plain");
+
+		return response;
+	}
+
+	//TODO comprobaciones:
+	//path vacio, path con directorio,path con ..
+	std::string filename = uploadStore + request.path;
 	int statusCode = 201;
 
 	if (!saveFile(filename, request.body))
@@ -220,7 +260,10 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 		response.setHeaders("text/plain");
 	}
 	else
+	{
 		response.body = status.defaultBody;
+		response.setHeaders("text/plain");
+	}
 
 	return response;
 }
@@ -277,7 +320,7 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 {
 
 	const LocationConfig* location = findLocation(request, server);
-        if (!location)
+		if (!location)
 		return Response::createError(NOT_FOUND);
 	
 	else if (request.method == "GET" && !location->getMethodGet())
