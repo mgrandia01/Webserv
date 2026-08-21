@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/21 13:08:10 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/21 13:23:43 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,17 +196,24 @@ int HttpHandler::validatePostPath(const std::string& path)
 	if (path.empty() || path == "/")
 		return 400;
 
-	// No permitimos subdirectorios
 	if (path.find('/', 1) != std::string::npos)
 		return 400;
 
-	// No permitimos ".." como componente del path
 	if (path == "/.." ||
 		path.find("/../") != std::string::npos)
 		return 400;
 
 	return 0;
 }
+
+bool HttpHandler::isPathSafe(const std::string& path)
+{
+	if (path == "/.." || path.find("/../") != std::string::npos)
+		return false;
+
+	return true;
+}
+
 Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location)
 {
 	//TODO cgi
@@ -241,8 +248,6 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 		return response;
 	}
 
-	//TODO comprobaciones:
-	//path vacio, path con directorio,path con ..
 	std::string filename = uploadStore + request.path;
 	int statusCode = 201;
 
@@ -270,12 +275,21 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 
 Response HttpHandler::handleDelete(const HttpRequest& request, const LocationConfig& location)
 {
-	(void)location;
 	Response response;
 
-	std::string root = location.getRoot();// "./www";TODO esto esta parcheado
+	std::string root = location.getRoot();
 	std::string fullPath = root + request.path;
+	if (!isPathSafe(request.path))
+	{
+		HttpStatusInfo status = getStatusInfo(400);
 
+		response.statusCode = 400;
+		response.reasonPhrase = status.reasonPhrase;
+		response.body = status.defaultBody;
+		response.setHeaders("text/plain");
+
+		return response;
+	}
 	int result = std::remove(fullPath.c_str());
 	int statusCode = 200;
 
@@ -293,6 +307,7 @@ Response HttpHandler::handleDelete(const HttpRequest& request, const LocationCon
 	response.statusCode = statusCode;
 	response.reasonPhrase = status.reasonPhrase;
 	response.body = status.defaultBody;
+	response.setHeaders("text/plain");
 	return response;
 }
 
