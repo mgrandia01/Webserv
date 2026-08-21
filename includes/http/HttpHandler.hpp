@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/21 13:10:04 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/21 13:24:41 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class HttpHandler
 		Response generateAutoindex(const std::string& fullPath, const std::string& requestPath);
 		Response handleGet(const HttpRequest& request, const LocationConfig& location);
 		int validatePostPath(const std::string& path);
+		bool isPathSafe(const std::string& path);
 		Response handlePost(const HttpRequest& request, const LocationConfig& location);
 		Response handleDelete(const HttpRequest& request, const LocationConfig& location);
 
