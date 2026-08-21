@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:44:51 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/19 21:03:44 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/21 21:08:57 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class LocationConfig
 
 		//GETTERS
 		const std::string&							getUri() const;
+		bool										getAllowMethodsConfigured() const;
 		const bool&									getMethodGet() const;
 		const bool&									getMethodPost() const;
 		const bool&									getMethodDelete() const;
@@ -101,11 +102,29 @@ class LocationConfig
 												"\' must start with \'/\'."){}
 		};
 
+		class	LocationConfigDupException : public std::runtime_error
+		{
+			public:
+				LocationConfigDupException(std::string& directive)
+												: std::runtime_error(
+												"Directive \'"+ directive +
+												"\' is duplicated."){}
+		};
 
-
+		class	LocationConfigCgiExtensionDupException : public std::runtime_error
+		{
+			public:
+				LocationConfigCgiExtensionDupException(const std::string& ext)
+												: std::runtime_error(
+												"Directive location cgi, extension \'" + ext +
+												"\' is duplicated."){}
+		};
 
 	private:
 		typedef void (LocationConfig::*locationDirFunc)(const t_directive&);
+	
+		//AQUI, falta:
+		//	check hasMethods
 
 		LocationConfig();
 		//LocationConfig(const LocationConfig& other);

@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:25:51 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/17 19:57:35 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/21 17:59:46 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,27 @@ class Config {
 		const std::vector<ServerConfig>& getServers() const;
 
 		//EXCEPTIONS
+		class ConfigLenExtensionException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Length cannot be less than the extension length.");}
+		};
+
+		class ConfigExtensionException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("Extension does not match the expected extension.");}
+		};
+
+		class ConfigEmptyFileException : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{return ("File is empty.");}
+		};
+
 		class ConfigBlockException : public std::exception
 		{
 			public:
@@ -58,18 +79,6 @@ class Config {
 				{return ("Invalid character between server blocks.");}
 		};
 		
-		/*class ConfigGraphException : public std::runtime_error
-		{
-			public:
-				ConfigGraphException(char c, size_t cPos, size_t lineNumber, std::string& line)
-									: std::runtime_error(
-									"Invalid character \'" + std::string(1, c) +
-									"\' position " + intToString(cPos) +
-									" on line " + intToString (lineNumber) +
-									".\n" + line +
-									"\n" + marker(line, cPos)){}
-		};*/
-		
 		class ConfigUnclosedQuoteException : public std::runtime_error
 		{
 			public:
@@ -89,7 +98,6 @@ class Config {
 									"Quoted value on line " + intToString (lineNumber) +
 									" must be a separate token.\n" + line +
 									"\n" + markerMisplaceQuote(line, c, cPos)){}
-									//quoted value must be a separate token
 		};
 
 		class ConfigSemiColonException : public std::runtime_error
@@ -101,15 +109,26 @@ class Config {
 									"\" does not have a ';' before closing the block."){}
 		};
 
+		class ConfigVirtualServerException : public std::runtime_error
+		{
+			public:
+				ConfigVirtualServerException(std::string& ip, int port)
+									: std::runtime_error(
+									"Duplicate listening address: \"" + ip +
+									":" + intToString(port) +
+									"\".\nMultiple servers are using the same IP:port, possibly because the default values were applied."){}
+		};
+
 
 	private:
 
 		Config();
-		Config(const Config& src);
-		Config& operator=(const Config& rhs);
+		//Config(const Config& src);
+		//Config& operator=(const Config& rhs);
 		
 		std::vector<ServerConfig> _servers;
 
+		void		checkExtension(const char* file);
 		size_t		jumpHeader(std::vector<std::string>& lines);
 		void		tokenizer(std::string& str, std::vector<std::string>& tokens, size_t j);
 		void		tokenizerStruct(std::vector<t_directive>& tokensStruct,
@@ -119,11 +138,11 @@ class Config {
 						std::vector<std::string>& tokens, size_t& j);
 		size_t		findStart(std::vector<std::string>& tokens, size_t size, size_t & n);
 		size_t		findEnd(std::vector<std::string>& tokens, size_t size, size_t& n);
-		//bool		isValidChar(char c);
 		bool		isSeparator(char c);
+		void		checkVirtualServers();
 		static std::string	marker(std::string& line, size_t cPos);	
 		static std::string	markerQuote(std::string& line, size_t cPos);	
-		static std::string	markerMisplaceQuote(std::string& line, char c,size_t cPos);	
+		static std::string	markerMisplaceQuote(std::string& line, char c,size_t cPos);
 };
 
 std::ostream& operator<<(std::ostream &out, const Config& config);

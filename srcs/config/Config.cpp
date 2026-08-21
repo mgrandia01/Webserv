@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/19 21:03:38 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/21 21:02:06 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,14 @@
 #include <cerrno>
 #include <iostream>
 #include <fstream>
+#include <set>
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "utils.hpp"
 
 /* ***************************** constr & destr ***************************** */
 
-Config::Config(){}
+Config::Config() : _servers(){}
 
 Config::Config(const char* file)
 {
@@ -29,11 +30,16 @@ Config::Config(const char* file)
 	std::string					buff;
 	std::vector<std::string>	lines;
 
+	//EXTENSION
+	checkExtension(file);
+
 	//READ
 	if (!fd.is_open())
 		throw std::runtime_error(strerror(errno));
 	while (getline(fd, buff))
 		lines.push_back(buff);
+	if (lines.empty())
+		throw ConfigEmptyFileException();
 
 	//TOKENS
 	std::vector<std::string>	tokens;
@@ -56,6 +62,8 @@ Config::Config(const char* file)
 		ServerConfig	tmp(tokensStruct);
 		_servers.push_back(tmp);
 	}
+
+	checkVirtualServers();	
 }
 
 //Config::Config(const Config& src){}
@@ -83,6 +91,21 @@ std::ostream& operator<<(std::ostream &out, const Config& config)
 const std::vector<ServerConfig>& Config::getServers() const{return (_servers);}
 
 /* ************************* member funcs / methods ************************* */
+
+void	Config::checkVirtualServers()
+{
+	const std::vector<ServerConfig>	servers = getServers();
+	std::set<std::pair<std::string, int> >	addresses;
+
+	for (std::vector<ServerConfig>::const_iterator it = servers.begin();
+			it != servers.end(); it++)
+	{
+		std::pair<std::string, int> address(it->getHost(), it->getPort());
+
+		if (!addresses.insert(address).second)
+			throw ConfigVirtualServerException(address.first, address.second);
+	}	
+}
 
 void	Config::parserDirective(std::vector<t_directive>& tkStruct,
 				std::vector<std::string>& tokens,
@@ -275,6 +298,7 @@ size_t  Config::findEnd(std::vector<std::string>& tokens, size_t size, size_t& n
 	}
 	throw ConfigBlockException();
 }
+
 size_t	Config::findStart(std::vector<std::string>& tokens, size_t size, size_t& n)
 {
 	if (n < size && tokens[n] != "server")
@@ -293,4 +317,19 @@ size_t	Config::jumpHeader(std::vector<std::string>& lines)
 	while (lines[j].find ("server"))
 		j++;
 	return (j);
+}
+
+void	Config::checkExtension(const char* file)
+{
+	const char* ext = ".conf";
+	size_t	fileLen = strlen(file);
+	size_t	extLen = strlen(ext);
+	
+	if (fileLen < extLen)
+		throw ConfigLenExtensionException();
+
+	size_t	pos =  fileLen - extLen;
+	
+	if (strcmp(file + pos, ext) != 0)
+		throw ConfigExtensionException();
 }

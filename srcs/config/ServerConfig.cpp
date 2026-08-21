@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/19 20:47:17 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/21 21:02:14 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <map>
 #include <cstring>
 #include <stdlib.h>
+#include <set>
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
@@ -21,19 +22,36 @@
 
 /* ***************************** constr & destr ***************************** */
 
-ServerConfig::ServerConfig(){}
+ServerConfig::ServerConfig():
+							_host("0.0.0.0"),
+							_port(0),
+							_defaultServer(false),
+							_serverName(),
+							_clientMaxBodySize(1048576),
+							_root(""),
+							_index(),
+							_clientHeaderTimeout(60 * 1000),
+							_clientBodyTimeout(60 * 1000),
+							_sendTimeout(60 * 1000 ),
+							_keepAliveTimeout(75 * 1000),
+							_locations(){}
+
 
 ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 										_host("0.0.0.0"),
 										_port(0),
 										_defaultServer(false),
+										_serverName(),
 										_clientMaxBodySize(1048576),
+										_root(""),
+										_index(),
 										_clientHeaderTimeout(60 * 1000),
 										_clientBodyTimeout(60 * 1000),
 										_sendTimeout(60 * 1000 ),
 										_keepAliveTimeout(75 * 1000)
 {
 	std::map<std::string, directiveFunc>	tkFuncMap;
+	std::set<std::string>					isNew;
 
 	tkFuncMap["listen"] = &ServerConfig::listenDirective;
 	tkFuncMap["server_name"] = &ServerConfig::serverNameDirective;
@@ -56,10 +74,19 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 		if (func == tkFuncMap.end())
 			throw ServerConfigDirectiveUnknowException(it->name);
 		(this->*(func->second))(*it);
+
+		if (it->name != "location" && it->name != "error_page")
+			if (!isNew.insert(it->name).second)
+				throw ServerConfigDupException(it->name);
 	}
 	
 	resolveConfigDefaults();
 }
+
+
+//ServerConfig::ServerConfig(const ServerConfig& src){}
+
+//ServerConfig::ServerConfig& operator=(const ServerConfig& rhs){}
 
 ServerConfig::~ServerConfig(){}
 
@@ -149,6 +176,51 @@ const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_
 
 /* ************************* member funcs / methods ************************* */
 
+void	ServerConfig::checkIp(std::string ip)
+{
+	size_t	parts = 0;
+	size_t	digits = 0;
+	size_t	num = 0;
+	size_t	i = 0;
+	bool	availableDot = false;
+
+	while (i < ip.size())
+	{
+
+		if (std::isdigit(static_cast<unsigned char>(ip[i])))
+		{
+			availableDot = true;
+			digits = 0;
+			while (std::isdigit(static_cast<unsigned char>(ip[i + digits])))
+				digits++;
+			if (digits > 3)
+				throw ServerConfigIpException("An IP address contains a number with more than 3 digits");
+			num = atoi(ip.c_str() + i);
+			if (num > 255)
+				throw ServerConfigIpException("An IP address contains a number outside the range 0-255.");
+			i += digits;
+		}
+		else if (ip[i] == '.')
+		{
+			if (i == 0)
+				throw ServerConfigIpException("An IP address starts with '.'");
+			else if (availableDot == false)
+				throw ServerConfigIpException("An IP address contains consecutive '.' characters.");
+			else if (i == ip.size() - 1)
+				throw ServerConfigIpException("An IP address ends with '.'");
+			availableDot = false;
+			parts++;
+			i++;
+		}
+		else
+			throw ServerConfigIpException("An IP address contains an invalid character.");
+	}
+	if (parts != 3)
+		throw ServerConfigIpException("An IP address must have 4 parts.");
+
+	_host = ip;
+}
+
 void	ServerConfig::listenDirective(const t_directive& tk)
 {
 	std::string	directive("listen");	
@@ -174,7 +246,7 @@ void	ServerConfig::listenDirective(const t_directive& tk)
 				if (tk.args[j] == "localhost")
 					_host = "127.0.0.1";
 				else
-					_host = tk.args[j].substr(0, pos);
+					checkIp(tk.args[j].substr(0, pos));
 				tmp = tk.args[j].substr(pos + 1);
 				_port = std::strtol(tmp.c_str(), &end, 10);
 			}

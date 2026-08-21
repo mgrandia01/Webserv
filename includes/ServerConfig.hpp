@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/19 20:12:31 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/21 20:14:49 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,12 @@ class ServerConfig
 
 		};
 
+		class ServerConfigIpException : public std::runtime_error
+		{
+			public:
+				ServerConfigIpException(std::string msg) : std::runtime_error(msg){}
+		};
+
 		class ServerConfigErrorCodeOutLimitsException : public std::exception
 		{
 			public:
@@ -148,6 +154,15 @@ class ServerConfig
 												"\' must start with \'/\'."){}
 		};
 
+		class	ServerConfigDupException : public std::runtime_error
+		{
+			public:
+				ServerConfigDupException(std::string& directive)
+												: std::runtime_error(
+												"Directive \'"+ directive +
+												"\' is duplicated."){}
+		};
+
 
 
 	private:
@@ -185,6 +200,7 @@ class ServerConfig
 		void	sendTimeout(const t_directive& tk);
 		void	keepAliveTimeout(const t_directive& tk);
 
+		void	checkIp(std::string ip);
 		void	timeoutParser(int& target, const t_directive& tk);
 		void	resolveConfigDefaults();
 };
