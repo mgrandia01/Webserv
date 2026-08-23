@@ -15,6 +15,7 @@
 
 #include <vector>
 #include <map>
+#include <csignal>
 #include "Config.hpp"
 #include "http/RequestParser.hpp"
 #include "Client.hpp"
@@ -33,12 +34,8 @@ public:
 	void	printSockets() const;
 	void	run();
 	
-
-
-
 	const ServerConfig* getServerConfigFromSocket(int fd) const;
 
-	
 
 private:
 
@@ -58,6 +55,7 @@ private:
 	HttpHandler					_requestHandler;
 	std::map<int, Client> _clients;
 	
+	static volatile sig_atomic_t	_running;
 	
 	void	createSockets();
 	void	bindSocket(int socketFd, const ServerConfig& server);
@@ -69,6 +67,8 @@ private:
 	bool	sendResponse(int index);
 
 	void	checkTimeouts();
+
+	static void signalHandler(int signal);
 	
 };
 

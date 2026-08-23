@@ -36,6 +36,8 @@ HttpStatusInfo getStatusInfo(int statusCode)
 			return HttpStatusInfo("Not Found", "404 Not Found");
 		case 405:
 			return HttpStatusInfo("Method Not Allowed", "405 Method Not Allowed");
+		case 408: // TO DO add control errors on ServerManager, example one 408
+			return HttpStatusInfo("Request Time-out", "408 Request Time-out");
 		case 413:
 			return HttpStatusInfo("Payload Too Large", "413 Payload Too Large");
 		case 500:

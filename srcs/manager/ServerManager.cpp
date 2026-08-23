@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ServerManager.hpp"
+#include "http/HttpStatus.hpp"
 
 #include <iostream>
 #include <cstring>
@@ -24,10 +25,14 @@
 #include <unistd.h> //sleep, close
 #include <arpa/inet.h> //address.sin_addr.s_addr = inet_addr(server.host.c_str());
 #include <algorithm>
+#include <csignal>
+#include <cerrno>
 
 
 static const int LISTEN_BACKLOG = 128;
 static const int POLL_TIMEOUT = 1000;
+
+volatile sig_atomic_t ServerManager::_running = 1;
 
 
 ServerManager::ServerManager(const Config& config) : _config(config) {}
@@ -49,6 +54,16 @@ ServerManager::~ServerManager()
 
 void	ServerManager::init()
 {
+	if (signal(SIGINT, ServerManager::signalHandler) == SIG_ERR)
+		throw std::runtime_error("Failed to register SIGINT handler.");
+
+	if (signal(SIGTERM, ServerManager::signalHandler) == SIG_ERR)
+		throw std::runtime_error("Failed to register SIGTERM handler.");
+
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+		throw std::runtime_error("Failed to register SIGPIPE handler.");
+
+
 	createSockets();
 	initPollFds();
 	//std::cout << "Server listening..." << std::endl;
@@ -166,13 +181,18 @@ void	ServerManager::run()
 	if (_pollFds.empty())
 		throw std::runtime_error("No sockets to poll");
 	
-	while (true) // adding signals management
+	while (_running) // running while not SIGINT or SIGTERM received
 	{
 		// POLL_TIMEOUT, maximum timoeut until at least one fd has an event
 		int	ret = poll(&_pollFds[0], _pollFds.size(), POLL_TIMEOUT);
 		
 		if (ret == -1)
-			throw std::runtime_error("poll() failed");
+		{
+			if (errno == EINTR) // SIGINT exits the program, not poll fails
+				continue;
+			else
+				throw std::runtime_error("poll() failed");
+		}
 		
 		if (ret == 0)
 		{
@@ -212,7 +232,9 @@ void	ServerManager::run()
 
 				    if (_listenSockets.empty())
 				    {
-				        throw std::runtime_error("No listening sockets available");
+				        std::cout << "No listening sockets available" << std::endl;
+				        _running = 0;
+				        break ;
 				    }
 				    continue ;
 				}
@@ -310,9 +332,14 @@ void ServerManager::checkTimeouts()
                 {
     				std::cout << "CLIENT data timeout WAITING REQUEST on fd: " << fd << std::endl;
                 
-                 	Response response("HTTP/1.1 408 Request Timeout\r\n Content-Length: 0\r\n\r\n");
-                 	client.setKeepAlive(false);
+                 	// TO DO este es un ejemplo de integracion de errores
+                 	// queda pendiente ampliar a todos los errores en el siguiente pullrequest
+                 	Response response(Response::createError(REQUEST_TIMEOUT));
+                 	//Response response("HTTP/1.1 408 Request Timeout\r\n Content-Length: 19\r\n\r\n");
                  	client.setResponse(response);
+                	client.setKeepAlive(false);
+
+
                 	client.setLastActivity();
 
 	                for (size_t i = 0; i < _pollFds.size(); i++)
@@ -504,9 +531,15 @@ bool ServerManager::sendResponse(int index)
     	_pollFds.erase(_pollFds.begin() + index);
     	
     	return true;
-	}
-
-	if (bytesSent > 0)
+	} else if (bytesSent == 0)
+	{
+		std::cout << "CLIENT data send() returned 0 on fd: " << fd << std::endl;
+		close(fd);
+		_clients.erase(fd);
+		_pollFds.erase(_pollFds.begin() + index);
+		
+		return true;
+	} else // bytesSent >0
 	{
 			client.addBytesSent(bytesSent);
 			client.setLastActivity();
@@ -523,6 +556,7 @@ bool ServerManager::sendResponse(int index)
         	client.setTimeoutState(KEEP_ALIVE);
         	client.setLastActivity();
     	    _pollFds[index].events = POLLIN;
+    	    std::cout << "CLIENT has sent full data on fd: " << fd << " and fd continues opened" << std::endl;
     	    return false;
 	    }
     	else
@@ -530,6 +564,7 @@ bool ServerManager::sendResponse(int index)
 	        close(fd);
     	    _clients.erase(fd);
         	_pollFds.erase(_pollFds.begin() + index);
+        	std::cout << "CLIENT has sent full data on fd: " << fd << " and fd is closed" << std::endl;
         	return true;
     	}
 	}
@@ -554,4 +589,13 @@ const ServerConfig* ServerManager::getServerConfigFromSocket(int fd) const
     }
 
     return NULL;
+}
+
+void	ServerManager::signalHandler(int signal)
+{
+	if (signal == SIGINT || signal == SIGTERM)
+	{
+		std::cout << "\nSIGINT received. Initiating server shutdown..." << '\n';
+        _running = 0;
+	}
 }

@@ -12,7 +12,6 @@
 
 #include "Response.hpp"
 #include <string>
-#include <iostream>
 #include "http/HttpSerializer.hpp"
 
 Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream(){}
@@ -42,8 +41,8 @@ Response& Response::operator=(const Response& other)
 
 const std::string& Response::getStream() const
 {
-	std::cout << "------arriba aquii----------" << std::endl;
 	_stream = HttpSerializer::serialize(*this);
+
 	return _stream;
 }
 
