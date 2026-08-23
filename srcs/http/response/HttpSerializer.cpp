@@ -13,6 +13,7 @@
 #include "http/HttpSerializer.hpp"
 #include "Response.hpp"
 #include <sstream>
+#include <iostream> //TO DO Remove if not necessary
 
 std::string intToString(int n)
 {

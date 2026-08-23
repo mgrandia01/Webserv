@@ -44,6 +44,7 @@ Response& Response::operator=(const Response& other)
 const std::string& Response::getStream() const
 {
 	_stream = HttpSerializer::serialize(*this);
+
 	return _stream;
 }
 

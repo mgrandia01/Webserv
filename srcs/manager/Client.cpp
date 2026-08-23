@@ -51,12 +51,14 @@ bool Client::receive()
    
     char buffer[4096];
 
-    int bytes = recv(_fd, buffer, sizeof(buffer), 0);
+    ssize_t bytes = recv(_fd, buffer, sizeof(buffer), 0);
 
     std::cout << "CLIENT data on fd " << _fd << " received " << bytes << std::endl;
 
     // there is no more data or some error has happened
-    if (bytes <= 0)
+    if (bytes == -1) // error on receiving data
+        return false;
+    if (bytes == 0) // closed connection
         return false;
 
     std::cout << "Information Received is: ";
