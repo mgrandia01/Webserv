@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/29 07:57:57 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/12 09:39:53 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/13 15:29:29 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ const LocationConfig* HttpHandler::findLocation(const HttpRequest& request, cons
 	return bestMatch;
 }
 
-void HttpHandler::setHeaders(Response& response, const std::string& contentType)
+/*void HttpHandler::setHeaders(Response& response, const std::string& contentType)
 {
 	response.headers["Content-Type"] = contentType;
 
@@ -54,7 +54,7 @@ void HttpHandler::setHeaders(Response& response, const std::string& contentType)
 	// response.headers["Date"] = ...
 	// response.headers["Server"] = ...
 	// response.headers["Connection"] = ...
-}
+}*/
 
 
 bool HttpHandler::saveFile(const std::string& path, const std::string& buffer)
