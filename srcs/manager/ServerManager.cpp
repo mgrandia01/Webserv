@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/13 15:14:18 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/24 11:21:55 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,7 +334,7 @@ void ServerManager::checkTimeouts()
                 
                  	// TO DO este es un ejemplo de integracion de errores
                  	// queda pendiente ampliar a todos los errores en el siguiente pullrequest
-                 	Response response(Response::createError(REQUEST_TIMEOUT));
+                 	Response response(Response::createError(REQUEST_TIMEOUT, *server));
                  	//Response response("HTTP/1.1 408 Request Timeout\r\n Content-Length: 19\r\n\r\n");
                  	client.setResponse(response);
                 	client.setKeepAlive(false);

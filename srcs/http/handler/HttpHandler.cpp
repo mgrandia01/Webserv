@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/21 13:23:43 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/24 11:17:32 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ Response HttpHandler::serveFile(const std::string& fullPath)
 	return response;
 }
 
-Response HttpHandler::serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath)
+Response HttpHandler::serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath, const ServerConfig& server)
 {
 	const std::vector<std::string>& indexes = location.getIndex();
 	for (size_t i = 0; i< indexes.size(); i++)
@@ -70,17 +70,17 @@ Response HttpHandler::serveDirectory(const std::string& fullPath, const Location
 			if (errno == ENOENT)
 				continue;
 			else if (errno == EACCES)
-				return Response::createError(FORBIDDEN);	
-			return Response::createError(INTERNAL_SERVER_ERROR);	
+				return Response::createError(FORBIDDEN, server);	
+			return Response::createError(INTERNAL_SERVER_ERROR, server);	
 		}
 
 		if (S_ISREG(indexInfo.st_mode))
 			return serveFile(indexPath);
 	}
 	if (location.getAutoindex())
-		return generateAutoindex(fullPath, requestPath);
+		return generateAutoindex(fullPath, requestPath, server);
 
-	return Response::createError(FORBIDDEN);
+	return Response::createError(FORBIDDEN, server);
 }
 
 std::string HttpHandler::createAutoindexHtml(const std::string& requestPath, const std::vector<std::string>& entries)
@@ -115,16 +115,16 @@ std::string HttpHandler::createAutoindexHtml(const std::string& requestPath, con
 	return html;
 }
 
-Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::string& requestPath)
+Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::string& requestPath, const ServerConfig& server)
 {
 	DIR* dir = opendir(fullPath.c_str());
 
 	if (dir == NULL)
 	{
 		if (errno == EACCES)
-			return Response::createError(FORBIDDEN);
+			return Response::createError(FORBIDDEN, server);
 
-		return Response::createError(INTERNAL_SERVER_ERROR);
+		return Response::createError(INTERNAL_SERVER_ERROR, server);
 	}
 
 	std::vector<std::string> entries;
@@ -157,7 +157,7 @@ Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::
 }
 
 
-Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location)
+Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
 {
 
 
@@ -174,11 +174,11 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 	if (stat(fullPath.c_str(), &fileInfo) == -1)
 	{
 		if (errno == ENOENT)
-			return Response::createError(NOT_FOUND);	
+			return Response::createError(NOT_FOUND, server);	
 		else if (errno == EACCES)
-			return Response::createError(FORBIDDEN);	
+			return Response::createError(FORBIDDEN, server);	
 		else
-			return Response::createError(INTERNAL_SERVER_ERROR);	
+			return Response::createError(INTERNAL_SERVER_ERROR, server);	
 	}
 	if (S_ISREG(fileInfo.st_mode))
 		return serveFile(fullPath);
@@ -186,9 +186,9 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 	{
 		if (request.path[request.path.size() - 1] != '/')
 			return Response::createRedirect(301, request.path + "/");
-		return serveDirectory(fullPath, location, request.path);
+		return serveDirectory(fullPath, location, request.path, server);
 	}
-	return Response::createError(FORBIDDEN);
+	return Response::createError(FORBIDDEN, server);
 }
 
 int HttpHandler::validatePostPath(const std::string& path)
@@ -336,14 +336,14 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 
 	const LocationConfig* location = findLocation(request, server);
 		if (!location)
-		return Response::createError(NOT_FOUND);
+		return Response::createError(NOT_FOUND, server);
 	
 	else if (request.method == "GET" && !location->getMethodGet())
-			return Response::createError(METHOD_NOT_ALLOWED);
+			return Response::createError(METHOD_NOT_ALLOWED, server);
 	else if (request.method == "POST" && !location->getMethodPost())
-			return Response::createError(METHOD_NOT_ALLOWED);
+			return Response::createError(METHOD_NOT_ALLOWED, server);
 	else if (request.method == "DELETE" && !location->getMethodDelete())
-			return Response::createError(METHOD_NOT_ALLOWED);
+			return Response::createError(METHOD_NOT_ALLOWED, server);
 	if (location->getIsEnabledReturn())
 	{
 		const t_return& redirect = location->getReturn();
@@ -351,12 +351,12 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 	}
 
 	if (request.method == "GET")
-		return handleGet(request, *location);
+		return handleGet(request, *location, server);
 	if (request.method == "POST")
 		return handlePost(request, *location);
 	if (request.method == "DELETE")
 		return handleDelete(request, *location);
-	return Response::createError(NOT_IMPLEMENTED);
+	return Response::createError(NOT_IMPLEMENTED, server);
 }
 
 
