@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/24 16:08:13 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/25 12:57:50 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <sstream>
 #include <vector>
 #include <sstream>
+#include <ctime>
 #include "http/HttpSerializer.hpp"
 #include "ServerConfig.hpp"
 #include "Response.hpp"
@@ -53,6 +54,17 @@ const std::string& Response::getStream() const
 	return _stream;
 }
 
+std::string getDateHeader()
+{
+	char buffer[100];
+
+	std::time_t now = std::time(NULL);
+	std:: tm *gmt = std::gmtime(&now);
+
+	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
+	return std::string(buffer);
+}
+
 void Response::setHeaders(const std::string& contentType)
 {
         headers["Content-Type"] = contentType;
@@ -61,10 +73,7 @@ void Response::setHeaders(const std::string& contentType)
         ss << body.size();
         headers["Content-Length"] = ss.str();
 
-        // TODO
-        // response.headers["Date"] = ...
-        // response.headers["Server"] = ...
-        // response.headers["Connection"] = ...
+	headers["Date"] = getDateHeader();
 }
 
 //TODO usar siempreeeee
