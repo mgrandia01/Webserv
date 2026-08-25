@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/24 11:17:32 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/25 10:45:13 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,16 +156,54 @@ Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::
 	return response;
 }
 
+bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& location) const
+{
+
+	std::cout << "dddddddddddddddddins el isCGIIIIIIIII" <<std::endl;
+	const std::map<std::string, std::string> cgi = location.getCgi();
+	if(cgi.empty())
+		return (false); //FIXME si no hay es empty?
+
+	std::string path = request.path;
+	std::size_t pos = path.rfind('.');
+
+	if (pos == std::string::npos)
+		return (false);
+
+	std::string extension = path.substr(pos);
+
+	if (cgi.find(extension) != cgi.end())
+		return (true);
+
+	return (false);
+}
+
+//funcion de cgi
+//if(!cgi.empty)
+//la extendiondel recurso esta configurada?
 
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
 {
-
+	
 
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
 
+	//if de si es .py .php 
+	//passar a Martha SERVER, PATH, QUERY Y LOCATION
+	//lo que devuelve el cgi es un string, que tendremos que parsear para devolver como respuesta
+	
+	if(isCgi(request, location))
+	{
+		std::cout << "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiisCgi torna TRUE" <<std::endl;
+		//llamar al cgi
+		//parsear resultado
+		//devoler response
+	
+	}
 
+	std::cout << "eeeeeeeeeeeestic foraaaaaaaaaa" <<std::endl;
 	std::string root = location.getRoot(); 
 	std::string fullPath = root + request.path;
 	
@@ -214,17 +252,22 @@ bool HttpHandler::isPathSafe(const std::string& path)
 	return true;
 }
 
-Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location)
+Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location,  const ServerConfig& server)
 {
+	(void)server;
+	//TODO server para codgo de error
 	//TODO cgi
 	//if (config.isCGI(request.path))
 	//	return cgiHandler.execute(request);
+	
+	
 
 	Response response;
 	std::string uploadStore = location.getUploadStore();
 	
 	if (uploadStore.empty())
 	{
+		//TODO portque no llamo a createError?
 		HttpStatusInfo status = getStatusInfo(403);
 
 		response.statusCode = 403;
@@ -261,6 +304,7 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 
 	if (statusCode == 201)
 	{
+		//TODO succesful?
 		response.body = "Upload successful";
 		response.setHeaders("text/plain");
 	}
@@ -273,8 +317,9 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 	return response;
 }
 
-Response HttpHandler::handleDelete(const HttpRequest& request, const LocationConfig& location)
+Response HttpHandler::handleDelete(const HttpRequest& request, const LocationConfig& location,  const ServerConfig& server)
 {
+	(void)server;
 	Response response;
 
 	std::string root = location.getRoot();
@@ -353,9 +398,9 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 	if (request.method == "GET")
 		return handleGet(request, *location, server);
 	if (request.method == "POST")
-		return handlePost(request, *location);
+		return handlePost(request, *location, server);
 	if (request.method == "DELETE")
-		return handleDelete(request, *location);
+		return handleDelete(request, *location, server);
 	return Response::createError(NOT_IMPLEMENTED, server);
 }
 

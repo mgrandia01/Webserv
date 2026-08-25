@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/24 12:48:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/24 16:08:13 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,9 @@ void Response::setHeaders(const std::string& contentType)
         // response.headers["Connection"] = ...
 }
 
-
+//TODO usar siempreeeee
 Response Response::createError(HttpStatus status, const ServerConfig& server)
 {
-	(void)server;
 	Response response;
 
 	HttpStatusInfo info = getStatusInfo(status);
