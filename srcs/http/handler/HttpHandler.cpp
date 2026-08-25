@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 10:45:13 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/25 12:29:22 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,6 @@ Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::
 bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& location) const
 {
 
-	std::cout << "dddddddddddddddddins el isCGIIIIIIIII" <<std::endl;
 	const std::map<std::string, std::string> cgi = location.getCgi();
 	if(cgi.empty())
 		return (false); //FIXME si no hay es empty?
@@ -177,10 +176,6 @@ bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& locati
 
 	return (false);
 }
-
-//funcion de cgi
-//if(!cgi.empty)
-//la extendiondel recurso esta configurada?
 
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
 {
