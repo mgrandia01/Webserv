@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/21 13:24:41 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/25 10:32:15 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,26 +29,26 @@ class LocationConfig;
 class HttpHandler
 {
 	public:
-		//TODO al hacer la integracion sera algo como:
-		//HttpResponse HttpHandler::handle
-		//(const HttpRequest& request,const LocationConfig& location)
 		Response handle(const HttpRequest& request, const ServerConfig& server);
 
 	private:
 		//HttpHandler.cpp
 		////TODO ordenar a utils
 		Response serveFile(const std::string& fullPath);
-		Response serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath);
+		Response serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath, const ServerConfig& server);
+		
 		std::string createAutoindexHtml(const std::string& requestPath, const std::vector<std::string>& entries);
-		Response generateAutoindex(const std::string& fullPath, const std::string& requestPath);
-		Response handleGet(const HttpRequest& request, const LocationConfig& location);
+		Response generateAutoindex(const std::string& fullPath, const std::string& requestPath,  const ServerConfig& server);
+		
+		bool isCgi(const HttpRequest& request, const LocationConfig& location) const;
 		int validatePostPath(const std::string& path);
 		bool isPathSafe(const std::string& path);
-		Response handlePost(const HttpRequest& request, const LocationConfig& location);
-		Response handleDelete(const HttpRequest& request, const LocationConfig& location);
+		
+		Response handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server);
+		Response handlePost(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server);
+		Response handleDelete(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server);
 
 		//HttpHandlerUtils.cpp
-		//void setHeaders(Response& response, const std::string& contentType);
 		std::string getContentType(const std::string& path);
 		bool readFile(int fd, std::string& body);
 		bool saveFile(const std::string& path, const std::string& buffer);

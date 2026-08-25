@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/13 16:19:07 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/24 12:09:06 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <map>
 
 #include "http/HttpStatus.hpp"
+
+class ServerConfig;
 
 class Response
 {
@@ -32,7 +34,8 @@ class Response
 		std::map<std::string, std::string> headers;
 		std::string body;
 		
-		static Response createError(HttpStatus status);
+		static Response createError(HttpStatus status, const ServerConfig& server);
+		static void applyConfiguredErrorPage(Response& response, const ServerConfig& server, HttpStatus status);
 		std::string serialize() const;
 
 		const std::string& getStream() const;
@@ -43,7 +46,7 @@ class Response
 		
 		
 		
-		mutable std::string _stream;//FIXME mutable??
+		mutable std::string _stream;
 	
 };
 
