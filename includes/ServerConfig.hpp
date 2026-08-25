@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/21 20:14:49 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:47:27 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 # include <vector>
 # include <exception>
 # include "LocationConfig.hpp"
-# include "utils.hpp"
+# include "ParserUtils.hpp"
+# include "ParserExceptions.hpp"
 
 class ServerConfig
 {
@@ -42,128 +43,22 @@ class ServerConfig
 		const std::vector<LocationConfig>&	getLocations() const;
 
 		//EXCEPTIONS
-		class ServerConfigSemicolonPosException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Semicolon is at wrong position.");}
-		};
-
-		class ServerConfigNotSemicolonException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("There is not semicolon.");}
-		};
-
-		class ServerConfigDirectiveUnknowException : public std::runtime_error
-		{
-			public:
-				ServerConfigDirectiveUnknowException(std::string& directive)
-										: std::runtime_error(
-										"\'" + directive + "\' unknown directive."){}
-		};
-
-		class ServerConfigArgsException : public std::runtime_error
-		{
-			public:
-				ServerConfigArgsException(std::string& directive,
-										char sign,
-										int expected,		
-										const std::vector<std::string>& args)
-										: std::runtime_error(
-										"Directive " + directive +
-										" expects " + std::string(1, sign) + intToString(expected) +
-										" arguments, but " + intToString(args.size()) +
-										" were provided: " + vectorToString(args)){}
-
-		};
 
 		class ServerConfigIpException : public std::runtime_error
 		{
 			public:
 				ServerConfigIpException(std::string msg) : std::runtime_error(msg){}
 		};
-
-		class ServerConfigErrorCodeOutLimitsException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("A error code is out of limits.");}
-		};
-		
-		class ServerConfigUnsignedNumberException : public std::runtime_error
-		{
-			public:
-				ServerConfigUnsignedNumberException (const std::string& directive,
-													const std::string& token)
-													: std::runtime_error(
-													"Directive " + directive +
-													" \'" + token +
-													"\' has invalid value, numeric values must be non-negative."){}
-		};
-
-		class ServerConfigInvalidUnitException : public std::runtime_error
-		{
-			public:
-				ServerConfigInvalidUnitException(std::string& directive, std::string& arg, std::string& unit)
-												: std::runtime_error(
-												"Directive " + directive +
-												" in arg \'" + arg +
-												"\' contains an invalid \'" + unit +
-												"\' unit suffix."){}
-
-		};
-
-		class ServerConfigRootException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Location has no \'root\' and server does not provide a default \'root\'.");}
-		};
 	
-		class ServerConfigIndexException : public std::exception
+		class ServerConfigProvideDirectiveException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Location has no \'index\' and server does not provide a default \'index\'.");}
+				ServerConfigProvideDirectiveException(std::string directive)
+										: std::runtime_error(
+										"Location has no \'" + directive +
+										"\' and server does not provide a default \'" + directive +
+										"\'."){}
 		};
-
-		class ServerConfigWrongChildrenException : public std::runtime_error
-		{
-			public:
-				ServerConfigWrongChildrenException(const t_directive& directive, int lvl)
-												: std::runtime_error(
-												"Some children do not belong to this directive.\n" + directiveToString(directive, lvl)){}
-
-		};
-
-		class ServerConfigServerNameRegex : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Regex is not supported for directive 'server_name'");}
-		};
-
-		class ServerConfigSlashException : public std::runtime_error
-		{
-			public:
-				ServerConfigSlashException(std::string& directive)
-												: std::runtime_error(
-												"Directive \'" + directive +
-												"\' must start with \'/\'."){}
-		};
-
-		class	ServerConfigDupException : public std::runtime_error
-		{
-			public:
-				ServerConfigDupException(std::string& directive)
-												: std::runtime_error(
-												"Directive \'"+ directive +
-												"\' is duplicated."){}
-		};
-
-
 
 	private:
 		ServerConfig();

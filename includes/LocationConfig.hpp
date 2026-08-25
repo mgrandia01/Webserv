@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:44:51 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/21 21:08:57 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:46:40 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include <iostream>
 # include <map>
 # include <vector>
-# include "utils.hpp"
+# include "ParserUtils.hpp"
+# include "ParserExceptions.hpp"
 
 class LocationConfig
 {
@@ -44,32 +45,10 @@ class LocationConfig
 		const t_return& 							getReturn() const;
 		
 		//EXCEPTIONS
-		class LocationConfigMissedDirectiveException : public std::exception
+		class LocationConfigAllowMethodsException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Unknown location children directive.");}
-		};
-
-		class LocationConfigInsufArgsException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Insufficient arguments.");}
-		};
-
-		class LocationConfigInvalidMethodException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Invalid HTTP method.");}
-		};
-		
-		class LocationConfigDuplicatedMethodException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Duplicated HTTP method.");}
+				LocationConfigAllowMethodsException(std::string msg) : std::runtime_error(msg){}
 		};
 
 		class LocationConfigAutoindexException : public std::exception
@@ -77,38 +56,6 @@ class LocationConfig
 			public:
 				virtual const char *what() const throw()
 				{return ("Autoindex must be \"on\" or \"off\"");}
-		};
-
-		class LocationConfigUnisgnedNumberException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Location numeric values must be non-negative.");}
-		};
-
-		class LocationConfigRegex : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Regex is not supported for directive 'location'");}
-		};
-
-		class LocationConfigSlashException : public std::runtime_error
-		{
-			public:
-				LocationConfigSlashException(const std::string& directive)
-												: std::runtime_error(
-												"Directive \'" + directive +
-												"\' must start with \'/\'."){}
-		};
-
-		class	LocationConfigDupException : public std::runtime_error
-		{
-			public:
-				LocationConfigDupException(std::string& directive)
-												: std::runtime_error(
-												"Directive \'"+ directive +
-												"\' is duplicated."){}
 		};
 
 		class	LocationConfigCgiExtensionDupException : public std::runtime_error
@@ -123,9 +70,6 @@ class LocationConfig
 	private:
 		typedef void (LocationConfig::*locationDirFunc)(const t_directive&);
 	
-		//AQUI, falta:
-		//	check hasMethods
-
 		LocationConfig();
 		//LocationConfig(const LocationConfig& other);
 		//LocationConfig& operator=(const LocationConfig& rhs);

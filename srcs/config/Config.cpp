@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/21 21:02:06 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:48:02 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <set>
 #include "Config.hpp"
 #include "ServerConfig.hpp"
-#include "utils.hpp"
+#include "ParserUtils.hpp"
 
 /* ***************************** constr & destr ***************************** */
 
@@ -39,7 +39,7 @@ Config::Config(const char* file)
 	while (getline(fd, buff))
 		lines.push_back(buff);
 	if (lines.empty())
-		throw ConfigEmptyFileException();
+		throw ConfigFileException("File is empty.");
 
 	//TOKENS
 	std::vector<std::string>	tokens;
@@ -296,17 +296,17 @@ size_t  Config::findEnd(std::vector<std::string>& tokens, size_t size, size_t& n
 			return (n);
 		n++;
 	}
-	throw ConfigBlockException();
+	throw ConfigParserException("Mismatched braces.");
 }
 
 size_t	Config::findStart(std::vector<std::string>& tokens, size_t size, size_t& n)
 {
 	if (n < size && tokens[n] != "server")
-		throw ConfigMissedCharException();
+		throw ConfigParserException("Unexpected content between server blocks.");
 	else if (n >= size)
-		throw ConfigAnyServerException();
+		throw ConfigParserException("\'Server\' not found.");
 	else if (n + 1 >= size || tokens[n + 1] != "{")
-		throw ConfigBraceServerException();
+		throw ConfigParserException("\'Server\' not found.");
 	return (n);
 }
 
@@ -326,10 +326,10 @@ void	Config::checkExtension(const char* file)
 	size_t	extLen = strlen(ext);
 	
 	if (fileLen < extLen)
-		throw ConfigLenExtensionException();
+		throw ConfigFileException("Length cannot be less than the extension length.");
 
 	size_t	pos =  fileLen - extLen;
 	
 	if (strcmp(file + pos, ext) != 0)
-		throw ConfigExtensionException();
+		throw ConfigFileException("Extension does not match the expected extension.");
 }

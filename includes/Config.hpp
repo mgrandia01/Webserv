@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:25:51 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/21 17:59:46 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:47:45 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <vector>
 # include <exception>
 # include "ServerConfig.hpp"
-# include "utils.hpp"
+# include "ParserUtils.hpp"
 
 class Config {
 
@@ -30,55 +30,18 @@ class Config {
 		const std::vector<ServerConfig>& getServers() const;
 
 		//EXCEPTIONS
-		class ConfigLenExtensionException : public std::exception
+		class ConfigFileException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Length cannot be less than the extension length.");}
+				ConfigFileException(std::string msg) : std::runtime_error(msg){}
 		};
 
-		class ConfigExtensionException : public std::exception
+		class ConfigParserException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Extension does not match the expected extension.");}
+				ConfigParserException(std::string msg) : std::runtime_error(msg){}
 		};
 
-		class ConfigEmptyFileException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("File is empty.");}
-		};
-
-		class ConfigBlockException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Mismatched braces.");}
-		};
-
-		class ConfigAnyServerException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("\'Server\' not found.");}
-		};
-
-		class ConfigBraceServerException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Expected '{' after 'server'.");}
-		};
-
-		class ConfigMissedCharException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Invalid character between server blocks.");}
-		};
-		
 		class ConfigUnclosedQuoteException : public std::runtime_error
 		{
 			public:

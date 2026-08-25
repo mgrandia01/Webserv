@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.hpp                                          :+:      :+:    :+:   */
+/*   ParserUtils.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 13:06:43 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/19 21:04:28 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:46:19 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_HPP
-# define UTILS_HPP
+#ifndef PARSER_UTILS_HPP
+# define PARSER_UTILS_HPP
 
 # include <vector>
 # include <iostream>
