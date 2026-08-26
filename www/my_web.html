@@ -27,18 +27,20 @@
 
 		<section class="upload-section">
 			<h2>Add a photo</h2>
-		<!--	
-			<form>
-				<input [type="file"]{display: none}>
-				<button>Upload</button>
-			</form>
-		-->
-		<label for="photo-upload" class="upload-button">
-		+ Add images
-		</label>
+			<input type="file" id="photo-upload" accept="image/*">
 
-    		<input type="file" id="photo-upload" accept="image/*" multiple>
+			<button type="button" id="upload-button">
+				Add image
+			</button>
+			<!--<label for="photo-upload" class="upload-button">
+				Add image
+			</label>
+			
+			<input type="file" id="photo-upload" accept="images/*">
+			-->
+
 		</section>
+		<script src="/upload.js"></script>
 
 	</main>
 

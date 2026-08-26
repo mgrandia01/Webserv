@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/26 15:59:12 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/26 17:04:30 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,6 +351,10 @@ bool HttpHandler::isPathSafe(const std::string& path)
 
 Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location,  const ServerConfig& server)
 {
+	std::cout << "===== POST =====" << std::endl;
+std::cout << "Path: [" << request.path << "]" << std::endl;
+std::cout << "Body size: " << request.body.size() << std::endl;
+
 	(void)server;
 	//TODO server para codgo de error
 	//TODO cgi
