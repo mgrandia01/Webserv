@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
+/*
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
@@ -34,3 +34,4 @@ class RequestHandler
 		
 };
 #endif
+*/

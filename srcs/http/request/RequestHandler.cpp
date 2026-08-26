@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/*
 
 #include <iostream>
 #include <sstream>
@@ -60,3 +61,4 @@ response = Response(oss.str());*/
     // temporal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //response = Response("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nHello");
 }
+*/

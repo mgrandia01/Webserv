@@ -22,6 +22,7 @@
 class Config {
 
 	public:
+		
 		//CONSTRUCTORS
 		Config(const char* file);
 		~Config();

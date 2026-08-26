@@ -6,13 +6,14 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/05 15:24:29 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 15:51:22 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/10 14:44:31 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpSerializer.hpp"
-#include "http/HttpResponse.hpp"
+#include "Response.hpp"
 #include <sstream>
+#include <iostream> //TO DO Remove if not necessary
 
 std::string intToString(int n)
 {
@@ -21,7 +22,7 @@ std::string intToString(int n)
 	return ss.str();
 }
 
-std::string HttpSerializer::serialize(const HttpResponse& response)
+std::string HttpSerializer::serialize(const Response& response)
 {
 	std::string raw;
 

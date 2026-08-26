@@ -59,10 +59,10 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 	tkFuncMap["client_max_body_size"] = &ServerConfig::clientMaxBodySizeDirective;
 	tkFuncMap["root"] = &ServerConfig::rootDirective;
 	tkFuncMap["index"] = &ServerConfig::indexDirective;
-	tkFuncMap["client_header_timeout"] = &ServerConfig::clientHeaderTimeout;
-	tkFuncMap["client_body_timeout"] = &ServerConfig::clientBodyTimeout;
-	tkFuncMap["send_timeout"] = &ServerConfig::sendTimeout;
-	tkFuncMap["keepalive_timeout"] = &ServerConfig::keepAliveTimeout;
+	tkFuncMap["client_header_timeout"] = &ServerConfig::clientHeaderTimeOut;
+	tkFuncMap["client_body_timeout"] = &ServerConfig::clientBodyTimeOut;
+	tkFuncMap["send_timeout"] = &ServerConfig::sendTimeOut;
+	tkFuncMap["keepalive_timeout"] = &ServerConfig::keepAliveTimeOut;
 	tkFuncMap["location"] = &ServerConfig::locationDirective;
 	
 	for (std::vector<t_directive>::iterator it = tokensStruct.begin();

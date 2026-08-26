@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/07 11:19:49 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/12 11:34:54 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ RequestParser::RequestParser()
 	_requestLineParsed = false;
 	_contentLength = 0;
 	_chunked = false;
-	_clientMaxBodySize = 1024*1024;//TODO es un parcheeee
 	_server = NULL;
+	_request.isKeepAlive = true;
 }
 	
 RequestParser::RequestParser(const RequestParser &other)
@@ -85,6 +85,7 @@ bool RequestParser::isComplete() const
 void RequestParser::feed(const char *buffer, size_t bytes, const ServerConfig& server)
 {
 	_server = &server;
+
 	_stream.append(buffer, bytes);
 
 	if (_state == PARSING_HEADERS)
@@ -93,3 +94,4 @@ void RequestParser::feed(const char *buffer, size_t bytes, const ServerConfig& s
 	if (_state == PARSING_BODY)
 		parseBody();
 }
+

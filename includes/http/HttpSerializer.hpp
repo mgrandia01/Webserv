@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/05 15:25:46 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/05 15:33:00 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/10 14:43:11 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 #define HTTPSERIALIZER_HPP
 
 #include <string>
-#include "HttpResponse.hpp"
+#include "Response.hpp"
 
 class HttpSerializer
 {
 	public:
-		static std::string serialize(const HttpResponse& response);
+		static std::string serialize(const Response& response);
 };
 
 #endif

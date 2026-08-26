@@ -6,27 +6,40 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/29 07:57:57 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/07/29 15:58:29 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/25 10:20:55 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
 #include "http/HttpStatus.hpp" //TODO 
-
+#include "ServerConfig.hpp"
+#include "LocationConfig.hpp"
 
 #include <sstream>
-void HttpHandler::setHeaders(HttpResponse& response, const std::string& contentType)
+#include <vector>
+#include <iostream>
+
+const LocationConfig* HttpHandler::findLocation(const HttpRequest& request, const ServerConfig& server) const
 {
-	response.headers["Content-Type"] = contentType;
+	const std::vector<LocationConfig>& locations = server.getLocations();
+	const LocationConfig* bestMatch = NULL;
+	std::size_t bestLength = 0;
 
-	std::stringstream ss;
-	ss << response.body.size();
-	response.headers["Content-Length"] = ss.str();
-
-	// TODO
-	// response.headers["Date"] = ...
-	// response.headers["Server"] = ...
-	// response.headers["Connection"] = ...
+	for (std::vector<LocationConfig>::const_iterator it = locations.begin(); it != locations.end();++it)
+	{
+		const LocationConfig& location = *it;
+		const std::string& locationUri = location.getUri();
+		
+		if (request.path.compare(0, locationUri.length(), locationUri) == 0)
+		{
+			if (locationUri.length() > bestLength)
+			{
+				bestMatch = &location;
+				bestLength = locationUri.length();
+			}
+		}
+	}	
+	return bestMatch;
 }
 
 bool HttpHandler::saveFile(const std::string& path, const std::string& buffer)
@@ -35,6 +48,7 @@ bool HttpHandler::saveFile(const std::string& path, const std::string& buffer)
 	if (fd == -1)
 		return false;
 	ssize_t bytesWritten = write(fd, buffer.c_str(), buffer.size());
+
 	close(fd);
 
 	if (bytesWritten < 0)
