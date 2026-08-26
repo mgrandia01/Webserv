@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Intra Gallery</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+	<header>
+		<h1>Intra Gallery</h1>
+			<p>Our little collection of memories.</p>
+	</header>
+
+	<main class="my_web">
+
+		<section>
+			<h2>Gallery</h2>
+
+			
+			<div class="gallery-section">
+				{{IMAGES}}
+
+			</div>
+		</section>
+
+		<section class="upload-section">
+			<h2>Add a photo</h2>
+		<!--	
+			<form>
+				<input [type="file"]{display: none}>
+				<button>Upload</button>
+			</form>
+		-->
+		<label for="photo-upload" class="upload-button">
+		+ Add images
+		</label>
+
+    		<input type="file" id="photo-upload" accept="image/*" multiple>
+		</section>
+
+	</main>
+
+	<footer>
+		<p>Webserv 42</p>
+	</footer>
+
+</body>
+
+</html>

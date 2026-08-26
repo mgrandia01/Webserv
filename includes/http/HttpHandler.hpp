@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 10:32:15 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/26 15:36:09 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,15 @@ class HttpHandler
 		Response handlePost(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server);
 		Response handleDelete(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server);
 
+		bool isImage(const std::string& filename);
 		//HttpHandlerUtils.cpp
 		std::string getContentType(const std::string& path);
 		bool readFile(int fd, std::string& body);
 		bool saveFile(const std::string& path, const std::string& buffer);
 		const LocationConfig* findLocation(const HttpRequest& request, const ServerConfig& server) const;
-
+		std::string createGalleryHtml(const std::string& uploadPath);
 };
+
 
 
 #endif

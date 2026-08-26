@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 12:29:22 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/26 15:59:12 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,26 @@
 #include <sstream>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 
+//FIXME web.cpp
+void replaceAll(std::string& str, const std::string& from, const std::string& to)
+{
+	size_t position = 0;
 
+	while (position != std::string::npos)
+	{
+		position = str.find(from, position);
+
+		if (position == std::string::npos)
+			break;
+
+		str.replace(position, from.length(), to);
+		position += to.length();
+	}
+}
+
+//FIXME utils.cpp
 Response HttpHandler::serveFile(const std::string& fullPath)
 {
 	Response response;
@@ -57,6 +75,7 @@ Response HttpHandler::serveFile(const std::string& fullPath)
 	return response;
 }
 
+//FIXME utils.cpp
 Response HttpHandler::serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath, const ServerConfig& server)
 {
 	const std::vector<std::string>& indexes = location.getIndex();
@@ -83,38 +102,45 @@ Response HttpHandler::serveDirectory(const std::string& fullPath, const Location
 	return Response::createError(FORBIDDEN, server);
 }
 
+//FIXME utils.cpp
 std::string HttpHandler::createAutoindexHtml(const std::string& requestPath, const std::vector<std::string>& entries)
 {
-	//TODO ara mateix es una mica cutreeee es veu al fer:
-	//http://localhost:8080/downloads
+	std::ifstream file("www/autoindex.html");
+
+	if(!file.is_open())
+		return "";
+	std::string html;
+	std::string line;
+
+	while (std::getline(file, line))
+	{
+		html += line;
+		html += "\n";
+	}
+	file.close();
+
+	std::string entriesHtml;
 	std::string path = requestPath;
 
 	if (path[path.size() - 1] != '/')
 		path += '/';
-	std::string html;
-
-	html += "<html>\n";
-	html += "<head><title>Index of " + requestPath + "</title></head>\n";
-	html += "<body>\n";
-	html += "<h1>Index of " + requestPath + "</h1>\n";
-	html += "<ul>\n";
 
 	for (size_t i = 0; i < entries.size(); i++)
 	{
 		std::string href = path + entries[i];
 		
-			html += "<li><a href=\"" + href + "\">";
-			html += entries[i];
-			html += "</a></li>\n";
+		entriesHtml += "<li><a href=\"" + href + "\">";
+		entriesHtml += entries[i];
+		entriesHtml += "</a></li>\n";
 	}
 
-	html += "</ul>\n";
-	html += "</body>\n";
-	html += "</html>\n";
+	replaceAll(html, "{{PATH}}", requestPath);
+	replaceAll(html, "{{ENTRIES}}", entriesHtml);
 
 	return html;
 }
 
+//FIXME utils.cpp
 Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::string& requestPath, const ServerConfig& server)
 {
 	DIR* dir = opendir(fullPath.c_str());
@@ -156,6 +182,7 @@ Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::
 	return response;
 }
 
+//FIXME utils.cpp
 bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& location) const
 {
 
@@ -175,6 +202,50 @@ bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& locati
 		return (true);
 
 	return (false);
+}
+
+#include <dirent.h>
+
+bool HttpHandler::isImage(const std::string& filename)
+{
+	size_t pos = filename.find_last_of('.');
+
+	if (pos == std::string::npos)
+		return false;
+
+	std::string extension = filename.substr(pos + 1);
+
+	return extension == "jpg" || extension == "jpeg" || extension == "png" || extension == "gif" || extension == "webp";
+}
+//FIXME web.cpp
+std::string HttpHandler::createGalleryHtml(const std::string& uploadPath)
+{
+	DIR* dir = opendir(uploadPath.c_str());
+
+	if (!dir)
+		return "";
+
+	std::string html;
+	struct dirent* entry;
+	
+	while ((entry = readdir(dir)) != NULL)
+	{
+		std::string name = entry->d_name;
+
+		if (name == "." || name == "..")
+			continue;
+		if(!isImage(name))
+			continue;
+
+		html += "<div class=\"photo\">\n";
+		html += "    <img src=\"/uploads/" + name + "\" alt=\"" + name + "\">\n";
+		html += "    <p>" + name + "</p>\n";
+		html += "</div>\n";
+	}
+	
+	closedir(dir);
+	
+	return html;
 }
 
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
@@ -197,8 +268,39 @@ Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig
 		//devoler response
 	
 	}
+//TODO sacarlo a una externa
 
-	std::cout << "eeeeeeeeeeeestic foraaaaaaaaaa" <<std::endl;
+	if(request.path == "/my_web.html")
+	{
+		std::ifstream file("www/my_web.html");
+
+		if (!file.is_open())
+		return Response::createError(INTERNAL_SERVER_ERROR, server);
+
+		std::string html;
+		std::string line;
+
+		while (std::getline(file, line))
+		{
+			html += line;
+			html += "\n";
+		}
+
+		file.close();
+
+		std::string imagesHtml = createGalleryHtml("./www/uploads");
+
+		replaceAll(html, "{{IMAGES}}", imagesHtml);
+		
+		Response response;
+		response.statusCode = 200;
+		response.reasonPhrase = "OK";
+		response.body = html;
+		response.setHeaders("text/html");
+
+		return response;
+	}
+
 	std::string root = location.getRoot(); 
 	std::string fullPath = root + request.path;
 	

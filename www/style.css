@@ -1,7 +1,71 @@
+/* ========================================
+   ESTILOS GENERALES
+   ======================================== */
+
 body {
-    background-color: lightblue;
+	background-color: #f3efe6;
+	color: #3d3a34;
+	font-family: Georgia, serif;
+	margin: 0;
+	padding: 10px;
+}
+
+main{
+	max-width: 800px;
+	margin: 50px auto;
+
 }
 
 h1 {
-    color: red;
+	font-size: 48px;
+	font-weight: normal;
+	margin-bottom: 40px;
 }
+
+
+footer {
+	text-align: right;
+	padding: 30px 0;
+	font-size: 12px;
+	opacity: 0.7;
+}
+/* ========================================
+   AUTOINDEX
+   ======================================== */
+
+.autoindex .file-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.autoindex .file-list li {
+	border-bottom: 1px solid #d8d1c4;
+	padding: 18px 0;
+}
+
+.autoindex .file-list a {
+	color: inherit;
+	text-decoration: none;
+	font-size: 20px;
+}
+
+.autoindex .file-list a:hover {
+	opacity: 0.6;
+	padding-left:10px;
+}
+/* ========================================
+   MY WEB / GALERÍA
+   ======================================== */
+.gallery-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.photo img {
+    width: 100%;
+    display: block;
+}
+
+
