@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/25 20:48:25 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/26 20:07:25 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,10 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 	tkFuncMap["client_max_body_size"] = &ServerConfig::clientMaxBodySizeDirective;
 	tkFuncMap["root"] = &ServerConfig::rootDirective;
 	tkFuncMap["index"] = &ServerConfig::indexDirective;
-	tkFuncMap["client_header_timeout"] = &ServerConfig::clientHeaderTimeOut;
-	tkFuncMap["client_body_timeout"] = &ServerConfig::clientBodyTimeOut;
-	tkFuncMap["send_timeout"] = &ServerConfig::sendTimeOut;
-	tkFuncMap["keepalive_timeout"] = &ServerConfig::keepAliveTimeOut;
+	tkFuncMap["client_header_timeout"] = &ServerConfig::clientHeaderTimeout;
+	tkFuncMap["client_body_timeout"] = &ServerConfig::clientBodyTimeout;
+	tkFuncMap["send_timeout"] = &ServerConfig::sendTimeout;
+	tkFuncMap["keepalive_timeout"] = &ServerConfig::keepAliveTimeout;
 	tkFuncMap["location"] = &ServerConfig::locationDirective;
 	
 	for (std::vector<t_directive>::iterator it = tokensStruct.begin();
