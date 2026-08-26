@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/07 13:36:48 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:47:27 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 # include <vector>
 # include <exception>
 # include "LocationConfig.hpp"
-# include "structs.hpp"
+# include "ParserUtils.hpp"
+# include "ParserExceptions.hpp"
 
 class ServerConfig
 {
@@ -42,67 +43,21 @@ class ServerConfig
 		const std::vector<LocationConfig>&	getLocations() const;
 
 		//EXCEPTIONS
-		class ServerConfigSemicolonPosException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Semicolon is at wrong position.");}
-		};
 
-		class ServerConfigNotSemicolonException : public std::exception
+		class ServerConfigIpException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("There is not semicolon.");}
-		};
-
-		class ServerConfigMissedDirectiveException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Unknown directive.");}
-		};
-
-		class ServerConfigInsufArgsException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Insufficient arguments.");}
-		};
-
-		class ServerConfigErrorCodeOutLimitsException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("A error code is out of limits.");}
-		};
-		
-		class ServerConfigUnisgnedNumberException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Numeric values must be non-negative.");}
-		};
-
-		class ServerConfigInvalidUnitException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Invalid unit suffix.");}
-		};
-
-		class ServerConfigRootException : public std::exception
-		{
-			public:
-				virtual const char *what() const throw()
-				{return ("Location has no \'root\' and server does not provide a default \'root\'.");}
+				ServerConfigIpException(std::string msg) : std::runtime_error(msg){}
 		};
 	
-		class ServerConfigIndexException : public std::exception
+		class ServerConfigProvideDirectiveException : public std::runtime_error
 		{
 			public:
-				virtual const char *what() const throw()
-				{return ("Location has no \'index\' and server does not provide a default \'index\'.");}
+				ServerConfigProvideDirectiveException(std::string directive)
+										: std::runtime_error(
+										"Location has no \'" + directive +
+										"\' and server does not provide a default \'" + directive +
+										"\'."){}
 		};
 
 	private:
@@ -135,11 +90,12 @@ class ServerConfig
 		void	rootDirective(const t_directive& tk);
 		void	indexDirective(const t_directive& tk);
 		void	locationDirective(const t_directive& tk);
-		void	clientHeaderTimeOut(const t_directive& tk);
-		void	clientBodyTimeOut(const t_directive& tk);
-		void	sendTimeOut(const t_directive& tk);
-		void	keepAliveTimeOut(const t_directive& tk);
+		void	clientHeaderTimeout(const t_directive& tk);
+		void	clientBodyTimeout(const t_directive& tk);
+		void	sendTimeout(const t_directive& tk);
+		void	keepAliveTimeout(const t_directive& tk);
 
+		void	checkIp(std::string ip);
 		void	timeoutParser(int& target, const t_directive& tk);
 		void	resolveConfigDefaults();
 };

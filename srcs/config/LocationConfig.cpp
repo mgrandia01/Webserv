@@ -6,16 +6,27 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:45:44 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/06 19:54:18 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 19:44:13 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <stdlib.h>
-#include "structs.hpp"
+#include <set>
 #include "LocationConfig.hpp"
 
-LocationConfig::LocationConfig(){}
+LocationConfig::LocationConfig()
+{
+	_uri = "/";
+	_allowMethods[GET] = false;
+	_allowMethods[DELETE] = false;
+	_allowMethods[POST] = false;
+	_root = "/";
+	_index.push_back("index.html");
+	_autoindex = false;
+	_uploadStore = "/upload";
+	_return.isEnabled = false;
+}
 
 LocationConfig::LocationConfig(const t_directive& tk)
 {
@@ -29,9 +40,10 @@ LocationConfig::LocationConfig(const t_directive& tk)
 	
 	std::vector<t_directive>	childrenStruct = tk.children;
 	std::map<std::string, locationDirFunc>	childFuncMap;
+	std::set<std::string>					isNew;
 
 	childFuncMap["allow_methods"] = &LocationConfig::allowMethodsDirective;
-	childFuncMap["root"] = &LocationConfig::rootDirective;//How heritate server root?
+	childFuncMap["root"] = &LocationConfig::rootDirective;
 	childFuncMap["index"] = &LocationConfig::indexDirective;
 	childFuncMap["autoindex"] = &LocationConfig::autoindexDirective;
 	childFuncMap["upload_store"] = &LocationConfig::uploadStoreDirective;
@@ -45,11 +57,12 @@ LocationConfig::LocationConfig(const t_directive& tk)
 
 		func = childFuncMap.find(it->name);
 		if (func == childFuncMap.end())
-		{
-			std::cout << it->name << std::endl; 
-			throw LocationConfigMissedDirectiveException();
-		}
+			throw UnknowDirectiveExc("Location", it->name);
 		(this->*(func->second))(*it);
+
+		if (it->name != "cgi")
+			if (!isNew.insert(it->name).second)
+				throw DupExc("Location", it->name);
 	}
 }
 
@@ -128,6 +141,9 @@ void	LocationConfig::setIndex(const std::vector<std::string>& serverIndex)
 
 const std::string&	LocationConfig::getUri() const {return (_uri);}
 
+bool	LocationConfig::getAllowMethodsConfigured() const
+{return (getMethodGet() || getMethodPost() || getMethodDelete());}
+
 const bool&	LocationConfig::getMethodGet() const {return (_allowMethods[GET]);}
 
 const bool&	LocationConfig::getMethodPost() const {return (_allowMethods[POST]);}
@@ -153,7 +169,9 @@ const t_return&	LocationConfig::getReturn() const {return (_return);}
 void	LocationConfig::uriDirective(const t_directive& tk)
 {
 	if (tk.args.size() < 1)
-		throw LocationConfigInsufArgsException();
+		throw ArgsExc("Location", tk.name, "=", 1, tk.args);
+	else if (tk.args[0] == "~" || tk.args[0] == "~*" || tk.args[0] == "~/")
+		throw RegexExc("Location", tk.name);
 
 	_uri = tk.args[0];
 }
@@ -166,20 +184,14 @@ void	LocationConfig::allowMethodsDirective(const t_directive& child)
 	methodsMap["POST"] = POST;
 	methodsMap["DELETE"] = DELETE;
 	
-	for (size_t j = 0; j < child.args.size(); j++)//Este itera los elementos del vector en orden ascendente
+	for (size_t j = 0; j < child.args.size(); j++)
 	{
-		//Este busca en el map que combina Xvar-Yvar, busca 'j' en Xvar.
-		//Y devuelve en que posicion lo encuentr.
-		//Ejem.: "GET" = 0, "POST" = 1 y "DELETE" = 2 dentro del mapa,
-		//no tiene  que seguir el orden del enum (podria ser , "DELETE" = 0, GET" = 1" y "POST" = 2
-		//pero si que de combinen adecuamente
-		//Me dice que el 'j' es el match del mapa numero N
 		std::map<std::string, e_methods>::iterator	method = methodsMap.find(child.args[j]);
 
 		if (method == methodsMap.end())
-			throw LocationConfigInvalidMethodException();
+			throw LocationConfigAllowMethodsException("Invalid HTTP method.");
 		if (_allowMethods[method->second] == true)
-			throw LocationConfigDuplicatedMethodException();
+			throw LocationConfigAllowMethodsException("Duplicated HTTP method.");
 		_allowMethods[method->second] = true;
 	}
 }
@@ -192,7 +204,11 @@ void	LocationConfig::indexDirective(const t_directive& child)
 void	LocationConfig::rootDirective(const t_directive& child)
 {
 	if (child.args.size() < 1)
-		throw LocationConfigInsufArgsException(); 
+		throw ArgsExc("Location", child.name, "=", 1, child.args); 
+	else if (child.args[0].size() == 0)
+		throw EmptyStringExc("Location", child.name);
+	else if (child.args[0].compare(0, 1, "/") != 0 && child.args[0].compare(0, 2, "./") != 0)
+		throw SlashExc("Location", child.name);
 
 	_root = child.args[0];
 }
@@ -200,7 +216,7 @@ void	LocationConfig::rootDirective(const t_directive& child)
 void	LocationConfig::autoindexDirective(const t_directive& child)
 {
 	if (child.args.size() < 1)
-		throw LocationConfigInsufArgsException();
+		throw ArgsExc("Location", child.name, "=", 1, child.args);
 
 	if (child.args[0] == "on" || child.args[0] == "ON")
 		_autoindex = true;
@@ -213,7 +229,9 @@ void	LocationConfig::autoindexDirective(const t_directive& child)
 void	LocationConfig::uploadStoreDirective(const t_directive& child)
 {
 	if (child.args.size() < 1)
-		throw LocationConfigInsufArgsException();
+		throw ArgsExc("Location", child.name, "=", 1, child.args);
+	else if (child.args[0].compare(0, 1, "/") != 0 && child.args[0].compare(0, 2, "./") != 0)
+		throw SlashExc("Location", child.name);
 	
 	_uploadStore = child.args[0];
 }
@@ -221,7 +239,12 @@ void	LocationConfig::uploadStoreDirective(const t_directive& child)
 void	LocationConfig::cgiDirective(const t_directive& child)
 {
 	if (child.args.size() != 2)
-		throw LocationConfigInsufArgsException();
+		throw ArgsExc("Location", child.name, "=", 2, child.args);
+
+	std::map<std::string, std::string>::iterator	it;
+	it = _cgi.find(child.args[0]);
+	if (it != _cgi.end())
+		throw  LocationConfigCgiExtensionDupException(child.args[0]);
 
 	_cgi[child.args[0]] = child.args[1];
 }
@@ -229,7 +252,7 @@ void	LocationConfig::cgiDirective(const t_directive& child)
 void	LocationConfig::returnDirective(const t_directive& child)
 {
 	if (child.args.size() != 2)
-		throw LocationConfigInsufArgsException();
+		throw ArgsExc("Location", child.name, "=", 2, child.args);
 
 	_return.isEnabled = true;
 
@@ -238,7 +261,7 @@ void	LocationConfig::returnDirective(const t_directive& child)
 	long		value = std::strtol(tmp.c_str(), &end, 10);
 
 	if (*end != '\0')
-		throw LocationConfigUnisgnedNumberException();
+		throw NumberExc("Location", child.name, child.args[0]);
 	_return.code = value;
 
 	_return.target = child.args[1];

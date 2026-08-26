@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/07 13:36:28 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/25 20:48:25 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,44 @@
 #include <map>
 #include <cstring>
 #include <stdlib.h>
+#include <set>
 #include "Config.hpp"
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
+#include "ParserUtils.hpp"
 
 /* ***************************** constr & destr ***************************** */
 
-ServerConfig::ServerConfig(){}
+ServerConfig::ServerConfig():
+							_host("0.0.0.0"),
+							_port(0),
+							_defaultServer(false),
+							_serverName(),
+							_clientMaxBodySize(1048576),
+							_root(""),
+							_index(),
+							_clientHeaderTimeout(60 * 1000),
+							_clientBodyTimeout(60 * 1000),
+							_sendTimeout(60 * 1000 ),
+							_keepAliveTimeout(75 * 1000),
+							_locations(){}
+
 
 ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 										_host("0.0.0.0"),
 										_port(0),
 										_defaultServer(false),
+										_serverName(),
 										_clientMaxBodySize(1048576),
+										_root(""),
+										_index(),
 										_clientHeaderTimeout(60 * 1000),
 										_clientBodyTimeout(60 * 1000),
 										_sendTimeout(60 * 1000 ),
 										_keepAliveTimeout(75 * 1000)
 {
 	std::map<std::string, directiveFunc>	tkFuncMap;
+	std::set<std::string>					isNew;
 
 	tkFuncMap["listen"] = &ServerConfig::listenDirective;
 	tkFuncMap["server_name"] = &ServerConfig::serverNameDirective;
@@ -53,12 +72,22 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 		
 		func = tkFuncMap.find(it->name);
 		if (func == tkFuncMap.end())
-			throw ServerConfigMissedDirectiveException();
+			//throw ServerConfigDirectiveUnknowException(it->name);//quitar este
+			throw UnknowDirectiveExc("Server", it->name);
 		(this->*(func->second))(*it);
+
+		if (it->name != "location" && it->name != "error_page")
+			if (!isNew.insert(it->name).second)
+				throw DupExc("Server", it->name);
 	}
 	
 	resolveConfigDefaults();
 }
+
+
+//ServerConfig::ServerConfig(const ServerConfig& src){}
+
+//ServerConfig::ServerConfig& operator=(const ServerConfig& rhs){}
 
 ServerConfig::~ServerConfig(){}
 
@@ -66,12 +95,10 @@ ServerConfig::~ServerConfig(){}
 
 std::ostream& operator<<(std::ostream &out, const ServerConfig& server)
 {
-	//std::right << std::setw(10)
-	//std::left	
 	std::cout << "\n\tSERVER" << std::endl;
 
 	out << "\tIP: " << server.getHost() << std::endl;
-	out << "\tPort:" << server.getPort() << std::endl;
+	out << "\tPort: " << server.getPort() << std::endl;
 	
 	if (server.getDefaultServer())
 		out << "\tDefault: true" << std::endl;
@@ -150,13 +177,62 @@ const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_
 
 /* ************************* member funcs / methods ************************* */
 
-void	ServerConfig::listenDirective(const t_directive& tk)//atoi?
+void	ServerConfig::checkIp(std::string ip)
+{
+	size_t	parts = 0;
+	size_t	digits = 0;
+	size_t	num = 0;
+	size_t	i = 0;
+	bool	availableDot = false;
+
+	while (i < ip.size())
+	{
+
+		if (std::isdigit(static_cast<unsigned char>(ip[i])))
+		{
+			availableDot = true;
+			digits = 0;
+			while (std::isdigit(static_cast<unsigned char>(ip[i + digits])))
+				digits++;
+			if (digits > 3)
+				throw ServerConfigIpException("An IP address contains a number with more than 3 digits");
+			num = atoi(ip.c_str() + i);
+			if (num > 255)
+				throw ServerConfigIpException("An IP address contains a number outside the range 0-255.");
+			i += digits;
+		}
+		else if (ip[i] == '.')
+		{
+			if (i == 0)
+				throw ServerConfigIpException("An IP address starts with '.'");
+			else if (availableDot == false)
+				throw ServerConfigIpException("An IP address contains consecutive '.' characters.");
+			else if (i == ip.size() - 1)
+				throw ServerConfigIpException("An IP address ends with '.'");
+			availableDot = false;
+			parts++;
+			i++;
+		}
+		else
+			throw ServerConfigIpException("An IP address contains an invalid character.");
+	}
+	if (parts != 3)
+		throw ServerConfigIpException("An IP address must have 4 parts.");
+
+	_host = ip;
+}
+
+void	ServerConfig::listenDirective(const t_directive& tk)
 {
 	if (tk.args.size() > 2)
-		throw ServerConfigInsufArgsException();
+		throw ArgsExc("Server", tk.name, "<=", 2, tk.args);
+	else if (tk.children.size() != 0)
+		throw WrongChildrenExc(tk, 0);
 
 	for (size_t j = 0; j < tk.args.size(); j++)
 	{
+		std::string	token = tk.args[j];
+	
 		if (tk.args[j] == "default_server")
 			_defaultServer = true;
 		else
@@ -169,22 +245,26 @@ void	ServerConfig::listenDirective(const t_directive& tk)//atoi?
 				if (tk.args[j] == "localhost")
 					_host = "127.0.0.1";
 				else
-					_host = tk.args[j].substr(0, pos);
+					checkIp(tk.args[j].substr(0, pos));
 				tmp = tk.args[j].substr(pos + 1);
 				_port = std::strtol(tmp.c_str(), &end, 10);
 			}
 			else
 				_port = std::strtol(tk.args[j].c_str(), &end, 10);
 			if (*end != '\0')
-				throw ServerConfigUnisgnedNumberException();
+				throw NumberExc("Server", tk.name, token);
 		}
 	}
 }
 
 void	ServerConfig::serverNameDirective(const t_directive& tk)
-{	
+{
 	if (tk.args.size() < 1)
-		throw ServerConfigInsufArgsException();
+		throw ArgsExc("Server", tk.name, ">=", 1, tk.args);
+
+	for (size_t j = 0; j < tk.args.size(); j++)
+		if (tk.args[j] == "~" || tk.args[j] == "~*" || tk.args[j] == "~/")
+			throw RegexExc("Server", tk.name);
 
 	_serverName = tk.args;
 }
@@ -192,22 +272,27 @@ void	ServerConfig::serverNameDirective(const t_directive& tk)
 void	ServerConfig::errorPageDirective(const t_directive& tk)
 {
 	t_errorPage	nd;
+	long	minCode = 300;
+	long	maxCode = 599;
 
 	if (tk.args.size() < 2)
-		throw ServerConfigInsufArgsException();
+		throw ArgsExc("Server", tk.name, ">=", 2, tk.args);
+	else if (tk.children.size() != 0)
+		throw WrongChildrenExc(tk, 0);
 
 	nd.errorFile = tk.args.back();
 
 	for (size_t j = 0; j < tk.args.size() - 1; j++)
 	{
+		std::string	token = tk.args[j];
 		char	*end;
 		std::string	tmp = tk.args[j];
 		long	value = std::strtol(tmp.c_str(), &end, 10);
 		
 		if (*end != '\0')
-			throw ServerConfigUnisgnedNumberException();
-		else if (value < 300 || value > 599)
-			throw ServerConfigErrorCodeOutLimitsException();
+			throw NumberExc("Server", tk.name, token);
+		else if (value < minCode || value > maxCode)
+			throw CodeOutLimitsExc("Server", tk.name, tk.args[j], minCode, maxCode);
 		nd.codes.push_back(value);
 	}
 
@@ -217,7 +302,9 @@ void	ServerConfig::errorPageDirective(const t_directive& tk)
 void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
 {
 	if (tk.args.size() != 1)
-		throw ServerConfigInsufArgsException();
+		throw ArgsExc("Server", tk.name, "=", 1, tk.args);
+	else if (tk.children.size() != 0)
+		throw WrongChildrenExc(tk, 0);
 	
 	char		*end;
 	std::string	tmp = tk.args[0];
@@ -231,13 +318,20 @@ void	ServerConfig::clientMaxBodySizeDirective(const t_directive& tk)
 	else if (unit == "M")
 		_clientMaxBodySize = value * 1048576;
 	else
-		throw ServerConfigInvalidUnitException();
+		throw InvalidUnitException(tk.name, tmp, unit);
 }
 
 void	ServerConfig::rootDirective(const t_directive& tk)
 {
+
 	if (tk.args.size() != 1)
-		throw ServerConfigInsufArgsException();
+		throw ArgsExc("Server", tk.name, "=", 1, tk.args);
+	else if (tk.children.size() != 0)
+		throw WrongChildrenExc(tk, 0);
+	else if (tk.args[0].size() == 0)
+		throw EmptyStringExc("Server", tk.name);
+	else if (tk.args[0].compare(0, 1, "/") != 0 && tk.args[0].compare(0, 2, "./") != 0)
+		throw SlashExc("Server", tk.name);
 
 	_root = tk.args[0];
 }
@@ -250,8 +344,9 @@ void	ServerConfig::indexDirective(const t_directive& tk)
 void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 {
 	if (tk.args.size() != 1)
-		throw ServerConfigInsufArgsException();
-
+		throw ArgsExc("Server", tk.name, "=", 1, tk.args);
+	else if (tk.children.size() != 0)
+		throw WrongChildrenExc(tk, 0);
 	char		*end;
 	std::string	tmp = tk.args[0];
 	long		value = std::strtol(tmp.c_str(), &end, 10);
@@ -266,17 +361,19 @@ void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 		target = value * 1000;
 	else if (unit == "m")
 		target = value * 60 * 1000;
+	else if (value == 0 && *end != '\0')
+		throw NumberExc("Server", tk.name, tk.args[0]);
 	else
-		throw ServerConfigInvalidUnitException();
+		throw InvalidUnitException(tk.name, tmp, unit);
 }
 
-void	ServerConfig::clientHeaderTimeOut(const t_directive& tk){timeoutParser(_clientHeaderTimeout, tk);}
+void	ServerConfig::clientHeaderTimeout(const t_directive& tk){timeoutParser(_clientHeaderTimeout, tk);}
 
-void	ServerConfig::clientBodyTimeOut(const t_directive& tk){timeoutParser(_clientBodyTimeout, tk);}
+void	ServerConfig::clientBodyTimeout(const t_directive& tk){timeoutParser(_clientBodyTimeout, tk);}
 
-void	ServerConfig::sendTimeOut(const t_directive& tk){timeoutParser(_sendTimeout, tk);}
+void	ServerConfig::sendTimeout(const t_directive& tk){timeoutParser(_sendTimeout, tk);}
 
-void	ServerConfig::keepAliveTimeOut(const t_directive& tk){timeoutParser(_keepAliveTimeout, tk);}
+void	ServerConfig::keepAliveTimeout(const t_directive& tk){timeoutParser(_keepAliveTimeout, tk);}
 
 void	ServerConfig::locationDirective(const t_directive& tk)
 {
@@ -297,7 +394,7 @@ void	ServerConfig::resolveConfigDefaults()
 		if (_root.empty())
 		{
 			if (locationRoot.empty() && (returnDir == false || locationCgi.size() > 0))
-				throw ServerConfigRootException();
+				throw ServerConfigProvideDirectiveException("root");
 		}
 		else
 			if (locationRoot.empty() && returnDir == false)
@@ -307,10 +404,11 @@ void	ServerConfig::resolveConfigDefaults()
 		if (_index.size() == 0)
 		{
 			if (locationIndex.size() == 0 && returnDir == false)
-				throw ServerConfigIndexException();
+				throw ServerConfigProvideDirectiveException("index");
 		}
 		else
 			if (locationIndex.size() == 0 && returnDir == false)
 				LocationIt->setIndex(_index);
 	}
 }
+
