@@ -1,5 +1,6 @@
 const input = document.getElementById("photo-upload");
 const button = document.getElementById("upload-button");
+const deleteButtons = document.querySelectorAll(".delete-photo");
 
 button.addEventListener("click", function()
 {
@@ -24,4 +25,23 @@ button.addEventListener("click", function()
     {
         console.log("ERROR:", error);
     });
+});
+
+deleteButtons.forEach(button => {
+
+	button.addEventListener("click", async () => {
+
+	const imageName = button.dataset.image;
+
+	const response = await fetch(`/uploads/${imageName}`, {
+		method: "DELETE"
+	});
+
+	if (response.ok) {
+		button.parentElement.remove();
+	} else {
+		console.log("Error deleting image");
+	}
+	});
+
 });

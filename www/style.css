@@ -70,4 +70,71 @@ footer {
 /* ========================================
    MY WEB / GALERÍA
    ======================================== */
+#upload-button {
+    padding: 10px 18px;
 
+    border: none;
+    border-radius: 8px;
+
+    background: #222;
+    color: white;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease,
+                transform 0.2s ease;
+}
+
+#upload-button:hover {
+    background: #000;
+    transform: translateY(-1px);
+}
+
+#upload-button:active {
+    transform: translateY(0);
+}
+
+
+.photo {
+    position: relative;
+}
+
+.delete-photo {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    width: 28px;
+    height: 28px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    opacity: 0;
+    transition: 0.2s ease;
+}
+
+.photo:hover .delete-photo {
+    opacity: 1;
+}
+
+.delete-photo:hover {
+    background: rgba(200, 40, 40, 0.9);
+    transform: scale(1.1);
+}

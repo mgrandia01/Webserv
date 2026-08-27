@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/26 17:04:30 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/27 15:12:04 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,6 +240,7 @@ std::string HttpHandler::createGalleryHtml(const std::string& uploadPath)
 		html += "<div class=\"photo\">\n";
 		html += "    <img src=\"/uploads/" + name + "\" alt=\"" + name + "\">\n";
 		html += "    <p>" + name + "</p>\n";
+		html += "    <button class=\"delete-photo\" data-image=\"" + name + "\">x</button>\n";//FIXME
 		html += "</div>\n";
 	}
 	
