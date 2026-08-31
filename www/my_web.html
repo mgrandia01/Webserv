@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Intra Gallery</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+
+	<main class="my_web">
+
+	<h1>Intra Gallery</h1>
+		<section>
+			<h2>Gallery</h2>
+
+			
+			<div class="gallery-section">
+				{{IMAGES}}
+
+
+			</div>
+		</section>
+
+		<section class="upload-section">
+			<h2>Add a photo</h2>
+			<input type="file" id="photo-upload" accept="image/*">
+
+			<label type="button" id="upload-button">
+				Add image
+			</label>
+
+		</section>
+		<script src="/upload.js"></script>
+
+	</main>
+
+	<footer>
+		<p>Webserv 42</p>
+	</footer>
+
+</body>
+
+</html>
