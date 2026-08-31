@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 12:13:43 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/24 11:52:31 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/31 11:32:06 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ HttpStatusInfo getStatusInfo(int statusCode)
 			return HttpStatusInfo("Payload Too Large", "413 Payload Too Large");
 		case 500:
 			return HttpStatusInfo("Internal Server Error", "500 Internal Server Error");
+		case 501:
+			return HttpStatusInfo("Not Implemented", "501 Not Implemented");
 		default:
 			return HttpStatusInfo("Internal Server Error", "500 Internal Server Error");
     }
