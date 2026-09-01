@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/31 11:24:51 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/31 12:49:57 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ RequestParser::~RequestParser()
 {
 }
 
-//TODO lo uso? 
 void RequestParser::reset()
 {
 	_state = PARSING_HEADERS;

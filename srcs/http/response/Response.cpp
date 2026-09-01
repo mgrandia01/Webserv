@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 12:57:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/31 12:52:18 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,6 @@ void Response::setHeaders(const std::string& contentType)
 	headers["Date"] = getDateHeader();
 }
 
-//TODO usar siempreeeee
 Response Response::createError(HttpStatus status, const ServerConfig& server)
 {
 	Response response;
