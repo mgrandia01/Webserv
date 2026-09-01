@@ -6,18 +6,19 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/29 07:57:57 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 10:20:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/08/31 13:10:11 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/HttpHandler.hpp"
-#include "http/HttpStatus.hpp" //TODO 
+#include "http/HttpStatus.hpp" 
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
 
 #include <sstream>
 #include <vector>
 #include <iostream>
+
 
 const LocationConfig* HttpHandler::findLocation(const HttpRequest& request, const ServerConfig& server) const
 {

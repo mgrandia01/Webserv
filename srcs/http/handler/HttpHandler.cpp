@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/27 15:12:04 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/01 10:30:01 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,30 +15,7 @@
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
 #include "Response.hpp"
-#include <cerrno>
-#include <sstream>
-#include <cstdio>
-#include <iostream>
-#include <fstream>
 
-//FIXME web.cpp
-void replaceAll(std::string& str, const std::string& from, const std::string& to)
-{
-	size_t position = 0;
-
-	while (position != std::string::npos)
-	{
-		position = str.find(from, position);
-
-		if (position == std::string::npos)
-			break;
-
-		str.replace(position, from.length(), to);
-		position += to.length();
-	}
-}
-
-//FIXME utils.cpp
 Response HttpHandler::serveFile(const std::string& fullPath)
 {
 	Response response;
@@ -75,7 +52,6 @@ Response HttpHandler::serveFile(const std::string& fullPath)
 	return response;
 }
 
-//FIXME utils.cpp
 Response HttpHandler::serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath, const ServerConfig& server)
 {
 	const std::vector<std::string>& indexes = location.getIndex();
@@ -102,7 +78,6 @@ Response HttpHandler::serveDirectory(const std::string& fullPath, const Location
 	return Response::createError(FORBIDDEN, server);
 }
 
-//FIXME utils.cpp
 std::string HttpHandler::createAutoindexHtml(const std::string& requestPath, const std::vector<std::string>& entries)
 {
 	std::ifstream file("www/autoindex.html");
@@ -140,7 +115,6 @@ std::string HttpHandler::createAutoindexHtml(const std::string& requestPath, con
 	return html;
 }
 
-//FIXME utils.cpp
 Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::string& requestPath, const ServerConfig& server)
 {
 	DIR* dir = opendir(fullPath.c_str());
@@ -182,13 +156,12 @@ Response HttpHandler::generateAutoindex(const std::string& fullPath, const std::
 	return response;
 }
 
-//FIXME utils.cpp
 bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& location) const
 {
 
 	const std::map<std::string, std::string> cgi = location.getCgi();
 	if(cgi.empty())
-		return (false); //FIXME si no hay es empty?
+		return (false);
 
 	std::string path = request.path;
 	std::size_t pos = path.rfind('.');
@@ -204,73 +177,17 @@ bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& locati
 	return (false);
 }
 
-#include <dirent.h>
 
-bool HttpHandler::isImage(const std::string& filename)
-{
-	size_t pos = filename.find_last_of('.');
 
-	if (pos == std::string::npos)
-		return false;
-
-	std::string extension = filename.substr(pos + 1);
-
-	return extension == "jpg" || extension == "jpeg" || extension == "png" || extension == "gif" || extension == "webp";
-}
-//FIXME web.cpp
-std::string HttpHandler::createGalleryHtml(const std::string& uploadPath)
-{
-	DIR* dir = opendir(uploadPath.c_str());
-
-	if (!dir)
-		return "";
-
-	std::string html;
-	struct dirent* entry;
-	
-	while ((entry = readdir(dir)) != NULL)
-	{
-		std::string name = entry->d_name;
-
-		if (name == "." || name == "..")
-			continue;
-		if(!isImage(name))
-			continue;
-
-		html += "<div class=\"photo\">\n";
-		html += "    <img src=\"/uploads/" + name + "\" alt=\"" + name + "\">\n";
-		html += "    <p>" + name + "</p>\n";
-		html += "    <button class=\"delete-photo\" data-image=\"" + name + "\">x</button>\n";//FIXME
-		html += "</div>\n";
-	}
-	
-	closedir(dir);
-	
-	return html;
-}
 
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
 {
-	
-
-	//TODO cgi
-	//if (config.isCGI(request.path))
-	//	return cgiHandler.execute(request);
-
-	//if de si es .py .php 
-	//passar a Martha SERVER, PATH, QUERY Y LOCATION
-	//lo que devuelve el cgi es un string, que tendremos que parsear para devolver como respuesta
-	
 	if(isCgi(request, location))
 	{
-		std::cout << "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiisCgi torna TRUE" <<std::endl;
-		//llamar al cgi
-		//parsear resultado
-		//devoler response
-	
+		//llamar al cgi resornar response
+		//serializer response
 	}
-//TODO sacarlo a una externa
-
+	
 	if(request.path == "/my_web.html")
 	{
 		std::ifstream file("www/my_web.html");
@@ -352,24 +269,18 @@ bool HttpHandler::isPathSafe(const std::string& path)
 
 Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location,  const ServerConfig& server)
 {
-	std::cout << "===== POST =====" << std::endl;
-std::cout << "Path: [" << request.path << "]" << std::endl;
-std::cout << "Body size: " << request.body.size() << std::endl;
-
 	(void)server;
-	//TODO server para codgo de error
-	//TODO cgi
-	//if (config.isCGI(request.path))
-	//	return cgiHandler.execute(request);
-	
-	
+	if(isCgi(request, location))
+	{
+		//llamar al cgi resornar response
+		//serializer response
+	}
 
 	Response response;
 	std::string uploadStore = location.getUploadStore();
 	
 	if (uploadStore.empty())
 	{
-		//TODO portque no llamo a createError?
 		HttpStatusInfo status = getStatusInfo(403);
 
 		response.statusCode = 403;
@@ -406,7 +317,6 @@ std::cout << "Body size: " << request.body.size() << std::endl;
 
 	if (statusCode == 201)
 	{
-		//TODO succesful?
 		response.body = "Upload successful";
 		response.setHeaders("text/plain");
 	}
@@ -505,6 +415,3 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 		return handleDelete(request, *location, server);
 	return Response::createError(NOT_IMPLEMENTED, server);
 }
-
-
-

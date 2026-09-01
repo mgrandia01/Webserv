@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/08/25 20:45:11 by mcuenca-         ###   ########.fr        #
+#    Updated: 2026/08/31 12:59:09 by mgrandia         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,7 @@ SRC = main.cpp \
       http/request/RequestParserHeaders.cpp http/request/RequestParserHeadersValidation.cpp \
       http/request/RequestParserStartLine.cpp http/request/RequestParserStartLineValidation.cpp \
       http/request/RequestParserBody.cpp http/request/RequestParserBodyValidation.cpp \
-      http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp \
+      http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp http/handler/HttpHandlerWeb.cpp\
       http/response/HttpStatus.cpp http/response/HttpSerializer.cpp \
       config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp \
       config/ServerConfig.cpp config/LocationConfig.cpp config/ParserUtils.cpp

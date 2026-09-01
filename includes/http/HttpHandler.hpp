@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/26 15:36:09 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/01 10:28:34 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <cerrno>
+#include <sstream>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+
 
 class ServerConfig;
 class LocationConfig;
@@ -33,7 +39,6 @@ class HttpHandler
 
 	private:
 		//HttpHandler.cpp
-		////TODO ordenar a utils
 		Response serveFile(const std::string& fullPath);
 		Response serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath, const ServerConfig& server);
 		
@@ -48,15 +53,17 @@ class HttpHandler
 		Response handlePost(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server);
 		Response handleDelete(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server);
 
-		bool isImage(const std::string& filename);
 		//HttpHandlerUtils.cpp
 		std::string getContentType(const std::string& path);
 		bool readFile(int fd, std::string& body);
 		bool saveFile(const std::string& path, const std::string& buffer);
 		const LocationConfig* findLocation(const HttpRequest& request, const ServerConfig& server) const;
+		
+		//HttpHandlerWeb.cpp
+
+		void replaceAll(std::string& str, const std::string& from, const std::string& to);
+		bool isImage(const std::string& filename);
 		std::string createGalleryHtml(const std::string& uploadPath);
 };
-
-
 
 #endif
