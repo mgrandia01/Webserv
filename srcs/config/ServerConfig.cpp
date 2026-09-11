@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/26 20:07:25 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/11 20:35:45 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,7 +330,7 @@ void	ServerConfig::rootDirective(const t_directive& tk)
 		throw WrongChildrenExc(tk, 0);
 	else if (tk.args[0].size() == 0)
 		throw EmptyStringExc("Server", tk.name);
-	else if (tk.args[0].compare(0, 1, "/") != 0 && tk.args[0].compare(0, 2, "./") != 0)
+	else if (tk.args[0].compare(0, 1, ".") != 0 && tk.args[0].compare(0, 1, "/") != 0 && tk.args[0].compare(0, 2, "./") != 0)
 		throw SlashExc("Server", tk.name);
 
 	_root = tk.args[0];

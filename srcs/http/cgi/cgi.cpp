@@ -6,11 +6,27 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 17:54:20 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/11 18:47:23 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/11 21:07:35 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
+#include "ServerConfig.hpp"
+#include "LocationConfig.hpp"
+#include "http/HttpHandler.hpp"
+#include "CgiRequest.hpp"
+
+void	cgiManager(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request)
+{
+	//preparar parametros de exceve
+	CgiRequest	execveVars;
+
+	if (!execveVars.build(server, location, request))
+		return ;//Response Error
+	//ejecutar
+	//parser respuesta
+}
+	
+/*#include <iostream>
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
 #include "http/HttpHandler.hpp"
@@ -19,9 +35,6 @@
 
 #include <errno.h>
 #include <string.h>
-
-
-
 
 std::string	obtainExecPathname(const std::string& path, const std::map<std::string, std::string>& cgi)
 {
@@ -120,7 +133,6 @@ void	cgiManager(const ServerConfig& server, const LocationConfig& location, cons
 		close(cgiToServer[READ_PIPE]);
 		close(cgiToServer[WRITE_PIPE]);
 
-		std::cerr << "location address: " << &location << std::endl;
 		const std::map<std::string, std::string>&	tmpCgi = location.getCgi();
 		std::string									pathname = obtainExecPathname(request.path, tmpCgi);
 		char										*uriArgv[3];
@@ -157,4 +169,4 @@ void	cgiManager(const ServerConfig& server, const LocationConfig& location, cons
 	//stdout_pipe:
     //[0] READ_PIPE
     //[1] WRITE_PIPE
-}
+}*/

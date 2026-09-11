@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:45:44 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/25 19:44:13 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/11 20:35:16 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,7 @@ void	LocationConfig::rootDirective(const t_directive& child)
 		throw ArgsExc("Location", child.name, "=", 1, child.args); 
 	else if (child.args[0].size() == 0)
 		throw EmptyStringExc("Location", child.name);
-	else if (child.args[0].compare(0, 1, "/") != 0 && child.args[0].compare(0, 2, "./") != 0)
+	else if (child.args[0].compare(0, 1, ".") != 0 && child.args[0].compare(0, 1, "/") != 0 && child.args[0].compare(0, 2, "./") != 0)
 		throw SlashExc("Location", child.name);
 
 	_root = child.args[0];
