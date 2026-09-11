@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/08/28 15:30:49 by mcuenca-         ###   ########.fr        #
+#    Updated: 2026/09/11 16:37:26 by mcuenca-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@
 NAME = webserv
 CC = c++
 RM = rm -f
-FLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address #-g 
+FLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address #-g 
 # ─────────────────────────────────────────────────────────────
 # COLORESSSSSS
 # ─────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 17:54:20 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/01 20:13:32 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/11 18:47:23 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,42 @@
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
 #include "http/HttpHandler.hpp"
+#include <signal.h>
+#include <sys/wait.h>
 
-//cgiManager(server, location, request._request.path, request._request.query)
-//Response	cgiManager(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request)
+#include <errno.h>
+#include <string.h>
+
+
+
+
+std::string	obtainExecPathname(const std::string& path, const std::map<std::string, std::string>& cgi)
+{
+	std::string::size_type	pos = path.find_last_of('.');
+
+	if (pos == std::string::npos)
+		return ("");//no hay '.' para una extension
+
+	std::string										tmpExt = path.substr(pos);
+	std::map<std::string, std::string>::const_iterator	it = cgi.find(tmpExt);
+
+	if (it == cgi.end())
+		return ("");//NO hay esa extension
+
+	return (it->second);
+}
+
+std::vector<char *>	obtainEnvChar(std::vector<std::string>& environment)
+{
+	std::vector<char *>	tmpEnv;
+
+
+	for (std::vector<std::string>::iterator it = environment.begin();
+			it != environment.end(); it++)
+		tmpEnv.push_back(const_cast<char *>(it->c_str()));
+	tmpEnv.push_back(NULL);
+	return (tmpEnv);
+}
 
 std::vector<std::string>	obtainEnvVars(const ServerConfig& server, const HttpRequest& request)
 {
@@ -56,34 +89,72 @@ std::vector<std::string>	obtainEnvVars(const ServerConfig& server, const HttpReq
 	tmp.push_back("SERVER_SOFTWARE=Webserv");
 	tmp.push_back("REMOTE_ADDR=" + server.getHost());
 
-	//tmp.push_back("=" + request.);
-
 	return (tmp);
 }
 
+//cgiManager(server, location, request._request.path, request._request.query)
+//Response	cgiManager(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request)
 void	cgiManager(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request)
 {
+	//OJO!!!
+	//comprobar antes si el request.paht pide cgi y si el servidor maneja cgi
 	std::vector<std::string>	environment = obtainEnvVars(server, request);
 
-	std::cout << location.getUri() << std::endl;
-	for (size_t i = 0; i < environment.size(); i++)
-		std::cout << environment[i] << std::endl;
-	/*int	stdin_pipe[2];
-	int	stdout_pipe[2];
+	int		serverToCgi[2];
+	int		cgiToServer[2];
+	pid_t	pid;
 
-	pipe(stdin_pipe);
-	pipe(stdout_pipe);
-	if (method == GET)
+	pipe(serverToCgi);
+	pipe(cgiToServer);
+	pid = fork();
+
+	std::cout << "PID: " << pid << std::endl;
+	if (pid == 0)
 	{
-		
-	}*/
-	//pipefd[0] // read
-	//pipefd[1] // write
-	/*stdin_pipe:
-    [0] READ
-    [1] WRITE
+		dup2(serverToCgi[READ_PIPE], STDIN_FILENO);
+		dup2(cgiToServer[WRITE_PIPE], STDOUT_FILENO);
 
-	stdout_pipe:
-    [0] READ
-    [1] WRITE*/
+		close(serverToCgi[READ_PIPE]);
+		close(serverToCgi[WRITE_PIPE]);
+
+		close(cgiToServer[READ_PIPE]);
+		close(cgiToServer[WRITE_PIPE]);
+
+		std::cerr << "location address: " << &location << std::endl;
+		const std::map<std::string, std::string>&	tmpCgi = location.getCgi();
+		std::string									pathname = obtainExecPathname(request.path, tmpCgi);
+		char										*uriArgv[3];
+		std::vector<char *>							tmpEnv = obtainEnvChar(environment);
+
+	
+		uriArgv[0] = const_cast<char *>(pathname.c_str());
+		uriArgv[1] = const_cast<char *>(request.path.c_str());
+		uriArgv[2] = NULL;
+
+		execve(pathname.c_str(), uriArgv, &tmpEnv[0]);
+		std::cerr << getpid() << "HELLO execve failed: " << strerror(errno) << std::endl;
+		exit(1);	
+	}
+	else
+	{
+		close(serverToCgi[READ_PIPE]);
+		close(serverToCgi[WRITE_PIPE]);
+
+		close(cgiToServer[READ_PIPE]);
+		close(cgiToServer[WRITE_PIPE]);
+	}
+
+	std::cerr << getpid() << " waitpid\n";
+	if (pid > 0)
+	{
+		kill(pid, SIGKILL);
+		waitpid(pid, NULL, 0);
+	}
+
+	//stdin_pipe:
+    //[0] READ_PIPE
+    //[1] WRITE_PIPE
+	//stdout_pipe:
+    //[0] READ_PIPE
+    //[1] WRITE_PIPE
 }
