@@ -1,19 +1,3 @@
-# Webserv
-
-Articulo general
-https://www.alimnaqvi.com/blog/webserv
-
-NGINX
-https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms
-
-HTTP
-https://www.rfc-editor.org/info/rfc9112/
-
-HTTP
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview
-
-
-
 *This project has been created as part of the 42 curriculum by arcmarti, mcuenca-, mgrandia.*
 
 # Webserv
@@ -156,9 +140,6 @@ For example:
 ```bash
 ./webserv config/config_file.conf
 ```
-
-If a default configuration path is supported by the final implementation, the server can also be started without explicitly providing a configuration file.
-
 ---
 
 ## Configuration
@@ -208,10 +189,6 @@ The exact syntax depends on the configuration parser implemented by the project.
 
 ## Resources
 
-The main resources used during development include:
-
-## Resources
-
 The following resources were consulted during the development and testing of the project:
 
 * [Webserv — Alim Naqvi](https://www.alimnaqvi.com/blog/webserv) — General information and practical reference for the Webserv project.
@@ -232,13 +209,4 @@ They were mainly used for:
 * Suggesting test cases and debugging strategies.
 * Reviewing explanations and documentation.
 
----
-
-## Team
-
-This project was developed collaboratively by:
-
-* **arcmarti**
-* **mcuenca-**
-* **mgrandi**
-
+AI-generated suggestions were reviewed, tested and adapted to the actual project requirements and implementation.
