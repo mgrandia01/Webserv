@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/09/01 10:30:01 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/14 11:03:15 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,11 +182,15 @@ bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& locati
 
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
 {
-	if(isCgi(request, location))
+/*	if(isCgi(request, location))
 	{
+		response response;
+		response = funcion_de_cgi_martha(request, location);
 		//llamar al cgi resornar response
 		//serializer response
-	}
+		//return response;
+		//TODO timeout cgi
+	}*/
 	
 	if(request.path == "/my_web.html")
 	{

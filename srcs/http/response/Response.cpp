@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/31 12:52:18 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/15 11:04:55 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,11 @@
 #include "ServerConfig.hpp"
 #include "Response.hpp"
 
-Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream(){}
+Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream()//, _cgi_execve(NULL)
+{}
 
-Response::Response(std::string stream) : _stream(stream){}
+Response::Response(std::string stream) : _stream(stream)//, _cgi_execvbe(NULL)
+{}
 
 Response::~Response(){}
 
@@ -43,9 +45,16 @@ Response& Response::operator=(const Response& other)
 	headers = other.headers;
 	body = other.body;
 	_stream = other._stream;
+	//_cgi_execve = other._cgi_execve;
     }
     return *this;
 }
+
+/*
+const Cgi_execve* Response::getCgi_execve() const
+{
+	return _cgi_execve;
+}*/
 
 const std::string& Response::getStream() const
 {

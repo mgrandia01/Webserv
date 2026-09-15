@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/24 12:09:06 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/15 11:03:15 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,12 @@ class Response
 		
 		void setHeaders(const std::string& contentType);
 		static Response createRedirect(int code, const std::string& target);
+	
+	//	const Cgi_execve* getCgi_execve() const;//FIXME descomentar para el objeto
 	private:
 		
-		
-		
 		mutable std::string _stream;
+	//	Cgi_execve* _cgi_execve;//FIXME object CGI
 	
 };
 
