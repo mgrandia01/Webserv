@@ -40,6 +40,7 @@ class ServerConfig
 		const int&							getClientBodyTimeout() const;
 		const int&							getSendTimeout() const;
 		const int&							getKeepAliveTimeout() const;
+		int							getCgiTimeout() const;
 		const std::vector<LocationConfig>&	getLocations() const;
 
 		//EXCEPTIONS

@@ -61,6 +61,8 @@ HttpStatusInfo getStatusInfo(int statusCode)
 			return HttpStatusInfo("Internal Server Error", generateErrorPage("500 Internal Server Error"));
 		case 501:
 			return HttpStatusInfo("Not Implemented", generateErrorPage("501 Not Implemented"));
+		case 504:
+			return HttpStatusInfo("Gateway Timeout", generateErrorPage("504 Gateway Timeout"));
 		default:
 			return HttpStatusInfo("Internal Server Error", generateErrorPage("500 Internal Server Error"));
     }
