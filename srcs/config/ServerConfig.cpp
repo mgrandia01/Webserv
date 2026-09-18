@@ -171,6 +171,8 @@ const int&	ServerConfig::getClientBodyTimeout() const {return _clientBodyTimeout
 
 const int&	ServerConfig::getSendTimeout() const {return _sendTimeout;}
 
+int	ServerConfig::getCgiTimeout() const {return 3;} // TO DO forzado a 3
+
 const int&	ServerConfig::getKeepAliveTimeout() const {return _keepAliveTimeout;}
 
 const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_locations);}

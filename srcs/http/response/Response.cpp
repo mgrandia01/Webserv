@@ -21,11 +21,12 @@
 #include "http/HttpSerializer.hpp"
 #include "ServerConfig.hpp"
 #include "Response.hpp"
+#include "CGI.hpp"
 
-Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream()//, _cgi_execve(NULL)
+Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream(), _cgi(NULL) //, _cgi_execve(NULL) borrar
 {}
 
-Response::Response(std::string stream) : _stream(stream)//, _cgi_execvbe(NULL)
+Response::Response(std::string stream) : _stream(stream)//, _cgi_execvbe(NULL) valorar si aqui seria _cgi(NULL) ATENCION!!!
 {}
 
 Response::~Response(){}
@@ -45,7 +46,8 @@ Response& Response::operator=(const Response& other)
 	headers = other.headers;
 	body = other.body;
 	_stream = other._stream;
-	//_cgi_execve = other._cgi_execve;
+	//_cgi_execve = other._cgi_execve; // borrar
+	_cgi = other._cgi;
     }
     return *this;
 }
@@ -55,6 +57,23 @@ const Cgi_execve* Response::getCgi_execve() const
 {
 	return _cgi_execve;
 }*/
+
+
+CGI* Response::getCgi() const
+{
+    return _cgi;
+}
+
+void Response::clearCgi()
+{
+    _cgi = NULL;
+}
+
+void Response::setCgi(CGI* cgi)
+{
+	_cgi = cgi;
+}
+
 
 const std::string& Response::getStream() const
 {

@@ -22,6 +22,8 @@
 #include "http/HttpHandler.hpp"
 #include "Response.hpp"
 
+#include "CGI.hpp"
+
 
 class ServerManager {
 
@@ -69,6 +71,20 @@ private:
 	void	checkTimeouts();
 
 	static void signalHandler(int signal);
+
+	
+
+	// CGI activos, indexados por client fd. ServerManager es el owner de los CGI.
+    std::map<int, CGI*>                 _cgis;
+    // Permite encontrar el CGI a partir de cualquiera de sus dos FDs registrados en poll().
+    std::map<int, CGI*>                 _cgiFds;
+	void registerCgi(CGI* cgi);
+	void removeCgiFd(int fd, CGI* cgi);
+	//bool isCgiFd(int fd) const;
+	bool handleCgiEvent(int indexPoll);
+	void finishCgi(CGI* cgi);
+	void timeoutCgi(CGI* cgi);
+
 	
 };
 

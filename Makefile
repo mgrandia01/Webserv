@@ -44,7 +44,7 @@ SRC = main.cpp \
       http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp http/handler/HttpHandlerWeb.cpp\
       http/response/HttpStatus.cpp http/response/HttpSerializer.cpp \
       config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp \
-      config/ServerConfig.cpp config/LocationConfig.cpp config/ParserUtils.cpp
+      config/ServerConfig.cpp config/LocationConfig.cpp config/ParserUtils.cpp CGI.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 
