@@ -13,6 +13,7 @@ The server can be tested using standard web browsers and HTTP clients. Its behav
 The project focuses on:
 
 * HTTP request parsing and response generation.
+* Sockets for network communication.
 * Non-blocking client/server communication.
 * Handling multiple simultaneous connections.
 * Serving static websites.
@@ -24,6 +25,7 @@ The project focuses on:
 * Configurable request body size limits.
 * Multiple listening addresses and ports.
 * Route-based configuration.
+* CGI handling.
 
 The server is designed around a single event loop using an I/O multiplexing mechanism to manage client connections without blocking.
 
@@ -44,6 +46,14 @@ The current implementation supports the main requirements of the mandatory part 
 * Persistent connections / connection closing
 * Request body size limits
 
+### Network communication
+
+* Multiplexing I/O operations using poll()
+* Sockets for server listening and clients connection
+* Pipes for CGIs communication
+* Non-blocking server
+* Clients and CGIs timeouts
+
 ### Static content
 
 * Serving HTML files
@@ -53,6 +63,10 @@ The current implementation supports the main requirements of the mandatory part 
 * Configurable document roots
 * Index files
 * Directory listing / autoindex
+
+### Dinamic content
+
+* CGI scripts execution
 
 ### File handling
 
@@ -195,7 +209,10 @@ The following resources were consulted during the development and testing of the
 * [Understanding NGINX Server and Location Block Selection Algorithms — DigitalOcean](https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms) — Reference for NGINX configuration and location handling.
 * [RFC 9112 — HTTP/1.1](https://www.rfc-editor.org/info/rfc9112/) — Reference for HTTP/1.1 protocol behavior.
 * [HTTP Overview — MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview) — Reference for HTTP requests, responses, headers and methods.
+* [NGINX official website](https://www.nginx.org) — Reference for NGINX.
 * **NGINX** and **web browsers** were also used during testing to compare and validate server behavior.
+* **curl** was also used during testing to test client connections.
+* **nc** was also used during testing to debug client connections.
 
 ### AI Usage
 
@@ -208,5 +225,6 @@ They were mainly used for:
 * Helping reason about parsing and error-handling cases.
 * Suggesting test cases and debugging strategies.
 * Reviewing explanations and documentation.
+* Supporting scripts generation on other programming languages to CGIs testing.
 
 AI-generated suggestions were reviewed, tested and adapted to the actual project requirements and implementation.
