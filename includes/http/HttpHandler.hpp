@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/09/01 10:28:34 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/02 18:42:55 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #define HTTPHANDLER_HPP
 
 #include "RequestParser.hpp"
-#include "Response.hpp"
 
 #include <cassert>
 #include <cstdlib>
@@ -31,6 +30,7 @@
 
 class ServerConfig;
 class LocationConfig;
+class Response;
 
 class HttpHandler
 {

@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/08/31 12:59:09 by mgrandia         ###   ########.fr        #
+#    Updated: 2026/10/02 18:50:24 by mcuenca-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@
 NAME = webserv
 CC = c++
 RM = rm -f
-FLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address #-g 
+FLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address #-g 
 # ─────────────────────────────────────────────────────────────
 # COLORESSSSSS
 # ─────────────────────────────────────────────────────────────
@@ -44,7 +44,8 @@ SRC = main.cpp \
       http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp http/handler/HttpHandlerWeb.cpp\
       http/response/HttpStatus.cpp http/response/HttpSerializer.cpp \
       config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp \
-      config/ServerConfig.cpp config/LocationConfig.cpp config/ParserUtils.cpp CGI.cpp
+      config/ServerConfig.cpp config/LocationConfig.cpp config/ParserUtils.cpp \
+	  http/cgi/cgi.cpp http/cgi/CgiRequest.cpp http/cgi/CgiExecve.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 

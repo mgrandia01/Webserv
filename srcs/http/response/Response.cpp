@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/09/15 11:04:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/01 16:43:58 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #include "http/HttpSerializer.hpp"
 #include "ServerConfig.hpp"
 #include "Response.hpp"
-#include "CGI.hpp"
+#include "CgiExecve.hpp"
 
 Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream(), _cgi(NULL) //, _cgi_execve(NULL) borrar
 {}
@@ -59,7 +59,7 @@ const Cgi_execve* Response::getCgi_execve() const
 }*/
 
 
-CGI* Response::getCgi() const
+CgiExecve* Response::getCgi() const
 {
     return _cgi;
 }
@@ -69,7 +69,7 @@ void Response::clearCgi()
     _cgi = NULL;
 }
 
-void Response::setCgi(CGI* cgi)
+void Response::setCgi(CgiExecve* cgi)
 {
 	_cgi = cgi;
 }

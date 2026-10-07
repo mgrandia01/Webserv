@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/24 11:21:55 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/01 16:45:19 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 #include <csignal>
 #include <cerrno>
 
-#include "CGI.hpp"
+#include "CgiExecve.hpp"
 
 
 static const int LISTEN_BACKLOG = 128;
@@ -46,7 +46,7 @@ ServerManager::~ServerManager()
 	
 	//cgis
 
-	for (std::map<int, CGI*>::iterator it = _cgis.begin();
+	for (std::map<int, CgiExecve*>::iterator it = _cgis.begin();
          it != _cgis.end(); ++it)
     {
         delete it->second;
@@ -320,9 +320,9 @@ void ServerManager::checkTimeouts()
     // CGI timeouts
 
 
-	for (std::map<int, CGI*>::iterator it = _cgis.begin(); it != _cgis.end(); )
+	for (std::map<int, CgiExecve*>::iterator it = _cgis.begin(); it != _cgis.end(); )
 	{
-	    CGI* cgi = it->second;
+	    CgiExecve* cgi = it->second;
 		
 		std::map<int, Client>::iterator clientIt = _clients.find(cgi->getClientFd());
 		Client& client = clientIt->second;
@@ -543,15 +543,21 @@ bool ServerManager::readClient(int indexPoll)
 	    	
 	    	//TEMP lineas de pruebas temporal para test CGI
 	    	// simulo POST enviando body
-	    	CGI* cgia = new CGI(clientFd, "Hola desde CGI\n");
+			
+			//ARCADIO
+	    	/*CgiExecve* cgia = new CgiExecve(clientFd, "Hola desde CGI\n");*/
 			// o simulo GET enviando nada
 			//CGI* cgia = new CGI(clientFd, "");
-			response.setCgi(cgia);
+			/*response.setCgi(cgia);*/
+
+			//MARTHA
+			response.getCgi()->setClientFd(clientFd);
+			
 			// TEMP fin de zona temporal para test CGI
 
 	    	client.setResponse(response);
 
-            CGI* cgi = client.getResponse().getCgi();
+            CgiExecve* cgi = client.getResponse().getCgi();
             if (cgi)
             {
                	_pollFds[indexPoll].events = 0;
@@ -675,13 +681,13 @@ void	ServerManager::signalHandler(int signal)
 
 
 //CGIs
-void ServerManager::registerCgi(CGI* cgi)
+void ServerManager::registerCgi(CgiExecve* cgi)
 {
     if (!cgi)
         return;
 
-    int stdinFd = cgi->getStdinFd();
-    int stdoutFd = cgi->getStdoutFd();
+    int stdinFd = cgi->getWriteFd();//int stdinFd = cgi->getStdinFd();
+	int stdoutFd = cgi->getReadFd();//int stdoutFd = cgi->getStdoutFd();
     int clientFd = cgi->getClientFd();
 
     // ServerManager registra el CGI del Response mientras esta activo
@@ -715,17 +721,17 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 {
     int fd = _pollFds[indexPoll].fd;
 
-    std::map<int, CGI*>::iterator it = _cgiFds.find(fd);
+    std::map<int, CgiExecve*>::iterator it = _cgiFds.find(fd);
 
     if (it == _cgiFds.end())
         return false;
 
-    CGI* cgi = it->second;
+    CgiExecve* cgi = it->second;
     short revents = _pollFds[indexPoll].revents;
 
     // CGI STDIN ServerManager -> pipe -> CGI
 	 
-	if (fd == cgi->getStdinFd())
+	if (fd == cgi->getWriteFd())//cgi->getStdinFd())
 	{
 		// Si el otro extremo ha cerrado el pipe, ya no podemos escribir. Eliminamos este FD.
 		
@@ -737,7 +743,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 
 		if (revents & POLLOUT)
 		{
-			const std::string& input = cgi->getInput();
+			/*const std::string& input = cgi->getInput();
 			size_t offset = cgi->getBytesWritten();
 
 			if (offset < input.size())
@@ -768,6 +774,12 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 
 				removeCgiFd(fd, cgi);
 				return true;
+			}*/
+
+			if (cgi->writeToCgi())
+			{
+				removeCgiFd(fd, cgi);
+				return true;	
 			}
 		}
 
@@ -776,14 +788,14 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 
 	// CGI STDOUT CGI -> pipe -> ServerManager
 	 
-	if (fd == cgi->getStdoutFd())
+	if (fd == cgi->getReadFd())//cgi->getStdoutFd())
 	{
 		// POLLHUP puede aparecer junto con datos todavía pendientes en el pipe.
 		// Por eso intentamos leer tanto con POLLIN como con POLLHUP.
 		 
 		if (revents & (POLLIN | POLLHUP))
 		{
-			char buffer[4096];
+			/*char buffer[4096];
 
 			ssize_t bytes = read(fd, buffer, sizeof(buffer));
 
@@ -814,8 +826,20 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 			
 			std::cout << "read() failed on CGI fd " << fd << std::endl;
 			removeCgiFd(fd, cgi);
-			return true;
+			return true;*/
+
+			if (cgi->readFromCgi())
+			{
+				removeCgiFd(fd, cgi);
+				cgi->collectProcess();
+				finishCgi(cgi);
+
+				return (true);
+			}
+			
+			return (false);
 		}
+
 
 		if (revents & (POLLERR | POLLNVAL))
 		{
@@ -904,7 +928,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
     return false;
 }
 
-void ServerManager::finishCgi(CGI* cgi)
+void ServerManager::finishCgi(CgiExecve* cgi)
 {
     if (!cgi)
         return;
@@ -917,7 +941,7 @@ void ServerManager::finishCgi(CGI* cgi)
         return;
     
     Client& client = it->second;
-    Response& response = client.getResponse();
+    Response&	response = client.getResponse();
 
     //response.body = cgi->getOutput(); No se puede anyadir directamente al body pq hay headers
     //response.processCGIOutput(); metodo especial para procesar el output del CGI y reconstruir el Response
@@ -967,10 +991,10 @@ void ServerManager::removeCgiFd(int fd)
 }
 
 */
-void ServerManager::removeCgiFd(int fd, CGI* cgi)
+void ServerManager::removeCgiFd(int fd, CgiExecve* cgi)
 {
     
-    std::map<int, CGI*>::iterator it = _cgiFds.find(fd);
+    std::map<int, CgiExecve*>::iterator it = _cgiFds.find(fd);
 
     if (it == _cgiFds.end())
     	return;
@@ -986,10 +1010,10 @@ void ServerManager::removeCgiFd(int fd, CGI* cgi)
     {
         if (_pollFds[i].fd == fd)
         {
-            if (fd == cgi->getStdinFd())
-            	cgi->closeStdinFd();
-        	else if (fd == cgi->getStdoutFd())
-            	cgi->closeStdoutFd();
+            if (fd == cgi->getWriteFd())//cgi->getStdinFd())
+            	cgi->closeInFd();
+        	else if (fd == cgi->getReadFd())//cgi->getStdoutFd())
+            	cgi->closeOutFd();
             _pollFds.erase(_pollFds.begin() + i);
             return;
         }
@@ -997,7 +1021,7 @@ void ServerManager::removeCgiFd(int fd, CGI* cgi)
 }
 
 
-void ServerManager::timeoutCgi(CGI* cgi)
+void ServerManager::timeoutCgi(CgiExecve* cgi)
 {
     if (!cgi)
         return;
@@ -1010,8 +1034,8 @@ void ServerManager::timeoutCgi(CGI* cgi)
     if (cgi->getPid() > 0)
         kill(cgi->getPid(), SIGKILL);
 
-    removeCgiFd(cgi->getStdinFd(), cgi);
-    removeCgiFd(cgi->getStdoutFd(), cgi);
+    removeCgiFd(cgi->getWriteFd(), cgi);
+    removeCgiFd(cgi->getReadFd(), cgi);
 
     cgi->collectProcess();
 

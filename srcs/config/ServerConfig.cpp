@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/26 20:07:25 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/30 18:36:53 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 	tkFuncMap["client_body_timeout"] = &ServerConfig::clientBodyTimeout;
 	tkFuncMap["send_timeout"] = &ServerConfig::sendTimeout;
 	tkFuncMap["keepalive_timeout"] = &ServerConfig::keepAliveTimeout;
+	tkFuncMap["cgi_timeout"] = &ServerConfig::cgiTimeout;
 	tkFuncMap["location"] = &ServerConfig::locationDirective;
 	
 	for (std::vector<t_directive>::iterator it = tokensStruct.begin();
@@ -174,6 +175,8 @@ const int&	ServerConfig::getSendTimeout() const {return _sendTimeout;}
 int	ServerConfig::getCgiTimeout() const {return 3;} // TO DO forzado a 3
 
 const int&	ServerConfig::getKeepAliveTimeout() const {return _keepAliveTimeout;}
+
+const int&	ServerConfig::getCgiTimeout() const {return _keepAliveTimeout;}
 
 const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_locations);}
 
@@ -332,7 +335,7 @@ void	ServerConfig::rootDirective(const t_directive& tk)
 		throw WrongChildrenExc(tk, 0);
 	else if (tk.args[0].size() == 0)
 		throw EmptyStringExc("Server", tk.name);
-	else if (tk.args[0].compare(0, 1, "/") != 0 && tk.args[0].compare(0, 2, "./") != 0)
+	else if (tk.args[0].compare(0, 1, ".") != 0 && tk.args[0].compare(0, 1, "/") != 0 && tk.args[0].compare(0, 2, "./") != 0)
 		throw SlashExc("Server", tk.name);
 
 	_root = tk.args[0];
@@ -376,6 +379,8 @@ void	ServerConfig::clientBodyTimeout(const t_directive& tk){timeoutParser(_clien
 void	ServerConfig::sendTimeout(const t_directive& tk){timeoutParser(_sendTimeout, tk);}
 
 void	ServerConfig::keepAliveTimeout(const t_directive& tk){timeoutParser(_keepAliveTimeout, tk);}
+
+void	ServerConfig::cgiTimeout(const t_directive& tk){timeoutParser(_cgiTimeout, tk);}
 
 void	ServerConfig::locationDirective(const t_directive& tk)
 {

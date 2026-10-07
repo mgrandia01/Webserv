@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/09/15 11:03:15 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/30 18:16:40 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <map>
 
 #include "http/HttpStatus.hpp"
-#include "CGI.hpp"
+#include "CgiExecve.hpp"
 
 class ServerConfig;
 
@@ -47,8 +47,8 @@ class Response
 		//	const Cgi_execve* getCgi_execve() const;//FIXME descomentar para el objeto
 		//  borrar el de arriba si solo era orientativo y no hay mas partes de codigo que tengan referencias a el 
 		//  usamos el get de abajo. Si el de arriba tiene mas referencias, cambiarlas de forma analoga con el de abajo
-		CGI* getCgi() const;
-    	void setCgi(CGI* cgi);
+		CgiExecve* getCgi() const;
+    	void setCgi(CgiExecve* cgi);
     	void clearCgi();
 	private:
 		
@@ -56,7 +56,7 @@ class Response
 		//	Cgi_execve* _cgi_execve;//FIXME object CGI
 		//  borrar el de arriba si solo era orientativo y no hay mas partes de codigo que tengan referencias a el
 		// usamos el de abajo. Si el de arriba tiene mas referencias, cambiarlas de forma analoga con el de abajo
-		CGI* _cgi;
+		CgiExecve* _cgi;
 	
 };
 
