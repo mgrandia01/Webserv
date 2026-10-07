@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/30 18:36:53 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/07 13:35:20 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,11 +172,9 @@ const int&	ServerConfig::getClientBodyTimeout() const {return _clientBodyTimeout
 
 const int&	ServerConfig::getSendTimeout() const {return _sendTimeout;}
 
-int	ServerConfig::getCgiTimeout() const {return 3;} // TO DO forzado a 3
-
 const int&	ServerConfig::getKeepAliveTimeout() const {return _keepAliveTimeout;}
 
-const int&	ServerConfig::getCgiTimeout() const {return _keepAliveTimeout;}
+const int&	ServerConfig::getCgiTimeout() const {return _cgiTimeout;}
 
 const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_locations);}
 
