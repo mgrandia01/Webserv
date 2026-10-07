@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 12:29:22 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/14 11:03:15 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,6 @@
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
 #include "Response.hpp"
-#include <cerrno>
-#include <sstream>
-#include <cstdio>
-#include <iostream>
-
 
 Response HttpHandler::serveFile(const std::string& fullPath)
 {
@@ -85,32 +80,37 @@ Response HttpHandler::serveDirectory(const std::string& fullPath, const Location
 
 std::string HttpHandler::createAutoindexHtml(const std::string& requestPath, const std::vector<std::string>& entries)
 {
-	//TODO ara mateix es una mica cutreeee es veu al fer:
-	//http://localhost:8080/downloads
+	std::ifstream file("www/autoindex.html");
+
+	if(!file.is_open())
+		return "";
+	std::string html;
+	std::string line;
+
+	while (std::getline(file, line))
+	{
+		html += line;
+		html += "\n";
+	}
+	file.close();
+
+	std::string entriesHtml;
 	std::string path = requestPath;
 
 	if (path[path.size() - 1] != '/')
 		path += '/';
-	std::string html;
-
-	html += "<html>\n";
-	html += "<head><title>Index of " + requestPath + "</title></head>\n";
-	html += "<body>\n";
-	html += "<h1>Index of " + requestPath + "</h1>\n";
-	html += "<ul>\n";
 
 	for (size_t i = 0; i < entries.size(); i++)
 	{
 		std::string href = path + entries[i];
 		
-			html += "<li><a href=\"" + href + "\">";
-			html += entries[i];
-			html += "</a></li>\n";
+		entriesHtml += "<li><a href=\"" + href + "\">";
+		entriesHtml += entries[i];
+		entriesHtml += "</a></li>\n";
 	}
 
-	html += "</ul>\n";
-	html += "</body>\n";
-	html += "</html>\n";
+	replaceAll(html, "{{PATH}}", requestPath);
+	replaceAll(html, "{{ENTRIES}}", entriesHtml);
 
 	return html;
 }
@@ -161,7 +161,7 @@ bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& locati
 
 	const std::map<std::string, std::string> cgi = location.getCgi();
 	if(cgi.empty())
-		return (false); //FIXME si no hay es empty?
+		return (false);
 
 	std::string path = request.path;
 	std::size_t pos = path.rfind('.');
@@ -177,28 +177,52 @@ bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& locati
 	return (false);
 }
 
+
+
+
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
 {
-	
-
-	//TODO cgi
-	//if (config.isCGI(request.path))
-	//	return cgiHandler.execute(request);
-
-	//if de si es .py .php 
-	//passar a Martha SERVER, PATH, QUERY Y LOCATION
-	//lo que devuelve el cgi es un string, que tendremos que parsear para devolver como respuesta
-	
-	if(isCgi(request, location))
+/*	if(isCgi(request, location))
 	{
-		std::cout << "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiisCgi torna TRUE" <<std::endl;
-		//llamar al cgi
-		//parsear resultado
-		//devoler response
+		response response;
+		response = funcion_de_cgi_martha(request, location);
+		//llamar al cgi resornar response
+		//serializer response
+		//return response;
+		//TODO timeout cgi
+	}*/
 	
+	if(request.path == "/my_web.html")
+	{
+		std::ifstream file("www/my_web.html");
+
+		if (!file.is_open())
+		return Response::createError(INTERNAL_SERVER_ERROR, server);
+
+		std::string html;
+		std::string line;
+
+		while (std::getline(file, line))
+		{
+			html += line;
+			html += "\n";
+		}
+
+		file.close();
+
+		std::string imagesHtml = createGalleryHtml("./www/uploads");
+
+		replaceAll(html, "{{IMAGES}}", imagesHtml);
+		
+		Response response;
+		response.statusCode = 200;
+		response.reasonPhrase = "OK";
+		response.body = html;
+		response.setHeaders("text/html");
+
+		return response;
 	}
 
-	std::cout << "eeeeeeeeeeeestic foraaaaaaaaaa" <<std::endl;
 	std::string root = location.getRoot(); 
 	std::string fullPath = root + request.path;
 	
@@ -250,19 +274,17 @@ bool HttpHandler::isPathSafe(const std::string& path)
 Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location,  const ServerConfig& server)
 {
 	(void)server;
-	//TODO server para codgo de error
-	//TODO cgi
-	//if (config.isCGI(request.path))
-	//	return cgiHandler.execute(request);
-	
-	
+	if(isCgi(request, location))
+	{
+		//llamar al cgi resornar response
+		//serializer response
+	}
 
 	Response response;
 	std::string uploadStore = location.getUploadStore();
 	
 	if (uploadStore.empty())
 	{
-		//TODO portque no llamo a createError?
 		HttpStatusInfo status = getStatusInfo(403);
 
 		response.statusCode = 403;
@@ -299,7 +321,6 @@ Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfi
 
 	if (statusCode == 201)
 	{
-		//TODO succesful?
 		response.body = "Upload successful";
 		response.setHeaders("text/plain");
 	}
@@ -398,6 +419,3 @@ Response HttpHandler::handle(const HttpRequest& request, const ServerConfig& ser
 		return handleDelete(request, *location, server);
 	return Response::createError(NOT_IMPLEMENTED, server);
 }
-
-
-

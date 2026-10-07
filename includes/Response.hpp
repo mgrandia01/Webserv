@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/24 12:09:06 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/09/30 18:16:40 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <map>
 
 #include "http/HttpStatus.hpp"
+#include "CgiExecve.hpp"
 
 class ServerConfig;
 
@@ -42,11 +43,20 @@ class Response
 		
 		void setHeaders(const std::string& contentType);
 		static Response createRedirect(int code, const std::string& target);
+	
+		//	const Cgi_execve* getCgi_execve() const;//FIXME descomentar para el objeto
+		//  borrar el de arriba si solo era orientativo y no hay mas partes de codigo que tengan referencias a el 
+		//  usamos el get de abajo. Si el de arriba tiene mas referencias, cambiarlas de forma analoga con el de abajo
+		CgiExecve* getCgi() const;
+    	void setCgi(CgiExecve* cgi);
+    	void clearCgi();
 	private:
 		
-		
-		
 		mutable std::string _stream;
+		//	Cgi_execve* _cgi_execve;//FIXME object CGI
+		//  borrar el de arriba si solo era orientativo y no hay mas partes de codigo que tengan referencias a el
+		// usamos el de abajo. Si el de arriba tiene mas referencias, cambiarlas de forma analoga con el de abajo
+		CgiExecve* _cgi;
 	
 };
 

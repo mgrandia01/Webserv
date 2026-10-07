@@ -6,7 +6,7 @@
 #    By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/06 16:16:34 by mgrandia          #+#    #+#              #
-#    Updated: 2026/09/11 19:31:41 by mcuenca-         ###   ########.fr        #
+#    Updated: 2026/10/02 18:50:24 by mcuenca-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,11 +41,11 @@ SRC = main.cpp \
       http/request/RequestParserHeaders.cpp http/request/RequestParserHeadersValidation.cpp \
       http/request/RequestParserStartLine.cpp http/request/RequestParserStartLineValidation.cpp \
       http/request/RequestParserBody.cpp http/request/RequestParserBodyValidation.cpp \
-      http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp \
+      http/handler/HttpHandler.cpp http/handler/HttpHandlerUtils.cpp http/handler/HttpHandlerWeb.cpp\
       http/response/HttpStatus.cpp http/response/HttpSerializer.cpp \
       config/Config.cpp manager/ServerManager.cpp manager/Client.cpp http/response/Response.cpp \
       config/ServerConfig.cpp config/LocationConfig.cpp config/ParserUtils.cpp \
-	  http/cgi/cgi.cpp http/cgi/CgiRequest.cpp
+	  http/cgi/cgi.cpp http/cgi/CgiRequest.cpp http/cgi/CgiExecve.cpp
 OBJS = $(addprefix $(DIR_OBJS), $(SRC:%.cpp=%.o))
 DEP_FILES = $(OBJS:%.o=%.d)
 

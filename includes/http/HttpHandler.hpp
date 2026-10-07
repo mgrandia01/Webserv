@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/27 11:55:34 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 10:32:15 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/02 18:42:55 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #define HTTPHANDLER_HPP
 
 #include "RequestParser.hpp"
-#include "Response.hpp"
 
 #include <cassert>
 #include <cstdlib>
@@ -22,9 +21,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <cerrno>
+#include <sstream>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+
 
 class ServerConfig;
 class LocationConfig;
+class Response;
 
 class HttpHandler
 {
@@ -33,7 +39,6 @@ class HttpHandler
 
 	private:
 		//HttpHandler.cpp
-		////TODO ordenar a utils
 		Response serveFile(const std::string& fullPath);
 		Response serveDirectory(const std::string& fullPath, const LocationConfig& location, const std::string& requestPath, const ServerConfig& server);
 		
@@ -53,8 +58,12 @@ class HttpHandler
 		bool readFile(int fd, std::string& body);
 		bool saveFile(const std::string& path, const std::string& buffer);
 		const LocationConfig* findLocation(const HttpRequest& request, const ServerConfig& server) const;
+		
+		//HttpHandlerWeb.cpp
 
+		void replaceAll(std::string& str, const std::string& from, const std::string& to);
+		bool isImage(const std::string& filename);
+		std::string createGalleryHtml(const std::string& uploadPath);
 };
-
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 14:57:48 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/08/25 12:57:50 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/01 16:43:58 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,13 @@
 #include "http/HttpSerializer.hpp"
 #include "ServerConfig.hpp"
 #include "Response.hpp"
+#include "CgiExecve.hpp"
 
-Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream(){}
+Response::Response(): statusCode(0), reasonPhrase(""), headers(), body(), _stream(), _cgi(NULL) //, _cgi_execve(NULL) borrar
+{}
 
-Response::Response(std::string stream) : _stream(stream){}
+Response::Response(std::string stream) : _stream(stream)//, _cgi_execvbe(NULL) valorar si aqui seria _cgi(NULL) ATENCION!!!
+{}
 
 Response::~Response(){}
 
@@ -43,9 +46,34 @@ Response& Response::operator=(const Response& other)
 	headers = other.headers;
 	body = other.body;
 	_stream = other._stream;
+	//_cgi_execve = other._cgi_execve; // borrar
+	_cgi = other._cgi;
     }
     return *this;
 }
+
+/*
+const Cgi_execve* Response::getCgi_execve() const
+{
+	return _cgi_execve;
+}*/
+
+
+CgiExecve* Response::getCgi() const
+{
+    return _cgi;
+}
+
+void Response::clearCgi()
+{
+    _cgi = NULL;
+}
+
+void Response::setCgi(CgiExecve* cgi)
+{
+	_cgi = cgi;
+}
+
 
 const std::string& Response::getStream() const
 {
@@ -76,7 +104,6 @@ void Response::setHeaders(const std::string& contentType)
 	headers["Date"] = getDateHeader();
 }
 
-//TODO usar siempreeeee
 Response Response::createError(HttpStatus status, const ServerConfig& server)
 {
 	Response response;

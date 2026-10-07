@@ -40,6 +40,7 @@ public:
     RequestParser& getParser();
 
     const Response& getResponse() const;
+    Response& getResponse();
     void setResponse(const Response& response);
 
     bool getKeepAlive() const;

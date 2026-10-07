@@ -15,6 +15,7 @@
 #include <iostream>
 #include <ctime>
 
+
 Client::Client(int fd) : _fd(fd), _hasResponse(false), _keepAlive (true), _bytesSent(0), _lastActivity(time(NULL)),
                         _timeoutState(WAITING_REQUEST), _parser(), _response(), _serverConfig(NULL){}
 Client::~Client() {}
@@ -86,6 +87,11 @@ RequestParser& Client::getParser()
 }
 
 const Response& Client::getResponse() const
+{
+    return _response;
+}
+
+Response& Client::getResponse()
 {
     return _response;
 }
