@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/11 18:58:54 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/11 21:06:54 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/30 18:15:32 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include "ServerConfig.hpp"
 # include "LocationConfig.hpp"
 # include "http/HttpHandler.hpp"
-#include <iostream>
+# include "http/HttpStatus.hpp"
+# include <iostream>
 
 class	CgiRequest {
 
@@ -28,20 +29,28 @@ class	CgiRequest {
 		const std::vector<std::string>&	getArgv() const;
 		const std::vector<std::string>&	getEnv() const;
 		const std::string&				getBody() const;
+		const size_t&					getMethod() const;
+		const size_t&					getContentLength() const;
 
-		bool	build(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request);
+		HttpStatus	build(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request);
 	
 	private:
 		std::string					_pathname;
 		std::vector<std::string>	_argv;
 		std::vector<std::string>	_env;
 		std::string					_body;
+		size_t						_method;
+		size_t						_contentLength;
 
-		bool	validatePathname(const std::string& compiler);
-		bool	validateArguments(const std::string& root, const std::string& uriPath, std::string& cgiFile);
+		HttpStatus	validatePathname(const std::string& compiler);
+		HttpStatus	validateArguments(const std::string& root, const std::string& uriPath, std::string& cgiFile);
 		//validateEnvironment();
-		bool	buildPathname(const LocationConfig& location, const HttpRequest& request);
-		bool	buildArguments(const LocationConfig& location, const HttpRequest& request);
-		bool	buildEnvironment(const ServerConfig& server, const HttpRequest& request);
+		HttpStatus	buildPathname(const LocationConfig& location, const HttpRequest& request);
+		HttpStatus	buildArguments(const LocationConfig& location, const HttpRequest& request);
+		HttpStatus	buildEnvironment(const ServerConfig& server, const HttpRequest& request);
+
+		void	ContentLengthCgiFunc(const HttpRequest& request);
+		void	MethodCgiFunc(const HttpRequest& request);
+		void	BodyCgiFunc(const HttpRequest& request);
 };
 #endif

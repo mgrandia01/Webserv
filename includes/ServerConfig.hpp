@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/25 20:47:27 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/01 16:50:53 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class ServerConfig
 		const int&							getClientBodyTimeout() const;
 		const int&							getSendTimeout() const;
 		const int&							getKeepAliveTimeout() const;
+		const int&							getCgiTimeout() const;
 		const std::vector<LocationConfig>&	getLocations() const;
 
 		//EXCEPTIONS
@@ -80,6 +81,7 @@ class ServerConfig
 		int							_clientBodyTimeout;
 		int							_sendTimeout;
 		int							_keepAliveTimeout;
+		int							_cgiTimeout;
 		std::vector<LocationConfig>	_locations;
 
 		//FUNCTIONS
@@ -94,6 +96,7 @@ class ServerConfig
 		void	clientBodyTimeout(const t_directive& tk);
 		void	sendTimeout(const t_directive& tk);
 		void	keepAliveTimeout(const t_directive& tk);
+		void	cgiTimeout(const t_directive& tk);
 
 		void	checkIp(std::string ip);
 		void	timeoutParser(int& target, const t_directive& tk);

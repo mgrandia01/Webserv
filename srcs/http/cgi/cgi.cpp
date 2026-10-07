@@ -6,24 +6,59 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 17:54:20 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/11 21:07:35 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/02 18:02:28 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
 #include "http/HttpHandler.hpp"
+#include "http/HttpStatus.hpp"
 #include "CgiRequest.hpp"
+#include "CgiExecve.hpp"
+#include "Response.hpp"
 
-void	cgiManager(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request)
+Response cgiManager(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request)
 {
-	//preparar parametros de exceve
-	CgiRequest	execveVars;
+	/*
+		Has de crear los datos
+		Hacer ejecucion del hijo
+		Anexar el new cgi al Response para poder comunicarte con el Server non blocking
+		Devolver la Response (Preguntar a Marta como montarla bien)	
+	*/
+	HttpStatus	statusCode;
+	Response	responseCgi;
+	CgiExecve	*cgi = new CgiExecve();
 
-	if (!execveVars.build(server, location, request))
-		return ;//Response Error
-	//ejecutar
-	//parser respuesta
+	statusCode = cgi->getVars().build(server, location, request);
+	if (statusCode != OK)
+		return responseCgi.createError(statusCode, server);
+	
+	statusCode = cgi->cgiExecveFunc();
+	if (statusCode != OK)
+		return responseCgi.createError(statusCode, server);
+
+	//Montar Response y anadir el cgi, quizas encapsularlo
+	responseCgi.setCgi(cgi);
+	/*
+											cgi trigger (aqui)
+												↑
+		ServerManger	-> HttpHandler -> genera una Response ↙
+						-> Client <- se le asigna la Response
+		
+		ServerManger usa el cgi que voy a crear aqui
+		Comunicar a Arcadio que he de crearlo yo porque ha de anexarlo al Response
+
+	*/
+	return (responseCgi);
+	/*
+		Hacer writtenFunc para cuando tenga permisos
+		Hacer ReadFunc para cuando tenga permisos
+		Matar al hijo en el detructor
+
+		Comunicar a Arcadio que yo hago el new
+		Preguntar a Marta como hacer bien la Reponse(no solo Response::error)
+	*/
 }
 	
 /*#include <iostream>

@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 13:06:43 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/31 19:43:28 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/14 16:03:42 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,6 @@ typedef enum	e_methods
 	DELETE
 }	t_methods;
 
-typedef enum	e_pipe
-{
-	READ_PIPE = 0,
-	WRITE_PIPE
-}	t_pipe;
 /* ********************************* structs ******************************** */
 
 typedef struct	s_directive

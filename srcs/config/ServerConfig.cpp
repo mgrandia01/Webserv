@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/11 20:35:45 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/09/30 18:36:53 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 	tkFuncMap["client_body_timeout"] = &ServerConfig::clientBodyTimeout;
 	tkFuncMap["send_timeout"] = &ServerConfig::sendTimeout;
 	tkFuncMap["keepalive_timeout"] = &ServerConfig::keepAliveTimeout;
+	tkFuncMap["cgi_timeout"] = &ServerConfig::cgiTimeout;
 	tkFuncMap["location"] = &ServerConfig::locationDirective;
 	
 	for (std::vector<t_directive>::iterator it = tokensStruct.begin();
@@ -172,6 +173,8 @@ const int&	ServerConfig::getClientBodyTimeout() const {return _clientBodyTimeout
 const int&	ServerConfig::getSendTimeout() const {return _sendTimeout;}
 
 const int&	ServerConfig::getKeepAliveTimeout() const {return _keepAliveTimeout;}
+
+const int&	ServerConfig::getCgiTimeout() const {return _keepAliveTimeout;}
 
 const std::vector<LocationConfig>&	ServerConfig::getLocations() const {return (_locations);}
 
@@ -374,6 +377,8 @@ void	ServerConfig::clientBodyTimeout(const t_directive& tk){timeoutParser(_clien
 void	ServerConfig::sendTimeout(const t_directive& tk){timeoutParser(_sendTimeout, tk);}
 
 void	ServerConfig::keepAliveTimeout(const t_directive& tk){timeoutParser(_keepAliveTimeout, tk);}
+
+void	ServerConfig::cgiTimeout(const t_directive& tk){timeoutParser(_cgiTimeout, tk);}
 
 void	ServerConfig::locationDirective(const t_directive& tk)
 {
