@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 13:51:44 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/10/07 13:06:11 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/08/31 12:51:39 by mgrandia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,30 +102,3 @@ name=Pepe
 	}
 	return (0);
 }
-
-/*
-
-bytes = recv(fd, buffer, sizeof(buffer),0));
-parser.feed(buffer, bytes, server);
-
-if (parser.hasError())
-{
-	HttpResponse response = HttpResponse::createError(parser.getErrorCode(), server);
-	//TODO mirar si existe una pagina de error para este codigo
-	response.applyConfiguredErrorPage(server);
-	//TODO serializer:
-	std::string raw = HttpSerializer::serialize(response);
-	send(fd, raw.c_str(), raw.size(),0);	
-}
-else if (parser.isComplete())
-{
-	HttpRequest request = parser.getRequest();
-	HttpResponse response = handler.handle(request, server);
-	//TODO mirar si existe una pagina de error para este codigo
-	response.applyConfiguredErrorPage(server);
-	//TODO serializer
-	send(respone)
-}
-
-
- * */
