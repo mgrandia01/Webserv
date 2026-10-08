@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/10/08 13:39:22 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 15:22:06 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -741,7 +741,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 
 		if (revents & POLLOUT)
 		{
-			const std::string& input = cgi->getResponseBuffer();//const std::string& input = cgi->getInput();
+			/*const std::string& input = cgi->getResponseBuffer();//const std::string& input = cgi->getInput();
 			size_t offset = cgi->getBytesWritten();
 
 			if (offset < input.size())
@@ -773,14 +773,14 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 
 				removeCgiFd(fd, cgi);
 				return true;
-			}
+			}*/
 
 			//MARTHA
-			/*if (cgi->writeToCgi())
+			if (cgi->writeToCgi())
 			{
 				removeCgiFd(fd, cgi);
 				return true;	
-			}*/
+			}
 		}
 
 		return false;
@@ -795,7 +795,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 		 
 		if (revents & (POLLIN | POLLHUP))
 		{
-			char buffer[4096];
+			/*char buffer[4096];
 
 			ssize_t bytes = read(fd, buffer, sizeof(buffer));
 
@@ -826,10 +826,10 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 			
 			std::cout << "read() failed on CGI fd " << fd << std::endl;
 			removeCgiFd(fd, cgi);
-			return true;
+			return true;*/
 
 			//MARTHA
-			/*if (cgi->readFromCgi())
+			if (cgi->readFromCgi())
 			{
 				removeCgiFd(fd, cgi);
 				cgi->collectProcess();
@@ -838,7 +838,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 				return (true);
 			}
 			
-			return (false);*/
+			return (false);
 		}
 
 
