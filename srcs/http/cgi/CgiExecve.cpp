@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 15:13:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/08 13:37:14 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 16:12:27 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,11 +118,11 @@ void	CgiExecve::childManager()
 
 	std::vector<char *>			envTmp = vectorToCharPtr(_vars.getEnv());
 
-	/*std::cerr << "PATHNAME: " << pathname << "   " << std::endl;
+	std::cerr << "PATHNAME: " << pathname << "   " << std::endl;
 	for (size_t i = 0; argvTmp[i] != NULL; i++)
 		std::cerr << "ARGV: " << argvTmp[i] << std::endl;
 	for (size_t i = 0; envTmp[i] != NULL; i++)
-		std::cerr << "ENV: " << envTmp[i] << std::endl;*/
+		std::cerr << "ENV: " << envTmp[i] << std::endl;
 
 	execve(pathname, &argvTmp[0], &envTmp[0]);
 	
@@ -329,7 +329,6 @@ void	CgiExecve::cgiOutputParser(Response& cgiResponse)//<-response.processCGIOut
 
 	if (_responseBuffer.empty())
 	{
-		std::cout << "*********ESTA VACIO******* :(" << std::endl;
 		cgiResponse.createError(INTERNAL_SERVER_ERROR, _server);
 		return ;
 	}
@@ -360,12 +359,12 @@ void	CgiExecve::cgiOutputParser(Response& cgiResponse)//<-response.processCGIOut
 	cgiStatus(cgiResponse);
 	cgiBody(body, cgiResponse);
 	
-	std::cout << "C'est fine. Owarimashita." << std::endl;
+	std::cout << "C'est fine. Cgi wo warimashita." << std::endl;
 }
 
 //#PARCHE
 
-void	CgiExecve::addBytesWritten(size_t bytes)
+/*void	CgiExecve::addBytesWritten(size_t bytes)
 {
     _bytesWritten += bytes;
 }
@@ -383,5 +382,5 @@ void	CgiExecve::feed(const char* buffer, size_t size)
     std::cout << "CGI-> Feed: " << size << " bytes" << std::endl;
     std::cout.write(buffer, size);
     std::cout << std::endl;
-}
+}*/
 
