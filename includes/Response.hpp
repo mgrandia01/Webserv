@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:25:50 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/09/30 18:16:40 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 11:51:19 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,5 @@ class Response
 	
 };
 
+Response	cgiManager(const ServerConfig& server, const LocationConfig& location, const HttpRequest& request);
 #endif

@@ -6,19 +6,20 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 15:13:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/07 13:05:31 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 11:59:54 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiExecve.hpp"
 #include "Response.hpp"
+#include "ServerConfig.hpp"
 #include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
 
 /* ***************************** constr & destr ***************************** */
 
-CgiExecve::CgiExecve() {}
+CgiExecve::CgiExecve(const ServerConfig& server) : _server(server) {}
 
 CgiExecve::~CgiExecve()
 {
@@ -324,6 +325,11 @@ void	CgiExecve::cgiOutputParser(Response& cgiResponse)//<-response.processCGIOut
 	size_t		lbLen = 0;
 	size_t		lbPos;
 
+	if (_responseBuffer.empty())
+	{
+		cgiResponse.createError(INTERNAL_SERVER_ERROR, _server);
+		return ;
+	}
 	delimiter = "\r\n\r\n";
 	lbLen = 4;
 	lbPos = _responseBuffer.find(delimiter);
@@ -333,7 +339,10 @@ void	CgiExecve::cgiOutputParser(Response& cgiResponse)//<-response.processCGIOut
 		lbLen = 2;
 		lbPos = _responseBuffer.find(delimiter);
 		if (lbPos == std::string::npos)
-			return	;//error, no hay header
+		{
+			cgiResponse.createError(INTERNAL_SERVER_ERROR, _server);
+			return	;
+		}
 	}
 
 	if (delimiter == "\r\n\r\n")

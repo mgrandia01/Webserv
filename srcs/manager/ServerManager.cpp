@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/10/01 16:45:19 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 11:46:50 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -550,9 +550,6 @@ bool ServerManager::readClient(int indexPoll)
 			//CGI* cgia = new CGI(clientFd, "");
 			/*response.setCgi(cgia);*/
 
-			//MARTHA
-			response.getCgi()->setClientFd(clientFd);
-			
 			// TEMP fin de zona temporal para test CGI
 
 	    	client.setResponse(response);
@@ -560,6 +557,7 @@ bool ServerManager::readClient(int indexPoll)
             CgiExecve* cgi = client.getResponse().getCgi();
             if (cgi)
             {
+				response.getCgi()->setClientFd(clientFd);
                	_pollFds[indexPoll].events = 0;
             	registerCgi(cgi);
             }

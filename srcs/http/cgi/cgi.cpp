@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 17:54:20 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/02 18:02:28 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 11:52:32 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ Response cgiManager(const ServerConfig& server, const LocationConfig& location, 
 	*/
 	HttpStatus	statusCode;
 	Response	responseCgi;
-	CgiExecve	*cgi = new CgiExecve();
+	CgiExecve	*cgi = new CgiExecve(server);
 
 	statusCode = cgi->getVars().build(server, location, request);
 	if (statusCode != OK)

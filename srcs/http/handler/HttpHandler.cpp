@@ -6,7 +6,7 @@
 /*   By: mgrandia <mgrandia@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/21 13:07:45 by mgrandia          #+#    #+#             */
-/*   Updated: 2026/09/14 11:03:15 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/08 12:08:33 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,16 +182,9 @@ bool HttpHandler::isCgi(const HttpRequest& request, const LocationConfig& locati
 
 Response HttpHandler::handleGet(const HttpRequest& request, const LocationConfig& location, const ServerConfig& server)
 {
-/*	if(isCgi(request, location))
-	{
-		response response;
-		response = funcion_de_cgi_martha(request, location);
-		//llamar al cgi resornar response
-		//serializer response
-		//return response;
-		//TODO timeout cgi
-	}*/
-	
+	/*if(isCgi(request, location))
+		return (cgiManager(server, location, request));*/
+
 	if(request.path == "/my_web.html")
 	{
 		std::ifstream file("www/my_web.html");
@@ -273,12 +266,9 @@ bool HttpHandler::isPathSafe(const std::string& path)
 
 Response HttpHandler::handlePost(const HttpRequest& request, const LocationConfig& location,  const ServerConfig& server)
 {
-	(void)server;
-	if(isCgi(request, location))
-	{
-		//llamar al cgi resornar response
-		//serializer response
-	}
+	(void) server;
+	/*if(isCgi(request, location))
+		return (cgiManager(server, location, request));*/
 
 	Response response;
 	std::string uploadStore = location.getUploadStore();

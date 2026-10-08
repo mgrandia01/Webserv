@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 15:13:31 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/07 13:05:25 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 11:58:45 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define CGI_EXECVE_HPP
 
 # include "CgiRequest.hpp"
+# include "ServerConfig.hpp"
 
 typedef enum	e_pipe
 {
@@ -24,7 +25,7 @@ typedef enum	e_pipe
 class	CgiExecve
 {
 	public:
-		CgiExecve();
+		CgiExecve(const ServerConfig& server);
 		~CgiExecve();
 
 		CgiRequest&			getVars();
@@ -49,22 +50,21 @@ class	CgiExecve
 		HttpStatus	cgiExecveFunc();
 		void		cgiOutputParser(Response& cgiResponse);
 
-
-
 	private:
-	
-		CgiRequest	_vars;	
-		pid_t		_pid;
-		int			_clientFd;
-		int			_serverToCgi[2];
-		int			_cgiToServer[2];
-		int			_inFd;//_serverToCgi[WRITE]
-		int			_outFd;//_cgiToServer[READ]
-		size_t      _bytesWritten;
-		std::string	_responseBuffer;
-		bool		_inputClosed;
-		bool		_isFinished;
-		time_t		_startTime;
+
+		const ServerConfig&	_server;	
+		CgiRequest			_vars;	
+		pid_t				_pid;
+		int					_clientFd;
+		int					_serverToCgi[2];
+		int					_cgiToServer[2];
+		int					_inFd;//_serverToCgi[WRITE]
+		int					_outFd;//_cgiToServer[READ]
+		size_t      		_bytesWritten;
+		std::string			_responseBuffer;
+		bool				_inputClosed;
+		bool				_isFinished;
+		time_t				_startTime;
 
 		void	childManager();
 		void	parentManager();
