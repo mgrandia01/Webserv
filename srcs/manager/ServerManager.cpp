@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/10/08 11:46:50 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 15:22:06 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -741,12 +741,13 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 
 		if (revents & POLLOUT)
 		{
-			/*const std::string& input = cgi->getInput();
+			/*const std::string& input = cgi->getResponseBuffer();//const std::string& input = cgi->getInput();
 			size_t offset = cgi->getBytesWritten();
 
 			if (offset < input.size())
 			{
-				ssize_t bytes = write(cgi->getStdinFd(), input.c_str() + offset, input.size() - offset);
+				ssize_t bytes = write(cgi->getWriteFd(), input.c_str() + offset, input.size() - offset);
+				//ssize_t bytes = write(cgi->getStdinFd(), input.c_str() + offset, input.size() - offset);
 
 				if (bytes > 0)
 				{
@@ -774,6 +775,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 				return true;
 			}*/
 
+			//MARTHA
 			if (cgi->writeToCgi())
 			{
 				removeCgiFd(fd, cgi);
@@ -826,6 +828,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 			removeCgiFd(fd, cgi);
 			return true;*/
 
+			//MARTHA
 			if (cgi->readFromCgi())
 			{
 				removeCgiFd(fd, cgi);
@@ -943,6 +946,7 @@ void ServerManager::finishCgi(CgiExecve* cgi)
 
     //response.body = cgi->getOutput(); No se puede anyadir directamente al body pq hay headers
     //response.processCGIOutput(); metodo especial para procesar el output del CGI y reconstruir el Response
+	cgi->cgiOutputParser(response);
 	// Aquí el CGI ya ha terminado y su output está completo asi que puede acabarse de rellenar el Response
 
 	// El Response deja de referenciar al CGI

@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 15:13:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/08 11:59:54 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 16:12:27 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,14 +89,12 @@ HttpStatus	CgiExecve::cgiExecveFunc()
 	return (OK);
 }
 
-const char	*CgiExecve::strToCharPtr(const std::string& str)
-{return (str.c_str());}
 
-std::vector<char *>	CgiExecve::vectorToCharPtr(std::vector<std::string> vec)
+std::vector<char *>	CgiExecve::vectorToCharPtr(const std::vector<std::string>& vec)
 {
 	std::vector<char *>	tmp;
 
-	for (std::vector<std::string>::iterator it = vec.begin();
+	for (std::vector<std::string>::const_iterator it = vec.begin();
 			it != vec.end(); it++)
 		tmp.push_back(const_cast<char *>(it->c_str())); 
 	tmp.push_back(NULL);
@@ -114,15 +112,19 @@ void	CgiExecve::childManager()
 	close(_cgiToServer[READ_PIPE]);//nunca los neeite
 	close(_cgiToServer[WRITE_PIPE]);//ya estan duplicados
 
-	const char					*pathname = strToCharPtr(_vars.getPathname());
+	const char					*pathname = _vars.getPathname().c_str();
 
 	std::vector<char *>			argvTmp = vectorToCharPtr(_vars.getArgv());
-	char						**argv = &argvTmp[0];
 
 	std::vector<char *>			envTmp = vectorToCharPtr(_vars.getEnv());
-	char						**env = &envTmp[0];
 
-	execve(pathname, argv, env);
+	std::cerr << "PATHNAME: " << pathname << "   " << std::endl;
+	for (size_t i = 0; argvTmp[i] != NULL; i++)
+		std::cerr << "ARGV: " << argvTmp[i] << std::endl;
+	for (size_t i = 0; envTmp[i] != NULL; i++)
+		std::cerr << "ENV: " << envTmp[i] << std::endl;
+
+	execve(pathname, &argvTmp[0], &envTmp[0]);
 	
 	exit(1);
 }
@@ -356,4 +358,29 @@ void	CgiExecve::cgiOutputParser(Response& cgiResponse)//<-response.processCGIOut
 	cgiHeader(headersLine, delimiter, cgiResponse);
 	cgiStatus(cgiResponse);
 	cgiBody(body, cgiResponse);
+	
+	std::cout << "C'est fine. Cgi wo warimashita." << std::endl;
 }
+
+//#PARCHE
+
+/*void	CgiExecve::addBytesWritten(size_t bytes)
+{
+    _bytesWritten += bytes;
+}
+
+void	CgiExecve::feed(const char* buffer, size_t size)
+{
+    // De momento no necesitamos almacenar el output
+    // para probar el networking.
+    
+    //_output.append(buffer, size);
+    
+    (void)buffer;
+    (void)size;
+    
+    std::cout << "CGI-> Feed: " << size << " bytes" << std::endl;
+    std::cout.write(buffer, size);
+    std::cout << std::endl;
+}*/
+

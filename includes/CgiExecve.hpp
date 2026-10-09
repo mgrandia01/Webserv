@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 15:13:31 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/08 11:58:45 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/08 15:23:20 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,11 @@ class	CgiExecve
 		HttpStatus	cgiExecveFunc();
 		void		cgiOutputParser(Response& cgiResponse);
 
+		//#PARCHE
+		/*void	addBytesWritten(size_t bytes);
+		void	feed(const char* buffer, size_t size);*/
+
+
 	private:
 
 		const ServerConfig&	_server;	
@@ -69,15 +74,13 @@ class	CgiExecve
 		void	childManager();
 		void	parentManager();
 
-		const char			*strToCharPtr(const std::string& str);
-		std::vector<char *>	vectorToCharPtr(std::vector<std::string> vec);
+		std::vector<char *>	vectorToCharPtr(const std::vector<std::string>& vec);
 
 		std::vector<std::string>	strSplitStr(std::string& headersLine, std::string& delimiter);//
 		std::map<std::string, std::string>	headersToMap(std::vector<std::string> headers);
 		void	cgiHeader(std::string& headersLine, std::string delimiter, Response& cgiResponse);
 		void	cgiStatus(Response& cgiResponse);
 		void	cgiBody(std::string& body, Response& cgiResponse);
-
 };
 
 #endif
