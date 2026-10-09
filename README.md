@@ -68,11 +68,32 @@ The current implementation supports the main requirements of the mandatory part 
 
 * CGI scripts execution
 
+## CGI
+
+CGI is a mechanism that allows a server to communicate with external programs to process other types of files.
+
+- Check whether the server can handle the requested file extension.
+- Create the appropriate variables for execution.
+- Create the necessary pipes and fork a process, storing the relevant data so the server can manage it.
+- Execute the external program in the child process.
+- Read and write data using `poll()`, managing I/O operations appropriately.
+- Parse the CGI output.
+
 ### File handling
 
 * File uploads through `POST`
 * File deletion through `DELETE`
 * Configurable upload directories
+
+### Configuration File
+
+Server configuration.
+
+- Extract file information.
+- Tokenize directives.
+- Transform tokens into usable data.
+- Handle errors.
+- Determine how strict the configuration parsing should be.
 
 ### Server configuration
 
@@ -210,9 +231,15 @@ The following resources were consulted during the development and testing of the
 * [RFC 9112 — HTTP/1.1](https://www.rfc-editor.org/info/rfc9112/) — Reference for HTTP/1.1 protocol behavior.
 * [HTTP Overview — MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview) — Reference for HTTP requests, responses, headers and methods.
 * [NGINX official website](https://www.nginx.org) — Reference for NGINX.
+* [URL definition](https://developer.mozilla.org/es/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_URL)
+* [CGI definition](https://developer.mozilla.org/es/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_URL)
+
+
 * **NGINX** and **web browsers** were also used during testing to compare and validate server behavior.
 * **curl** was also used during testing to test client connections.
 * **nc** was also used during testing to debug client connections.
+- **Excalidraw** was used to create a visual diagram illustrating the encapsulation of configuration file classes.
+- **Figma** was used to create a concept map of client requests.
 
 ### AI Usage
 
