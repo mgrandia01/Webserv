@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 13:40:12 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/10 15:16:21 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:43:15 by arcmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,6 @@ bool Client::receive()
     if (!_parser.isComplete())
         _timeoutState = WAITING_REQUEST;
     
-    //para el CGI podria ser necesario diferenciar el body y entonces aprovchamos aqui
-    /*else if (_parser.hasBody())
-        _timeoutState = RECEIVING_BODY;
-    else
-        _timeoutState = WAITING_HEADERS;*/
 
     return true;
 }

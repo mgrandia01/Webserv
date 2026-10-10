@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 13:37:22 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/10 14:42:11 by mgrandia         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:45:12 by arcmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ public:
     void setServerConfig(const ServerConfig* config);
     const ServerConfig* getServerConfig() const;
 
-    //void setHasResponse(bool flag);
     
     size_t getBytesSent() const;
     void addBytesSent(size_t bytes);
@@ -77,7 +76,6 @@ private:
     int     _fd;
     bool     _hasResponse;
     
-    // TO DO se instancia desde el parserrrrrrrrrrrrrrrrrrrrrrrrrrr
     bool    _keepAlive;
 
     size_t  _bytesSent;
@@ -89,7 +87,6 @@ private:
     RequestParser   _parser;
     Response     _response;
 
-    //TODO hay uno, pero habra que poner un vector de candidatos
     const ServerConfig* _serverConfig;
 
     

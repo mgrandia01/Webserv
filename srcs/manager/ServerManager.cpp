@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:50:07 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/10/08 15:22:06 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:42:44 by arcmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@
 
 static const int LISTEN_BACKLOG = 128;
 static const int POLL_TIMEOUT = 1000;
-
-#define CGI_TIMEOUT 10 // TO DO recofer fel configgggggggggggggggggggg TEMP
 
 volatile sig_atomic_t ServerManager::_running = 1;
 
@@ -83,7 +81,6 @@ void	ServerManager::init()
 
 	createSockets();
 	initPollFds();
-	//std::cout << "Server listening..." << std::endl;
 }
 
 void	ServerManager::createSockets()
@@ -299,7 +296,7 @@ void	ServerManager::run()
 						continue ;
 					}
 				}
-			} else if (_pollFds[i].revents & POLLOUT)  // temporal debug
+			} else if (_pollFds[i].revents & POLLOUT)
 			{
 				if (sendResponse(i))
 				{
@@ -344,9 +341,9 @@ void ServerManager::checkTimeouts()
     std::map<int, Client>::iterator it = _clients.begin();
 
     // only check timeouts if there are Clients connected
-    // si virtual servers, coger el default server en el primer acceso
-    // y luego los valores ya seran los correctos
-    // esto es indep de los timeouts globales que se usan al inicio de Config
+    // virtual servers not implemented, if not taking default server in first access
+    // and after that values will be the correct ones
+    // this is independent of the global timeouts used at the beginning of Config
     while (it != _clients.end())
     {
         Client& client = it->second;
@@ -359,7 +356,7 @@ void ServerManager::checkTimeouts()
             switch (client.getTimeoutState())
 			{
 			    case WAITING_REQUEST:
-			        timeout = server->getClientHeaderTimeout(); //TO DO en el server cambiar el nombre a Request en vez de Header
+			        timeout = server->getClientHeaderTimeout();
 			        break;
 
 			    case SENDING_RESPONSE:
@@ -384,10 +381,7 @@ void ServerManager::checkTimeouts()
                 {
     				std::cout << "CLIENT data timeout WAITING REQUEST on fd: " << fd << std::endl;
                 
-                 	// TO DO este es un ejemplo de integracion de errores
-                 	// queda pendiente ampliar a todos los errores en el siguiente pullrequest
                  	Response response(Response::createError(REQUEST_TIMEOUT, *server));
-                 	//Response response("HTTP/1.1 408 Request Timeout\r\n Content-Length: 19\r\n\r\n");
                  	client.setResponse(response);
                 	client.setKeepAlive(false);
 
@@ -407,22 +401,22 @@ void ServerManager::checkTimeouts()
                 else //SENDING RESPONS OR KEEP ALIVE
                 {
                		
-					std::cout << "CLIENT data timeout SENDING RESPONSE or KEEP ALVE on fd: " << fd << std::endl;
+			std::cout << "CLIENT data timeout SENDING RESPONSE or KEEP ALVE on fd: " << fd << std::endl;
 
-			        std::map<int, Client>::iterator current = it;
-			        ++it;
+			std::map<int, Client>::iterator current = it;
+			++it;
 
-			        close(fd);
-			        _clients.erase(current);
+			close(fd);
+			_clients.erase(current);
 
-			        for (size_t i = 0; i < _pollFds.size(); ++i)
-			        {
-			            if (_pollFds[i].fd == fd)
-			            {
-			                _pollFds.erase(_pollFds.begin() + i);
-			                break;
-			            }
-			        }
+			for (size_t i = 0; i < _pollFds.size(); ++i)
+			{
+			    if (_pollFds[i].fd == fd)
+			    {
+			          _pollFds.erase(_pollFds.begin() + i);
+			          break;
+			    }
+			}
                 }
               
             }
@@ -518,7 +512,6 @@ bool ServerManager::readClient(int indexPoll)
 
     if (client.hasParserError())
     {
-        //Response response("HTTP/1.1 400 Bad Request\r\n Content-Length: 0\r\n\r\n");
         Response response(Response::createError(client.getParser().getErrorCode(), *client.getServerConfig()));
         client.setResponse(response);
     }
@@ -529,7 +522,7 @@ bool ServerManager::readClient(int indexPoll)
         const HttpRequest& request = client.getParser().getRequest();
         const ServerConfig* server = client.getServerConfig();
 
-        client.setKeepAlive(request.isKeepAlive); // TO DO habra que sacarlo de httpRequest quee habra parseado el header
+        client.setKeepAlive(request.isKeepAlive);
 
         if (!server)
         {
@@ -539,25 +532,14 @@ bool ServerManager::readClient(int indexPoll)
         else
         {
             
-	    	Response response = _requestHandler.handle(request, *server);
+	    Response response = _requestHandler.handle(request, *server);
 	    	
-	    	//TEMP lineas de pruebas temporal para test CGI
-	    	// simulo POST enviando body
-			
-			//ARCADIO
-	    	/*CgiExecve* cgia = new CgiExecve(clientFd, "Hola desde CGI\n");*/
-			// o simulo GET enviando nada
-			//CGI* cgia = new CGI(clientFd, "");
-			/*response.setCgi(cgia);*/
-
-			// TEMP fin de zona temporal para test CGI
-
-	    	client.setResponse(response);
+	    client.setResponse(response);
 
             CgiExecve* cgi = client.getResponse().getCgi();
             if (cgi)
             {
-				response.getCgi()->setClientFd(clientFd);
+		response.getCgi()->setClientFd(clientFd);
                	_pollFds[indexPoll].events = 0;
             	registerCgi(cgi);
             }
@@ -593,9 +575,8 @@ bool ServerManager::sendResponse(int index)
     const std::string& data = client.getResponse().getStream();
 
 
-    //temporal, no hay que asumir que el send envia todo
-    //send(fd, data.c_str(), data.size(), 0);
-
+    //send could not send all the info in one shoot
+    
     ssize_t bytesSent = send(fd, data.c_str() + client.getBytesSent(), data.size() - client.getBytesSent(), 0);
 
     std::cout << "-------- Data.c_str = " << data.c_str() << std::endl;
@@ -652,8 +633,7 @@ bool ServerManager::sendResponse(int index)
     	return false;
 	}
     
-	//return false;
-    
+	    
 }
 
 
@@ -684,11 +664,11 @@ void ServerManager::registerCgi(CgiExecve* cgi)
     if (!cgi)
         return;
 
-    int stdinFd = cgi->getWriteFd();//int stdinFd = cgi->getStdinFd();
-	int stdoutFd = cgi->getReadFd();//int stdoutFd = cgi->getStdoutFd();
+    int stdinFd = cgi->getWriteFd();
+    int stdoutFd = cgi->getReadFd();
     int clientFd = cgi->getClientFd();
 
-    // ServerManager registra el CGI del Response mientras esta activo
+    // ServerManager records CGI of Response while is active
     _cgis[clientFd] = cgi;
 
     struct pollfd pollFd;
@@ -731,7 +711,7 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 	 
 	if (fd == cgi->getWriteFd())//cgi->getStdinFd())
 	{
-		// Si el otro extremo ha cerrado el pipe, ya no podemos escribir. Eliminamos este FD.
+		// if the other end-side has closed the pipe, it is not possible to receive. Remove FD.
 		
 		if (revents & (POLLHUP | POLLERR | POLLNVAL))
 		{
@@ -741,41 +721,6 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 
 		if (revents & POLLOUT)
 		{
-			/*const std::string& input = cgi->getResponseBuffer();//const std::string& input = cgi->getInput();
-			size_t offset = cgi->getBytesWritten();
-
-			if (offset < input.size())
-			{
-				ssize_t bytes = write(cgi->getWriteFd(), input.c_str() + offset, input.size() - offset);
-				//ssize_t bytes = write(cgi->getStdinFd(), input.c_str() + offset, input.size() - offset);
-
-				if (bytes > 0)
-				{
-					cgi->addBytesWritten(static_cast<size_t>(bytes));
-
-					std::cout << "Wrote " << bytes << " bytes to CGI fd " << fd << std::endl;
-				}
-				else if (bytes == -1)
-				{
-					// NO permitido comprobar errno
-					std::cout << "write() failed on CGI fd " << fd << std::endl;
-
-					removeCgiFd(fd, cgi);
-					return true;
-				}
-			}
-
-			// Hemos enviado todo el body. Cerramos stdin para enviar EOF al CGI.
-			
-			if (cgi->getBytesWritten() == input.size())
-			{
-				std::cout << "CGI input completely sent on fd " << fd << std::endl;
-
-				removeCgiFd(fd, cgi);
-				return true;
-			}*/
-
-			//MARTHA
 			if (cgi->writeToCgi())
 			{
 				removeCgiFd(fd, cgi);
@@ -790,45 +735,11 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 	 
 	if (fd == cgi->getReadFd())//cgi->getStdoutFd())
 	{
-		// POLLHUP puede aparecer junto con datos todavía pendientes en el pipe.
-		// Por eso intentamos leer tanto con POLLIN como con POLLHUP.
+		// POLLHUP can happen together with data still inside the pipe.
+		// It is necessary to read as with POLLIN as with POLLHUP
 		 
 		if (revents & (POLLIN | POLLHUP))
 		{
-			/*char buffer[4096];
-
-			ssize_t bytes = read(fd, buffer, sizeof(buffer));
-
-			if (bytes > 0)
-			{
-				cgi->feed(buffer, bytes);
-
-				std::cout << "Read " << bytes << " bytes from CGI fd " << fd << std::endl;
-
-				return false;
-			}
-
-			if (bytes == 0)
-			{
-				// EOF no hay mas salida real del CGI.
-				std::cout << "CGI EOF on fd " << fd << std::endl;
-
-				
-				removeCgiFd(fd, cgi);
-				cgi->collectProcess();
-				finishCgi(cgi);
-				//asumimos que la respoisne esta preparada... veerificar esto
-
-				return true;
-			}
-
-			// read() ha fallado, pero no podemos comprobar errono usamos errno
-			
-			std::cout << "read() failed on CGI fd " << fd << std::endl;
-			removeCgiFd(fd, cgi);
-			return true;*/
-
-			//MARTHA
 			if (cgi->readFromCgi())
 			{
 				removeCgiFd(fd, cgi);
@@ -851,80 +762,6 @@ bool ServerManager::handleCgiEvent(int indexPoll)
 		}
 	}
 
-    /*if (_pollFds[indexPoll].revents & POLLOUT)
-    {
-        // WRITE to CGI in case of POST (body write)
-        const std::string& input = cgi->getInput();
-        size_t offset = cgi->getBytesWritten();
-        if (offset < input.size())
-    	{
-        	ssize_t bytes = write(cgi->getStdinFd(), input.c_str() + offset, input.size() - offset);
-        	if (bytes > 0)
-        	{
-        		cgi->addBytesWritten(static_cast<size_t>bytes);
-        		std::cout << "Wrote " << bytes << " bytes to CGI fd " << fd  << std::endl;
-        	}
-        	else if (bytes == -1)
-        	{
-            	if (errno != EAGAIN && errno != EWOULDBLOCK) // no permitido en 42
-            		std::cout << "write() failed on CGI fd " << fd << std::endl;
-            	return true;
-            }
-        }
-        if (cgi->getBytesWritten() == input.size())
-        {
-    		 std::cout << "CGI input completely sent on fd " << fd << std::endl;
-    		
-    		int stdinFd = cgi->getStdinFd();
-    		close(stdinFd); // cloe pipe write
-			_cgiFds.erase(stdinFd);
-    		_pollFds.erase(_pollFds.begin() + indexPoll);
-
-    		return true;
-    	}
-
-
-    }
-
-    if (_pollFds[indexPoll].revents & POLLIN)
-    {
-        // READ from CGI
-
-        char buffer[4096];
-        ssize_t bytes = read(fd, buffer, sizeof(buffer));
-        if (bytes > 0)
-        {
-			cgi->feed(buffer, bytes);
-			std::cout << "Read " << bytes << " bytes from CGI fd " << fd << std::endl;
-			return false;
-        }
-		else if (bytes == 0)
-		{
-			cgi->setStdoutClosed(true);
-			_cgiFds.erase(fd);
-            close(fd);
-            _pollFds.erase(_pollFds.begin() + indexPoll);
-             if (cgi->isFinished())
-    			 finishCgi(cgi);
-    		
-			//consultar el output del cgi
-			//waitpid ???? podria bloquear
-			//cosnturir response final (cidado pq ya tendria que venir rellenada)
-			std::cout << "CGI EOF on fd " << fd << std::endl;
-			return true;
-		}
-		else
-		{
-    		if (errno != EAGAIN && errno != EWOULDBLOCK) //  NO permitido segun subject en 42!!!!
-    		{
-        		// error
-        		return true;
-    		}
-		}
-
-    }*/
-
-
 
     return false;
 }
@@ -944,16 +781,12 @@ void ServerManager::finishCgi(CgiExecve* cgi)
     Client& client = it->second;
     Response&	response = client.getResponse();
 
-    //response.body = cgi->getOutput(); No se puede anyadir directamente al body pq hay headers
-    //response.processCGIOutput(); metodo especial para procesar el output del CGI y reconstruir el Response
-	cgi->cgiOutputParser(response);
-	// Aquí el CGI ya ha terminado y su output está completo asi que puede acabarse de rellenar el Response
+    cgi->cgiOutputParser(response);
+    // At this point CGI has finished and output is completed so Response can be filled
 
-	// El Response deja de referenciar al CGI
 	response.clearCgi();
 
     
-    // El Response ya debe estar rellenado aquí con el resultado del CGI
 
     
     client.setTimeoutState(SENDING_RESPONSE);
@@ -969,30 +802,10 @@ void ServerManager::finishCgi(CgiExecve* cgi)
 
     _cgis.erase(clientFd);
 
-    // El CGI lo borrara el ServerManager
     delete cgi;
 
  }
-/*
-void ServerManager::removeCgiFd(int fd)
-{
-	std::cout << "removeCgiFd(" << fd << ")" << std::endl; //temp
 
-	_cgiFds.erase(fd);
-
-	for (size_t i = 0; i < _pollFds.size(); ++i)
-	{
-		if (_pollFds[i].fd == fd)
-		{
-			std::cout << "REMOVING FROM POLL fd=" << fd << std::endl;
-			close(fd);
-			_pollFds.erase(_pollFds.begin() + i);
-			return;
-		}
-	}
-}
-
-*/
 void ServerManager::removeCgiFd(int fd, CgiExecve* cgi)
 {
     
@@ -1012,9 +825,9 @@ void ServerManager::removeCgiFd(int fd, CgiExecve* cgi)
     {
         if (_pollFds[i].fd == fd)
         {
-            if (fd == cgi->getWriteFd())//cgi->getStdinFd())
+            if (fd == cgi->getWriteFd())
             	cgi->closeInFd();
-        	else if (fd == cgi->getReadFd())//cgi->getStdoutFd())
+        	else if (fd == cgi->getReadFd())
             	cgi->closeOutFd();
             _pollFds.erase(_pollFds.begin() + i);
             return;
@@ -1032,7 +845,7 @@ void ServerManager::timeoutCgi(CgiExecve* cgi)
 
     int clientFd = cgi->getClientFd();
 
-     // Eliminar el CGI
+     // Delete CGI
     if (cgi->getPid() > 0)
         kill(cgi->getPid(), SIGKILL);
 

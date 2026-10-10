@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:47:52 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/09/30 16:37:16 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:44:48 by arcmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,12 @@ private:
 
 	
 
-	// CGI activos, indexados por client fd. ServerManager es el owner de los CGI.
-    std::map<int, CgiExecve*>                 _cgis;
-    // Permite encontrar el CGI a partir de cualquiera de sus dos FDs registrados en poll().
-    std::map<int, CgiExecve*>                 _cgiFds;
+	// CGI active, indexed by client fd. ServerManager is the owner of CGIs.
+        std::map<int, CgiExecve*>                 _cgis;
+        // To allow finding CGI by means of their both two FDs recorded in poll().
+        std::map<int, CgiExecve*>                 _cgiFds;
 	void registerCgi(CgiExecve* cgi);
 	void removeCgiFd(int fd, CgiExecve* cgi);
-	//bool isCgiFd(int fd) const;
 	bool handleCgiEvent(int indexPoll);
 	void finishCgi(CgiExecve* cgi);
 	void timeoutCgi(CgiExecve* cgi);
