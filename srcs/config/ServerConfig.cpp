@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:15:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/07 13:35:20 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 12:00:55 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ ServerConfig::ServerConfig():
 							_clientBodyTimeout(60 * 1000),
 							_sendTimeout(60 * 1000 ),
 							_keepAliveTimeout(75 * 1000),
+							_cgiTimeout(75 * 1000),
 							_locations(){}
 
 
@@ -48,7 +49,8 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 										_clientHeaderTimeout(60 * 1000),
 										_clientBodyTimeout(60 * 1000),
 										_sendTimeout(60 * 1000 ),
-										_keepAliveTimeout(75 * 1000)
+										_keepAliveTimeout(75 * 1000),
+										_cgiTimeout(75 * 1000)
 {
 	std::map<std::string, directiveFunc>	tkFuncMap;
 	std::set<std::string>					isNew;
@@ -73,7 +75,6 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 		
 		func = tkFuncMap.find(it->name);
 		if (func == tkFuncMap.end())
-			//throw ServerConfigDirectiveUnknowException(it->name);//quitar este
 			throw UnknowDirectiveExc("Server", it->name);
 		(this->*(func->second))(*it);
 
@@ -84,11 +85,6 @@ ServerConfig::ServerConfig(std::vector<t_directive>& tokensStruct) :
 	
 	resolveConfigDefaults();
 }
-
-
-//ServerConfig::ServerConfig(const ServerConfig& src){}
-
-//ServerConfig::ServerConfig& operator=(const ServerConfig& rhs){}
 
 ServerConfig::~ServerConfig(){}
 
@@ -243,7 +239,7 @@ void	ServerConfig::listenDirective(const t_directive& tk)
 			size_t	pos = tk.args[j].find(":");
 			std::string	tmp;
 			char		*end;
-			if (pos != std::string::npos)//x.x.x.x
+			if (pos != std::string::npos)
 			{
 				if (tk.args[j] == "localhost")
 					_host = "127.0.0.1";
@@ -355,7 +351,6 @@ void	ServerConfig::timeoutParser(int& target, const t_directive& tk)
 	long		value = std::strtol(tmp.c_str(), &end, 10);
 	std::string	unit = tmp.substr(end - tmp.c_str());
 
-	//NGINX uses ms and Arcadio uses seconds. Check it.
 	if (unit == "")
 		target = value;
 	else if (unit == "ms")

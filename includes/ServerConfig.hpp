@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 20:16:27 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/07 13:32:33 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:56:43 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,6 @@ class ServerConfig
 
 	private:
 		ServerConfig();
-		//ServerConfig(const ServerConfig& src);
-		//ServerConfig& operator=(const ServerConfig& rhs);
 
 		typedef void (ServerConfig::*directiveFunc)(const t_directive&);
 

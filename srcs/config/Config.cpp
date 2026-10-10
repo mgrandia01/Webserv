@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:29:23 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/25 20:48:02 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:57:32 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,6 @@ Config::Config(const char* file)
 
 	checkVirtualServers();	
 }
-
-//Config::Config(const Config& src){}
-
-//Config::operator=(const Config& rhs){}
 
 Config::~Config(){}
 
@@ -150,7 +146,7 @@ void	Config::tokenizerStruct(std::vector<t_directive>& tokensStruct,
 	}
 }
 
-//PASAR DE LECTURA A TOKEN
+//FROM READED CONTENT TO TOKEN
 std::string	Config::markerMisplaceQuote(std::string& line, char c, size_t cPos)
 {
 	std::string	mark;

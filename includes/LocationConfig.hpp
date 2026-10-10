@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:44:51 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/08/25 20:46:40 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:56:07 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,6 @@ class LocationConfig
 		typedef void (LocationConfig::*locationDirFunc)(const t_directive&);
 	
 		LocationConfig();
-		//LocationConfig(const LocationConfig& other);
-		//LocationConfig& operator=(const LocationConfig& rhs);
 
 		std::string							_uri;
 		bool								_allowMethods[3];

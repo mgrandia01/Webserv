@@ -68,7 +68,7 @@ The current implementation supports the main requirements of the mandatory part 
 
 * CGI scripts execution
 
-## CGI
+### CGI
 
 CGI is a mechanism that allows a server to communicate with external programs to process other types of files.
 
@@ -238,8 +238,8 @@ The following resources were consulted during the development and testing of the
 * **NGINX** and **web browsers** were also used during testing to compare and validate server behavior.
 * **curl** was also used during testing to test client connections.
 * **nc** was also used during testing to debug client connections.
-- **Excalidraw** was used to create a visual diagram illustrating the encapsulation of configuration file classes.
-- **Figma** was used to create a concept map of client requests.
+* **Excalidraw** was used to create a visual diagram illustrating the encapsulation of configuration file classes.
+* **Figma** was used to create a concept map of client requests.
 
 ### AI Usage
 

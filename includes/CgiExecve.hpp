@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 15:13:31 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/08 15:23:20 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:55:31 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,6 @@ class	CgiExecve
 	
 		HttpStatus	cgiExecveFunc();
 		void		cgiOutputParser(Response& cgiResponse);
-
-		//#PARCHE
-		/*void	addBytesWritten(size_t bytes);
-		void	feed(const char* buffer, size_t size);*/
-
 
 	private:
 

@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/11 18:59:00 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/01 16:58:34 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 12:05:21 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,13 @@ HttpStatus	CgiRequest::buildPathname(const LocationConfig& location, const HttpR
 	std::string::size_type						pos = fileCgi.find_last_of('.');
 
 	if (pos == std::string::npos)
-		return (BAD_REQUEST);//no hay '.' para una extension
+		return (BAD_REQUEST);//There is not '.' to make extension
 
 	std::string										extension = fileCgi.substr(pos);
 	std::map<std::string, std::string>::const_iterator	it = cgiMap.find(extension);
 
 	if (it == cgiMap.end())
-		return (NOT_IMPLEMENTED);//NO hay esa extension
+		return (NOT_IMPLEMENTED);//Server no accept this exception
 
 
 	HttpStatus	statusCode = validatePathname(it->second);
@@ -93,9 +93,9 @@ HttpStatus	CgiRequest::buildPathname(const LocationConfig& location, const HttpR
 HttpStatus	CgiRequest::validatePathname(const std::string& compiler)
 {
 	if (access(compiler.c_str(), F_OK) != 0)
-		return (INTERNAL_SERVER_ERROR);//NO existe el compiler
+		return (INTERNAL_SERVER_ERROR);//Compiler does not exist
 	else if(access(compiler.c_str(), R_OK | X_OK) != 0)
-		return (INTERNAL_SERVER_ERROR);//NO puede ejecutar el compiler
+		return (INTERNAL_SERVER_ERROR);//Compiler cannot work
 	
 	return (OK);
 }
@@ -135,9 +135,9 @@ HttpStatus	CgiRequest::validateArguments(const std::string& root,
 		return (BAD_REQUEST);
 
 	if (access(cgiFile.c_str(), F_OK) != 0)
-		return (NOT_FOUND);//NO existe esta file
+		return (NOT_FOUND);//File no exist
 	else if (access(cgiFile.c_str(), X_OK) != 0) 
-		return (FORBIDDEN);//NO puede ejecutar la file
+		return (FORBIDDEN);//File cannot exec
 
 	return (OK);
 }
@@ -153,7 +153,7 @@ HttpStatus	CgiRequest::buildEnvironment(const ServerConfig& server, const HttpRe
 	tmp.push_back("REQUEST_METHOD=" + request.method);
 	tmp.push_back("QUERY_STRING=" + request.query);
 	tmp.push_back("SERVER_PROTOCOL=" + request.version);
-	tmp.push_back("SCRIPT_NAME=" + request.path);//ver que el request.path coincida con el location block que me han pasado
+	tmp.push_back("SCRIPT_NAME=" + request.path);
 
 	it = request.headers.find("host");
 	if (it != request.headers.end())
@@ -161,7 +161,7 @@ HttpStatus	CgiRequest::buildEnvironment(const ServerConfig& server, const HttpRe
 	else
 		tmp.push_back("HTTP_HOST=");
 	size_t	pos = it->second.find(':');
-	tmp.push_back("SERVER_NAME=" + it->second.substr(0, pos));//VER que el el host(antes de ':') de client request coincida con algun server_name del server
+	tmp.push_back("SERVER_NAME=" + it->second.substr(0, pos));
 	tmp.push_back("SERVER_PORT=" + it->second.substr(pos + 1));
 
 

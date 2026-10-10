@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/14 15:13:23 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/10/08 16:12:27 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 12:02:23 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,10 @@ void	CgiExecve::childManager()
 	dup2(_serverToCgi[READ_PIPE], STDIN_FILENO);
 	dup2(_cgiToServer[WRITE_PIPE], STDOUT_FILENO);
 
-	close(_serverToCgi[READ_PIPE]);//ya estan duplicados
-	close(_serverToCgi[WRITE_PIPE]);//nunca los necesite
-	close(_cgiToServer[READ_PIPE]);//nunca los neeite
-	close(_cgiToServer[WRITE_PIPE]);//ya estan duplicados
+	close(_serverToCgi[READ_PIPE]);
+	close(_serverToCgi[WRITE_PIPE]);
+	close(_cgiToServer[READ_PIPE]);
+	close(_cgiToServer[WRITE_PIPE]);
 
 	const char					*pathname = _vars.getPathname().c_str();
 
@@ -133,8 +133,6 @@ void	CgiExecve::parentManager()
 {
 	close(_serverToCgi[READ_PIPE]);
 	close(_cgiToServer[WRITE_PIPE]);
-	//ServerToCgi[WRITE_PIPE]   // escribir body hacia CGI
-	//CgiToServer[READ_PIPE]   // leer respuesta del CGI
 	
 	_inFd = _serverToCgi[WRITE_PIPE];
 	_outFd = _cgiToServer[READ_PIPE];
@@ -321,7 +319,7 @@ void	CgiExecve::cgiStatus(Response& cgiResponse)
 	}
 }
 
-void	CgiExecve::cgiOutputParser(Response& cgiResponse)//<-response.processCGIOutput();
+void	CgiExecve::cgiOutputParser(Response& cgiResponse)
 {
 	std::string	delimiter;
 	size_t		lbLen = 0;
@@ -361,26 +359,3 @@ void	CgiExecve::cgiOutputParser(Response& cgiResponse)//<-response.processCGIOut
 	
 	std::cout << "C'est fine. Cgi wo warimashita." << std::endl;
 }
-
-//#PARCHE
-
-/*void	CgiExecve::addBytesWritten(size_t bytes)
-{
-    _bytesWritten += bytes;
-}
-
-void	CgiExecve::feed(const char* buffer, size_t size)
-{
-    // De momento no necesitamos almacenar el output
-    // para probar el networking.
-    
-    //_output.append(buffer, size);
-    
-    (void)buffer;
-    (void)size;
-    
-    std::cout << "CGI-> Feed: " << size << " bytes" << std::endl;
-    std::cout.write(buffer, size);
-    std::cout << std::endl;
-}*/
-

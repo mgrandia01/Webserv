@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/11 18:58:54 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/30 18:15:32 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:55:40 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ class	CgiRequest {
 
 		HttpStatus	validatePathname(const std::string& compiler);
 		HttpStatus	validateArguments(const std::string& root, const std::string& uriPath, std::string& cgiFile);
-		//validateEnvironment();
 		HttpStatus	buildPathname(const LocationConfig& location, const HttpRequest& request);
 		HttpStatus	buildArguments(const LocationConfig& location, const HttpRequest& request);
 		HttpStatus	buildEnvironment(const ServerConfig& server, const HttpRequest& request);

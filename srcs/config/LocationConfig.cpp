@@ -6,7 +6,7 @@
 /*   By: mcuenca- <mcuenca-@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/31 14:45:44 by mcuenca-          #+#    #+#             */
-/*   Updated: 2026/09/11 20:35:16 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:58:12 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,22 +65,6 @@ LocationConfig::LocationConfig(const t_directive& tk)
 				throw DupExc("Location", it->name);
 	}
 }
-
-
-/*LocationConfig::LocationConfig(const LocationConfig& other)
-{
- 	*this = other;
-}*/
-
-/*LocationConfig&	LocationConfig::operator=(const LocationConfig& rhs)
-{
-	if (this != &rhs)
-	{
-		//varibales
-	}
-
-	return (*this);
-}*/
 
 LocationConfig::~LocationConfig(){}
 

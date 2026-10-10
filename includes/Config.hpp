@@ -6,7 +6,7 @@
 /*   By: arcmarti <arcmarti@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/18 09:25:51 by arcmarti          #+#    #+#             */
-/*   Updated: 2026/08/25 20:47:45 by mcuenca-         ###   ########.fr       */
+/*   Updated: 2026/10/10 11:55:54 by mcuenca-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,6 @@ class Config {
 	private:
 
 		Config();
-		//Config(const Config& src);
-		//Config& operator=(const Config& rhs);
 		
 		std::vector<ServerConfig> _servers;
 
